@@ -1,0 +1,35 @@
+# Render blueprint (NOT deployed). Review, then: render.com > New > Blueprint > this repo.
+services:
+  - type: web
+    name: localledger-web
+    runtime: docker
+    plan: starter            # ~$7/mo; needed for the persistent disk
+    healthCheckPath: /healthz
+    disk:
+      name: localledger-data
+      mountPath: /app/var
+      sizeGB: 5
+    envVars:
+      - key: DATABASE_URL
+        value: sqlite:////app/var/localledger.db   # or a Render Postgres URL (postgresql+psycopg://...)
+      - key: LL_RAW_DIR
+        value: /app/var/raw
+      - key: LL_OUT_DIR
+        value: /app/var/out
+      - key: LL_CACHE_DIR
+        value: /app/var/cache
+      - key: PORTKEY_API_KEY
+        sync: false          # set in the Render dashboard; never commit it
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PILOT_PASSCODE
+        sync: false
+      - key: ADMIN_PASSCODE
+        sync: false
+      - key: LLM_BUDGET_USD
+        value: "10"
+      - key: CONTACT_EMAIL
+        value: aceamf25@gmail.com
+# Weekly jobs (ingest -> signals -> newsletter draft) run where the data lives. With the SQLite-on-disk setup
+# above, use the service shell (`ll ingest && ll signals && ll newsletter`) or local cron. For a Render cron job,
+# switch DATABASE_URL to a Render Postgres instance first (Render disks can't be shared between services).

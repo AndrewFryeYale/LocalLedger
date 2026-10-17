@@ -108,3 +108,23 @@ Endpoint changes or blocks: probe at build time, fall back, log in BLOCKERS.md, 
 6. `out/leads.csv` exists and `out/outreach/` holds ≥20 drafts; both PDFs render.
 7. `pytest` green (connector fixtures, signal math, citation enforcement, compliance block, fact-check, cache/budget, routes, SSE multiplayer with the mock LLM); `ruff check` clean; all docs present.
 8. `ll costs` shows the ledger total under $10.
+
+---
+
+## Status at end of build (2026-10-17)
+
+All six milestones were built and committed (`git log`). Deviations from the original prompt, each deliberate:
+- **LLM:** Portkey + OpenAI SDK with `gpt-5.6-luna` (Andrew's standing instruction), not the Anthropic SDK. Heavy and fast tiers are separate env vars. There's a $10 budget cap with a mock fallback.
+- **Census BPS:** built, but automated fetching is off because www2.census.gov's robots.txt disallows generic agents under RFC 9309. A manual inbox works meanwhile (BLOCKERS.md).
+- **Oil and gas:** New Mexico C-115 data comes via NM Tech GO-TECH; OCD's own report pages are behind Cloudflare Turnstile.
+- **Gaming:** Indiana (property-level PDFs, FLL Rising Star) instead of Colorado (CloudFront 403).
+- **Second war-room ticker:** TRC.
+
+## Definition of Done: verification (2026-10-17)
+- Fresh clone (`git clone` into a scratch dir, **no PORTKEY_API_KEY**): `make setup && make seed && make ingest && make signals && make newsletter && make demo` exited 0. Census degraded with its robots.txt message, and the LLM steps ran on the mock.
+- `ll stats`: 237 companies; 6 connectors with real signals (edgar, ffiec, legistar, pdf_agenda, og_state, gaming_state) across 226 tickers. `ll check-citations`: 559/559 citation URLs return HTTP 200.
+- Newsletter 2026-W42 was built from real signals with the live LLM: 8 items, a deep company note, new-to-the-universe, methodology and disclosures. Fact-check passed.
+- War rooms on PCYO (#2) and TRC (#3) completed with the live LLM. Two logged-in clients on room #2 received an identical SSE event sequence; Alice's redirect ("rerun bear case assuming lower volumes") changed the Bear's output and reran Moderator and Note writer, and Bob saw it.
+- Public pages render with disclosures; the waitlist and pilot forms write to the DB (tests).
+- `out/leads.csv` has 860 funds (97 research buyers after filters); `out/outreach/` has 50 drafts.
+- `pytest`: 113 passed; `ruff check`: clean.
