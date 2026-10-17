@@ -59,15 +59,39 @@ class RateLimiter:
             time.sleep(sleep_for)
 
 
-class RobotsCache:
-    """RFC 9309: 4xx on robots.txt -> allow all; 5xx/unreachable -> disallow all."""
+def load_robots_permissions(path: Path | None = None) -> list[dict]:
+    path = path or get_settings().config_dir / "robots_permissions.yaml"
+    if not path.exists():
+        return []
+    import yaml
 
-    def __init__(self, client: httpx.Client, user_agent: str) -> None:
+    entries = (yaml.safe_load(path.read_text()) or {}).get("permissions") or []
+    return [e for e in entries if e.get("host") and str(e.get("basis", "")).strip()]
+
+
+class RobotsCache:
+    """RFC 9309: 4xx on robots.txt -> allow all; 5xx/unreachable -> disallow all.
+
+    A host/path listed in config/robots_permissions.yaml with a written basis is allowed even if robots.txt
+    blocks generic agents.
+    """
+
+    def __init__(self, client: httpx.Client, user_agent: str, permissions: list[dict] | None = None) -> None:
         self._client = client
         self._ua = user_agent
         self._parsers: dict[str, urllib.robotparser.RobotFileParser | bool] = {}
+        self._permissions = load_robots_permissions() if permissions is None else permissions
+
+    def permitted(self, url: str) -> bool:
+        parts = urlparse(url)
+        for entry in self._permissions:
+            if entry["host"] == parts.netloc and any(parts.path.startswith(p) for p in entry.get("paths") or ["/"]):
+                return True
+        return False
 
     def allowed(self, url: str) -> bool:
+        if self.permitted(url):
+            return True
         parts = urlparse(url)
         base = f"{parts.scheme}://{parts.netloc}"
         if base not in self._parsers:
@@ -219,9 +243,7 @@ class DocStore:
         text: str | None = None,
     ) -> Document:
         sha = hashlib.sha256(content).hexdigest()
-        existing = self.session.exec(
-            select(Document).where(Document.url == url, Document.sha256 == sha)
-        ).first()
+        existing = self.session.exec(select(Document).where(Document.url == url, Document.sha256 == sha)).first()
         if existing:
             if ticker and not existing.ticker:
                 existing.ticker = ticker
@@ -273,10 +295,11 @@ def read_document_bytes(doc: Document, settings: Settings | None = None) -> byte
 def read_document_text(doc: Document, settings: Settings | None = None) -> str:
     """Plain text of a stored document (cached extraction for HTML/PDF; decoded bytes otherwise)."""
     settings = settings or get_settings()
-    if doc.text_path and doc.text_path.endswith(f".v{TEXT_VERSION}.txt.gz"):
-        path = settings.raw_dir / doc.text_path
-        if path.exists():
-            return gzip.decompress(path.read_bytes()).decode("utf-8", errors="replace")
+    # Text cache path is derived from the sha, so reading never writes to the DB (no lock contention).
+    rel = str(Path(doc.path).parent / f"{doc.sha256}.v{TEXT_VERSION}.txt.gz")
+    path = settings.raw_dir / rel
+    if path.exists():
+        return gzip.decompress(path.read_bytes()).decode("utf-8", errors="replace")
     raw = read_document_bytes(doc, settings)
     if doc.content_type == "application/pdf":
         from localledger.pdftext import pdf_to_text
@@ -287,7 +310,5 @@ def read_document_text(doc: Document, settings: Settings | None = None) -> str:
     else:
         return raw.decode("utf-8", errors="replace")
     # Extraction improved since this doc was stored: write a new versioned text file (raw bytes untouched).
-    rel = str(Path(doc.path).parent / f"{doc.sha256}.v{TEXT_VERSION}.txt.gz")
-    (settings.raw_dir / rel).write_bytes(gzip.compress(text.encode("utf-8")))
-    doc.text_path = rel
+    path.write_bytes(gzip.compress(text.encode("utf-8")))
     return text

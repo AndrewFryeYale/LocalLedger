@@ -1,0 +1,13 @@
+{% for c in companies %}
+<tr class="border-b border-slate-100 hover:bg-slate-50">
+  <td class="py-1.5 pr-2 font-mono"><a class="text-ledger-700 underline" href="/app/company/{{ c.ticker }}">{{ c.ticker }}</a></td>
+  <td class="pr-2">{{ c.name }}</td>
+  <td class="pr-2 text-right num">{{ '%.0f'|format(c.mkt_cap_musd or 0) }}M</td>
+  <td class="pr-2 text-slate-600">{{ c.archetype }}</td>
+  <td class="pr-2 text-slate-600">{{ c.analyst_coverage }}</td>
+  <td class="pr-2 text-right num">{{ c.priority|num(1) }}</td>
+  <td class="pr-2 text-right num">{{ counts.get(c.ticker, 0) }}</td>
+  <td class="pr-2 num text-slate-500">{{ latest.get(c.ticker) or '' }}</td>
+</tr>
+{% else %}<tr><td colspan="8" class="py-4 text-slate-500">No companies match.</td></tr>
+{% endfor %}

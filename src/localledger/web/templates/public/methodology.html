@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Methodology & data sources · {{ brand() }}{% endblock %}
+{% block content %}
+<div class="max-w-4xl prose">
+  <h1>Methodology &amp; data sources</h1>
+  <p>{{ brand() }} covers 237 US-listed companies under $500M of market cap whose fundamentals depend on a local or state government decision or on a public dataset: community banks, land developers, water utilities, royalty trusts, regional casinos, P&amp;C insurers and others. Most have little or no sell-side coverage.</p>
+  <h2>How a signal is made</h2>
+  <ol class="list-decimal pl-5">
+    <li><strong>Fetch.</strong> Connectors pull public records on each source's cadence, declare a User-Agent with a contact address, rate-limit themselves and follow robots.txt. Every raw file is stored with its SHA-256 so each claim can be reproduced.</li>
+    <li><strong>Map.</strong> Records are mapped to tickers using hand-maintained maps (county FIPS codes, municipal agendas, bank charters, wells, casino properties) and SEC identifiers.</li>
+    <li><strong>Score.</strong> Significance (0–1) comes from rules: the size of the move, the base it's measured on, and the type of event. The weekly feed ranks by significance blended with the company's priority score, decayed for staleness.</li>
+    <li><strong>Write.</strong> For signals above a threshold, an analyst agent writes 3–5 claims on what changed and why it matters. Each claim must cite a stored document and quote it verbatim.</li>
+    <li><strong>Verify.</strong> A fact-check pass rejects any claim whose quote isn't verbatim in the cited document, whose numbers aren't in that document, or that a second agent can't support from the cited text. Rejected claims are logged and never published.</li>
+  </ol>
+  <h2>Sources</h2>
+</div>
+<div class="max-w-5xl overflow-x-auto mt-2">
+<table class="w-full text-sm border-collapse">
+  <thead><tr class="text-left border-b border-slate-300 text-slate-600"><th class="py-2 pr-3">Source</th><th class="pr-3">Access method</th><th class="pr-3">Cadence</th><th class="pr-3">Status</th><th class="pr-3 text-right">Signals</th><th>Terms</th></tr></thead>
+  <tbody>
+  {% for s in sources %}
+  <tr class="border-b border-slate-100 align-top">
+    <td class="py-2 pr-3 font-medium">{{ s.name }}</td>
+    <td class="pr-3 text-slate-600">{{ s.access_method }}</td>
+    <td class="pr-3 text-slate-600">{{ s.cadence }}</td>
+    <td class="pr-3"><span class="text-xs px-1.5 py-0.5 rounded {{ 'bg-ledger-50 text-ledger-700' if s.status == 'available' else ('bg-amber-50 text-amber-800' if s.status == 'degraded' else 'bg-slate-100 text-slate-600') }}">{{ s.status }}</span></td>
+    <td class="pr-3 text-right num">{{ counts.get(s.id, 0) }}</td>
+    <td class="text-slate-500 text-xs">{{ s.terms_note }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+<div class="max-w-4xl prose mt-6">
+  <h2>What we don't do</h2>
+  <ul><li>No expert-network calls, no material non-public information, no scraping behind logins.</li><li>No issuer compensation of any kind.</li><li>No personalized recommendations: the research is impersonal and the same for every reader.</li></ul>
+</div>
+{% endblock %}

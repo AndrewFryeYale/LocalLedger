@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ brand() }}: independent microcap research from public records{% endblock %}</title>
+  <meta name="description" content="Independent research on under-covered US microcaps, built from local and state public records. Every claim cited.">
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script>
+    tailwind.config = { theme: { extend: {
+      fontFamily: { sans: ['ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+                    mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'] },
+      colors: { ledger: { 50: '#f2f7f5', 100: '#dcebe4', 600: '#1f6f54', 700: '#175841', 900: '#0d3326' } } } } };
+  </script>
+  <script src="https://unpkg.com/htmx.org@1.9.12/dist/htmx.min.js"></script>
+  <link rel="stylesheet" href="/static/app.css">
+  {% block head %}{% endblock %}
+</head>
+<body class="bg-white text-slate-900 antialiased">
+  <header class="border-b border-slate-200 bg-white/95 sticky top-0 z-20 backdrop-blur">
+    <div class="mx-auto max-w-7xl px-4 h-12 flex items-center gap-5 text-sm overflow-x-auto whitespace-nowrap">
+      <a href="/" class="font-semibold tracking-tight text-ledger-900 flex items-center gap-1.5">
+        <span class="inline-block w-3 h-3 bg-ledger-600"></span>{{ brand() }}</a>
+      <nav class="flex items-center gap-4 text-slate-600">
+        <a href="/sample" class="hover:text-slate-900">Sample issue</a>
+        <a href="/methodology" class="hover:text-slate-900">Methodology</a>
+        <a href="/pricing" class="hover:text-slate-900">Pricing</a>
+        {% if user %}
+        <span class="text-slate-300">|</span>
+        <a href="/app/universe" class="hover:text-slate-900">Universe</a>
+        <a href="/app/signals" class="hover:text-slate-900">Signals</a>
+        <a href="/warroom" class="hover:text-slate-900">War room</a>
+        {% if user.role == 'admin' %}<a href="/admin" class="hover:text-slate-900">Admin</a>{% endif %}
+        {% endif %}
+      </nav>
+      <div class="ml-auto flex items-center gap-3 text-slate-600">
+        {% if user %}<span class="text-xs">{{ user.name }} · {{ user.role }}</span><a href="/logout" class="hover:text-slate-900">Log out</a>
+        {% else %}<a href="/login" class="hover:text-slate-900">Pilot log in</a>{% endif %}
+      </div>
+    </div>
+  </header>
+  <main class="mx-auto max-w-7xl px-4 py-6">{% block content %}{% endblock %}</main>
+  {% include "_disclosures.html" %}
+  {% block scripts %}{% endblock %}
+</body>
+</html>

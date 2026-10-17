@@ -1,0 +1,20 @@
+# Census Building Permits Survey geographies -> tickers.
+# Add a market with one entry. level: county (state_fips + county_fips) or place (region + state_fips + place_fips).
+# FIPS codes: https://www.census.gov/library/reference/code-lists/ansi.html
+# "why" is shown on company pages; keep it to the operating exposure disclosed in the 10-K.
+geographies:
+  - {id: arapahoe-co, level: county, state_fips: "08", county_fips: "005", name: "Arapahoe County, CO", tickers: [PCYO], why: "Sky Ranch master-planned community (water/wastewater taps + lot sales)"}
+  - {id: sandoval-nm, level: county, state_fips: "35", county_fips: "043", name: "Sandoval County, NM", tickers: [AXR], why: "Rio Rancho land holdings and homebuilding"}
+  - {id: rio-rancho-nm, level: place, region: West, state_fips: "35", place_fips: "63460", name: "Rio Rancho, NM", tickers: [AXR], why: "Rio Rancho plats and permits"}
+  - {id: sussex-de, level: county, state_fips: "10", county_fips: "005", name: "Sussex County, DE", tickers: [ARTNA], why: "Fastest-growing Artesian water service territory"}
+  - {id: new-castle-de, level: county, state_fips: "10", county_fips: "003", name: "New Castle County, DE", tickers: [ARTNA], why: "Artesian core service territory"}
+  - {id: maui-hi, level: county, state_fips: "15", county_fips: "009", name: "Maui County, HI", tickers: [MLP], why: "Maui Land & Pineapple entitled land and water assets"}
+  - {id: paulding-ga, level: county, state_fips: "13", county_fips: "223", name: "Paulding County, GA", tickers: [SDHC], why: "Atlanta-division communities (verify vs 10-K community list)"}
+  - {id: bartow-ga, level: county, state_fips: "13", county_fips: "015", name: "Bartow County, GA", tickers: [SDHC], why: "Atlanta-division communities (verify vs 10-K community list)"}
+  - {id: johnston-nc, level: county, state_fips: "37", county_fips: "101", name: "Johnston County, NC", tickers: [SDHC], why: "Raleigh-division communities (verify vs 10-K community list)"}
+  - {id: rutherford-tn, level: county, state_fips: "47", county_fips: "149", name: "Rutherford County, TN", tickers: [SDHC], why: "Nashville-division communities (verify vs 10-K community list)"}
+  - {id: shelby-al, level: county, state_fips: "01", county_fips: "117", name: "Shelby County, AL", tickers: [SDHC], why: "Birmingham-division communities (verify vs 10-K community list)"}
+  - {id: kern-ca, level: county, state_fips: "06", county_fips: "029", name: "Kern County, CA", tickers: [TRC], why: "Tejon Ranch entitlements (Mountain Village, Centennial, Grapevine)"}
+  - {id: ventura-ca, level: county, state_fips: "06", county_fips: "111", name: "Ventura County, CA", tickers: [LMNR], why: "Harvest at Limoneira, Santa Paula"}
+  - {id: pinal-az, level: county, state_fips: "04", county_fips: "021", name: "Pinal County, AZ", tickers: [GWRS], why: "Global Water Resources Maricopa/Pinal service areas"}
+  - {id: loudoun-va, level: county, state_fips: "51", county_fips: "107", name: "Loudoun County, VA", tickers: [CHCI], why: "Loudoun Station transit-oriented development"}

@@ -1,0 +1,12 @@
+# Author holdings register. The publish check BLOCKS any note on a ticker listed here unless that
+# note's disclosure flag is set (`ll publish --note-id N --disclose`), and every publication prints
+# a trading-blackout reminder for blackout_days before and after.
+policy: >-
+  The author may hold positions in securities discussed. Any holding in a covered company is disclosed
+  in the relevant note. The author does not trade a covered security from {blackout_days} days before to
+  {blackout_days} days after publishing research on it.
+blackout_days: 3
+positions: []
+#  - ticker: PCYO
+#    since: 2026-01-15
+#    note: "long common"

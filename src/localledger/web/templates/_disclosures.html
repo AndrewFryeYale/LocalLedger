@@ -1,0 +1,6 @@
+<footer class="border-t border-slate-200 mt-12 bg-slate-50" id="disclosures">
+  <div class="mx-auto max-w-7xl px-4 py-6 text-xs leading-relaxed text-slate-600 grid gap-2 md:grid-cols-2">
+    {% for line in disclosures() %}<p>{{ line }}</p>{% endfor %}
+    <p class="md:col-span-2 text-slate-500">© {{ year() }} {{ brand() }} · <a class="underline" href="/disclosures">Full disclosures</a> · <a class="underline" href="/methodology">Sources &amp; methodology</a> · Contact {{ contact_email() }}</p>
+  </div>
+</footer>

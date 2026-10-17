@@ -137,8 +137,9 @@ class EdgarConnector(Connector):
         "Public filings; no login."
     )
 
-    def __init__(self, *args: Any, full_text: bool = True, frames: bool = True, today: date | None = None,
-                 **kwargs: Any) -> None:
+    def __init__(
+        self, *args: Any, full_text: bool = True, frames: bool = True, today: date | None = None, **kwargs: Any
+    ) -> None:
         super().__init__(*args, **kwargs)
         self.full_text = full_text
         self.frames = frames
@@ -148,8 +149,9 @@ class EdgarConnector(Connector):
     # --- discover -------------------------------------------------------------------------------
     def discover(self) -> list[tuple[str, Any]]:
         resp = self.http.get_ok(TICKERS_URL)
-        self.save(url=TICKERS_URL, content=resp.content, content_type="application/json",
-                  title="SEC company_tickers.json")
+        self.save(
+            url=TICKERS_URL, content=resp.content, content_type="application/json", title="SEC company_tickers.json"
+        )
         mapping = {row["ticker"].upper(): row for row in resp.json().values()}
         targets: list[tuple[str, Any]] = []
         for ticker, company in sorted(self.universe().items(), key=lambda kv: kv[1].sheet_rank or 999):
@@ -188,8 +190,13 @@ class EdgarConnector(Connector):
             return []
         if resp.status_code != 200:
             raise RuntimeError(f"frames HTTP {resp.status_code} for {url}")
-        doc = self.save(url=url, content=resp.content, content_type="application/json",
-                        title=f"XBRL frame {tag} {period}", meta={"kind": "frame", "tag": tag, "period": period})
+        doc = self.save(
+            url=url,
+            content=resp.content,
+            content_type="application/json",
+            title=f"XBRL frame {tag} {period}",
+            meta={"kind": "frame", "tag": tag, "period": period},
+        )
         return [doc]
 
     def _fetch_company(self, ticker: str) -> list[Document]:
@@ -197,8 +204,16 @@ class EdgarConnector(Connector):
         url = SUBMISSIONS_URL.format(cik=company.cik)
         resp = self.http.get_ok(url)
         sub = resp.json()
-        docs = [self.save(url=url, content=resp.content, content_type="application/json", ticker=ticker,
-                          title=f"EDGAR submissions {ticker}", meta={"kind": "submissions"})]
+        docs = [
+            self.save(
+                url=url,
+                content=resp.content,
+                content_type="application/json",
+                ticker=ticker,
+                title=f"EDGAR submissions {ticker}",
+                meta={"kind": "submissions"},
+            )
+        ]
         addr = (sub.get("addresses") or {}).get("business") or {}
         company.state = addr.get("stateOrCountry") or company.state
         company.sic = sub.get("sic") or company.sic
@@ -208,8 +223,9 @@ class EdgarConnector(Connector):
         filings = [dict(zip(recent.keys(), vals, strict=False)) for vals in zip(*recent.values(), strict=False)]
         cutoff = (self.today - timedelta(days=EVENT_WINDOW_DAYS)).isoformat()
 
-        earnings = next((f for f in filings if f["form"] in ("8-K", "8-K/A") and "2.02" in (f.get("items") or "")),
-                        None)
+        earnings = next(
+            (f for f in filings if f["form"] in ("8-K", "8-K/A") and "2.02" in (f.get("items") or "")), None
+        )
         if earnings:
             docs += self._fetch_exhibit_991(company, earnings)
         for f in filings:
@@ -235,34 +251,66 @@ class EdgarConnector(Connector):
         if known:
             return [known]
         resp = self.http.get_ok(url)
-        meta = {"kind": kind, "form": filing["form"], "accession": filing["accessionNumber"],
-                "filing_date": filing["filingDate"], "report_date": filing.get("reportDate"),
-                "items": filing.get("items"), "index_url": filing_index_url(company.cik, filing["accessionNumber"])}
-        return [self.save(url=url, content=resp.content, content_type="text/html", ticker=company.ticker,
-                          title=f"{company.ticker} {filing['form']} {filing['filingDate']}", meta=meta)]
+        meta = {
+            "kind": kind,
+            "form": filing["form"],
+            "accession": filing["accessionNumber"],
+            "filing_date": filing["filingDate"],
+            "report_date": filing.get("reportDate"),
+            "items": filing.get("items"),
+            "index_url": filing_index_url(company.cik, filing["accessionNumber"]),
+        }
+        return [
+            self.save(
+                url=url,
+                content=resp.content,
+                content_type="text/html",
+                ticker=company.ticker,
+                title=f"{company.ticker} {filing['form']} {filing['filingDate']}",
+                meta=meta,
+            )
+        ]
 
     def _fetch_exhibit_991(self, company: Company, filing: dict) -> list[Document]:
         index_url = filing_index_url(company.cik, filing["accessionNumber"])
-        meta = {"kind": "ex99", "form": filing["form"], "accession": filing["accessionNumber"],
-                "filing_date": filing["filingDate"], "report_date": filing.get("reportDate"),
-                "items": filing.get("items"), "index_url": index_url}
+        meta = {
+            "kind": "ex99",
+            "form": filing["form"],
+            "accession": filing["accessionNumber"],
+            "filing_date": filing["filingDate"],
+            "report_date": filing.get("reportDate"),
+            "items": filing.get("items"),
+            "index_url": index_url,
+        }
         existing = self.session.exec(
             select(Document).where(Document.ticker == company.ticker, Document.source_id == self.source_id)
         ).all()
         for doc in existing:
-            if doc.meta_json and json.loads(doc.meta_json).get("accession") == filing["accessionNumber"] \
-                    and json.loads(doc.meta_json).get("kind") == "ex99":
+            if (
+                doc.meta_json
+                and json.loads(doc.meta_json).get("accession") == filing["accessionNumber"]
+                and json.loads(doc.meta_json).get("kind") == "ex99"
+            ):
                 return [doc]
         index = self.http.get_ok(index_url)
         rows = parse_exhibit_index(index.content)
         ex = next((r for r in rows if r["type"].upper() in ("EX-99.1", "EX-99")), None) or next(
-            (r for r in rows if r["type"].upper().startswith("EX-99")), None)
+            (r for r in rows if r["type"].upper().startswith("EX-99")), None
+        )
         if not ex or not ex["url"]:
             return []
         resp = self.http.get_ok(ex["url"])
         ctype = "application/pdf" if ex["url"].lower().endswith(".pdf") else "text/html"
-        return [self.save(url=ex["url"], content=resp.content, content_type=ctype, ticker=company.ticker,
-                          title=f"{company.ticker} 8-K Ex. 99.1 {filing['filingDate']}", meta=meta)]
+        return [
+            self.save(
+                url=ex["url"],
+                content=resp.content,
+                content_type=ctype,
+                ticker=company.ticker,
+                title=f"{company.ticker} 8-K Ex. 99.1 {filing['filingDate']}",
+                meta=meta,
+            )
+        ]
 
     # --- parse ----------------------------------------------------------------------------------
     def parse(self, doc: Document) -> list[dict]:
@@ -286,9 +334,19 @@ class EdgarConnector(Connector):
             ticker = self._cik_to_ticker.get(int(row["cik"]))
             if not ticker:
                 continue
-            out.append({"kind": "frame", "ticker": ticker, "tag": meta["tag"], "period": meta["period"],
-                        "val": float(row["val"]), "accn": row["accn"], "end": row["end"], "cik": row["cik"],
-                        "document_id": doc.id})
+            out.append(
+                {
+                    "kind": "frame",
+                    "ticker": ticker,
+                    "tag": meta["tag"],
+                    "period": meta["period"],
+                    "val": float(row["val"]),
+                    "accn": row["accn"],
+                    "end": row["end"],
+                    "cik": row["cik"],
+                    "document_id": doc.id,
+                }
+            )
         return out
 
     def _parse_submissions(self, doc: Document) -> list[dict]:
@@ -301,9 +359,17 @@ class EdgarConnector(Connector):
             if f["filingDate"] < cutoff:
                 break
             if f["form"] in FORM_SIGNIFICANCE:
-                out.append({"kind": "form", "ticker": doc.ticker, "form": f["form"],
-                            "filing_date": f["filingDate"], "accession": f["accessionNumber"],
-                            "cik": sub.get("cik"), "document_id": doc.id})
+                out.append(
+                    {
+                        "kind": "form",
+                        "ticker": doc.ticker,
+                        "form": f["form"],
+                        "filing_date": f["filingDate"],
+                        "accession": f["accessionNumber"],
+                        "cik": sub.get("cik"),
+                        "document_id": doc.id,
+                    }
+                )
         return out
 
     # --- signals --------------------------------------------------------------------------------
@@ -319,30 +385,53 @@ class EdgarConnector(Connector):
         for r in records:
             if r["kind"] == "ex99" and r["filing_date"] >= cutoff:
                 period = r.get("report_date") or r["filing_date"]
-                drafts.append(SignalDraft(
-                    ticker=r["ticker"], metric="earnings_release", as_of=date.fromisoformat(r["filing_date"]),
-                    period=r["accession"], significance=0.45, citation_url=r["url"], document_id=r["document_id"],
-                    summary=f"{r['ticker']} filed an earnings release (8-K Item 2.02, Ex. 99.1) on "
-                            f"{r['filing_date']} (event date {period}).",
-                    detail={"index_url": r["index_url"], "items": r.get("items")}))
+                drafts.append(
+                    SignalDraft(
+                        ticker=r["ticker"],
+                        metric="earnings_release",
+                        as_of=date.fromisoformat(r["filing_date"]),
+                        period=r["accession"],
+                        significance=0.45,
+                        citation_url=r["url"],
+                        document_id=r["document_id"],
+                        summary=f"{r['ticker']} filed an earnings release (8-K Item 2.02, Ex. 99.1) on "
+                        f"{r['filing_date']} (event date {period}).",
+                        detail={"index_url": r["index_url"], "items": r.get("items")},
+                    )
+                )
             elif r["kind"] == "8k":
                 items = [i for i in (r.get("items") or "").split(",") if i in ITEM_SIGNIFICANCE]
                 if not items:
                     continue
                 top = max(items, key=lambda i: ITEM_SIGNIFICANCE[i][0])
                 sig, phrase = ITEM_SIGNIFICANCE[top]
-                drafts.append(SignalDraft(
-                    ticker=r["ticker"], metric=f"8k_item_{top}", as_of=date.fromisoformat(r["filing_date"]),
-                    period=r["accession"], significance=sig, citation_url=r["url"], document_id=r["document_id"],
-                    summary=f"{r['ticker']} {phrase} (8-K Item {top}, filed {r['filing_date']}).",
-                    detail={"items": r.get("items"), "index_url": r["index_url"]}))
+                drafts.append(
+                    SignalDraft(
+                        ticker=r["ticker"],
+                        metric=f"8k_item_{top}",
+                        as_of=date.fromisoformat(r["filing_date"]),
+                        period=r["accession"],
+                        significance=sig,
+                        citation_url=r["url"],
+                        document_id=r["document_id"],
+                        summary=f"{r['ticker']} {phrase} (8-K Item {top}, filed {r['filing_date']}).",
+                        detail={"items": r.get("items"), "index_url": r["index_url"]},
+                    )
+                )
             elif r["kind"] == "form":
                 sig, phrase = FORM_SIGNIFICANCE[r["form"]]
-                drafts.append(SignalDraft(
-                    ticker=r["ticker"], metric=f"form_{r['form'].replace(' ', '_').lower()}",
-                    as_of=date.fromisoformat(r["filing_date"]), period=r["accession"], significance=sig,
-                    citation_url=filing_index_url(r["cik"], r["accession"]), document_id=r["document_id"],
-                    summary=f"{r['ticker']} {phrase} ({r['form']}, filed {r['filing_date']})."))
+                drafts.append(
+                    SignalDraft(
+                        ticker=r["ticker"],
+                        metric=f"form_{r['form'].replace(' ', '_').lower()}",
+                        as_of=date.fromisoformat(r["filing_date"]),
+                        period=r["accession"],
+                        significance=sig,
+                        citation_url=filing_index_url(r["cik"], r["accession"]),
+                        document_id=r["document_id"],
+                        summary=f"{r['ticker']} {phrase} ({r['form']}, filed {r['filing_date']}).",
+                    )
+                )
         return drafts
 
     def _xbrl_signals(self, rows: list[dict]) -> list[SignalDraft]:
@@ -354,8 +443,14 @@ class EdgarConnector(Connector):
         for ticker in tickers:
             for metric, tags in (("revenue_yoy", REVENUE_TAGS), ("net_income_yoy", INCOME_TAGS)):
                 for current, prior in recent_quarters(self.today):
-                    pair = next(((by_key[(ticker, t, current)], by_key[(ticker, t, prior)]) for t in tags
-                                 if (ticker, t, current) in by_key and (ticker, t, prior) in by_key), None)
+                    pair = next(
+                        (
+                            (by_key[(ticker, t, current)], by_key[(ticker, t, prior)])
+                            for t in tags
+                            if (ticker, t, current) in by_key and (ticker, t, prior) in by_key
+                        ),
+                        None,
+                    )
                     if not pair:
                         continue
                     cur, pri = pair
@@ -367,23 +462,43 @@ class EdgarConnector(Connector):
                     if (cur["val"] < 0) != (pri["val"] < 0):
                         sig = max(sig, 0.6)  # swung between profit and loss
                     if metric == "revenue_yoy":
-                        label = "total interest income" if cur["tag"] == "InterestAndDividendIncomeOperating" \
-                            else "revenue"
+                        label = (
+                            "total interest income" if cur["tag"] == "InterestAndDividendIncomeOperating" else "revenue"
+                        )
                     else:
                         label = "net income"
                     if (cur["val"] < 0) != (pri["val"] < 0) or pri["val"] < 0:
-                        move_txt = "sign change; % not meaningful" if (cur["val"] < 0) != (pri["val"] < 0) \
+                        move_txt = (
+                            "sign change; % not meaningful"
+                            if (cur["val"] < 0) != (pri["val"] < 0)
                             else f"loss {'narrowed' if cur['val'] > pri['val'] else 'widened'}"
+                        )
                         pct = None if (cur["val"] < 0) != (pri["val"] < 0) else pct
                     else:
                         move_txt = f"{pct:+.1%} y/y" if pct is not None else "n/m"
-                    drafts.append(SignalDraft(
-                        ticker=ticker, metric=metric, as_of=date.fromisoformat(cur["end"]), period=current,
-                        value=cur["val"], prior_value=pri["val"], unit="USD", significance=round(sig, 4),
-                        citation_url=filing_index_url(cur["cik"], cur["accn"]), document_id=cur["document_id"],
-                        summary=f"{quarter_label(current)} {label} {fmt_musd(cur['val'])} vs "
-                                f"{fmt_musd(pri['val'])} a year earlier ({move_txt}), XBRL tag {cur['tag']}.",
-                        detail={"tag": cur["tag"], "accn": cur["accn"], "prior_accn": pri["accn"],
-                                "prior_document_id": pri["document_id"], "pct_change": pct}))
+                    drafts.append(
+                        SignalDraft(
+                            ticker=ticker,
+                            metric=metric,
+                            as_of=date.fromisoformat(cur["end"]),
+                            period=current,
+                            value=cur["val"],
+                            prior_value=pri["val"],
+                            unit="USD",
+                            significance=round(sig, 4),
+                            citation_url=filing_index_url(cur["cik"], cur["accn"]),
+                            document_id=cur["document_id"],
+                            summary=f"{quarter_label(current)} {label} {fmt_musd(cur['val'])} vs "
+                            f"{fmt_musd(pri['val'])} a year earlier ({move_txt}).",
+                            detail={
+                                "tag": cur["tag"],
+                                "accn": cur["accn"],
+                                "prior_accn": pri["accn"],
+                                "prior_document_id": pri["document_id"],
+                                "pct_change": pct,
+                                "prior_url": filing_index_url(pri["cik"], pri["accn"]),
+                            },
+                        )
+                    )
                     break  # most recent available quarter only
         return drafts

@@ -6,6 +6,7 @@ import importlib
 
 REGISTRY: dict[str, str] = {
     "edgar": "localledger.connectors.edgar:EdgarConnector",
+    "census_bps": "localledger.connectors.census_bps:CensusBpsConnector",
 }
 
 

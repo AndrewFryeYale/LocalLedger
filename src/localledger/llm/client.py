@@ -121,9 +121,7 @@ class LLM:
         tier = tier or prompt.tier
         model = self.model_for(tier)
         system, user = prompt.render(variables)
-        key = hashlib.sha256(
-            "\x1f".join([prompt_name, prompt.raw, model, system, user]).encode("utf-8")
-        ).hexdigest()
+        key = hashlib.sha256("\x1f".join([prompt_name, prompt.raw, model, system, user]).encode("utf-8")).hexdigest()
         cache_path = self.settings.cache_dir / "llm" / key[:2] / f"{key}.json"
 
         if cache_path.exists():

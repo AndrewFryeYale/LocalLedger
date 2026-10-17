@@ -1,0 +1,7 @@
+Survey,FIPS,FIPS,Region,Division,County,,1-unit,,,2-units,,,3-4 units,,,5+ units,,,1-unit rep,,,2-units rep,,,3-4 units rep,,, 5+units rep
+Date,State,County,Code,Code,Name,Bldgs,Units,Value,Bldgs,Units,Value,Bldgs,Units,Value,Bldgs,Units,Value,Bldgs,Units,Value,Bldgs,Units,Value,Bldgs,Units,Value,Bldgs,Units,Value
+ 
+202608,08,005,4,8,Arapahoe County                                             ,121,121,32653199,0,0,0,0,0,0,0,0,0,108,108,29066175,0,0,0,0,0,0,0,0,0
+202608,10,005,3,5,Sussex County                                               ,315,315,104811672,0,0,0,0,0,0,0,0,0,315,315,104811672,0,0,0,0,0,0,0,0,0
+202608,15,009,4,9,Maui County                                                 ,42,42,14863202,3,6,1363944,0,0,0,1,13,3569176,0,0,0,0,0,0,0,0,0,0,0,0
+202608,35,043,4,8,Sandoval County                                             ,54,54,12422997,0,0,0,0,0,0,0,0,0,54,54,12422997,0,0,0,0,0,0,0,0,0

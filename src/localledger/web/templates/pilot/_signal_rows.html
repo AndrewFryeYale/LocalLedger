@@ -1,0 +1,13 @@
+{% for s, c in rows %}
+<tr class="border-b border-slate-100 align-top hover:bg-slate-50">
+  <td class="py-1.5 pr-2 text-right num text-slate-500">{{ '%.2f'|format(s.rank_score) }}</td>
+  <td class="pr-2 num whitespace-nowrap">{{ s.as_of }}</td>
+  <td class="pr-2 font-mono"><a class="text-ledger-700 underline" href="/app/company/{{ s.ticker }}">{{ s.ticker }}</a></td>
+  <td class="pr-2 text-xs font-mono text-slate-500">{{ s.source_id }}</td>
+  <td class="pr-2">{{ s.summary }}<div class="text-xs text-slate-500">{{ c.name }} · {{ c.archetype }}</div></td>
+  <td class="pr-2 text-right num">{{ '%.2f'|format(s.significance) }}</td>
+  <td class="pr-2">{% set n = notes.get(s.id) %}{% if n %}<a class="underline text-xs {{ 'text-ledger-700' if n.factcheck_passed else 'text-amber-700' }}" href="/app/note/{{ n.id }}">{{ 'checked' if n.factcheck_passed else 'failed' }}</a>{% endif %}</td>
+  <td><a class="text-ledger-700 underline" href="{{ s.citation_url }}" target="_blank" rel="noopener">doc ↗</a></td>
+</tr>
+{% else %}<tr><td colspan="8" class="py-4 text-slate-500">No signals match.</td></tr>
+{% endfor %}

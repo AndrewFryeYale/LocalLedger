@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Note · {{ brand() }}{% endblock %}
+{% block content %}
+<div class="max-w-3xl">
+  <p class="text-xs text-slate-500 uppercase">{{ note.kind }} note · {{ note.status }} · model {{ note.model }} · <a class="underline" href="/app/company/{{ note.ticker }}">{{ note.ticker }}</a></p>
+  <h1 class="text-xl font-semibold mt-1">{{ note.title }}</h1>
+  <div class="mt-3 prose-note">{{ note.body_md|md }}</div>
+  <h2 class="mt-6 font-semibold text-sm uppercase tracking-wide text-slate-600">Claims and citations ({{ claims|length }} kept)</h2>
+  <ol class="mt-2 space-y-2 text-sm list-decimal pl-5">
+    {% for c in claims %}<li>{{ c.text }}<div class="text-xs text-slate-500 mt-0.5">“{{ c.citation.quote }}” · <a class="underline" href="{{ c.citation.url }}" target="_blank" rel="noopener">document {{ c.citation.document_id }} ↗</a></div></li>{% endfor %}
+  </ol>
+  <h2 class="mt-6 font-semibold text-sm uppercase tracking-wide text-slate-600">Fact-check log ({{ dropped|length }} rejected)</h2>
+  <ul class="mt-2 space-y-2 text-sm">
+    {% for d in dropped %}<li class="border-l-2 border-amber-500 pl-3"><span class="line-through text-slate-500">{{ d.claim.text }}</span><div class="text-xs text-amber-800">{{ d.stage }}: {{ d.reason }}</div></li>{% else %}<li class="text-slate-500">No claims rejected.</li>{% endfor %}
+  </ul>
+</div>
+{% endblock %}

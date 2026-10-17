@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Disclosures · {{ brand() }}{% endblock %}
+{% block content %}
+<div class="max-w-3xl prose">
+  <h1>Disclosures</h1>
+  {% for line in disclosures() %}<p>{{ line }}</p>{% endfor %}
+  <h2>Independence</h2>
+  <p>{{ brand() }} does not accept payment, sponsorship, or any other compensation from companies it covers or their affiliates, and does not produce "sponsored" or "issuer-paid" research.</p>
+  <h2>Sources</h2>
+  <p>All inputs are public records: SEC filings, government statistical releases, municipal agendas and minutes, regulatory filings and state data. We don't use expert networks, material non-public information or data behind logins. Each claim links to its source document. See <a href="/methodology">Methodology</a>.</p>
+  <h2>No advice</h2>
+  <p>Content is general and impersonal. It isn't an offer, solicitation or recommendation to buy, sell or hold any security, and isn't tailored to any person's financial situation or objectives. Do your own work and consult your own advisers.</p>
+  <h2>Accuracy</h2>
+  <p>Public data are revised, mis-keyed, delayed and sometimes wrong, and our mapping of records to companies involves judgment. We correct errors when we find them. Contact {{ contact_email() }}.</p>
+  <h2>Author holdings and trading</h2>
+  <p>The author's holdings in covered securities are recorded and disclosed in any note on that security. Publication is blocked by our system for any held security unless the note carries that disclosure, and the author observes a trading blackout around publication.</p>
+</div>
+{% endblock %}

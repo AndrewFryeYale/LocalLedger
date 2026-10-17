@@ -1,0 +1,5 @@
+Survey,FIPS,FIPS,Region,Division,County,,1-unit,,,2-units,,,3-4 units,,,5+ units,,,1-unit rep,,,2-units rep,,,3-4 units rep,,, 5+units rep
+Date,State,County,Code,Code,Name,Bldgs,Units,Value,Bldgs,Units,Value,Bldgs,Units,Value,Bldgs,Units,Value,Bldgs,Units,Value,Bldgs,Units,Value,Bldgs,Units,Value,Bldgs,Units,Value
+ 
+202508,08,005,4,8,Arapahoe County                                             ,100,100,25845864,0,0,0,0,0,0,4,558,78594022,98,98,24686589,0,0,0,0,0,0,4,558,78594022
+202508,15,009,4,9,Maui County                                                 ,30,30,11000000,0,0,0,0,0,0,0,0,0,30,30,11000000,0,0,0,0,0,0,0,0,0

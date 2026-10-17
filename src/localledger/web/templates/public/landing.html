@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="grid gap-8 lg:grid-cols-5 items-start">
+  <div class="lg:col-span-3">
+    <p class="text-xs uppercase tracking-widest text-ledger-700 font-semibold">Independent microcap research</p>
+    <h1 class="mt-2 text-3xl sm:text-4xl font-semibold tracking-tight leading-tight">The public records that move 237 under-covered microcaps, read every week.</h1>
+    <p class="mt-4 text-slate-700 max-w-2xl">Planning-board agendas, building permits, bank call reports, state production and gaming data, and SEC filings, mapped to tickers and turned into ranked, cited, fact-checked signals for fund managers.</p>
+    <ul class="mt-6 grid gap-3 sm:grid-cols-3 text-sm">
+      <li class="border border-slate-200 rounded-md p-3"><div class="text-2xl font-semibold num">{{ stats.companies }}</div><div class="text-slate-600">US-listed names under $500M; <span class="num">{{ stats.uncovered }}</span> with no verified sell-side coverage.</div></li>
+      <li class="border border-slate-200 rounded-md p-3"><div class="text-2xl font-semibold">Every claim cited</div><div class="text-slate-600">Each sentence links to its public source. A second agent re-reads it; anything it can't verify is dropped.</div></li>
+      <li class="border border-slate-200 rounded-md p-3"><div class="text-2xl font-semibold">Never issuer-paid</div><div class="text-slate-600">Public data only. No expert calls, no paid company sponsorships, no logins scraped.</div></li>
+    </ul>
+    <div class="mt-6 flex flex-wrap gap-3">
+      <a href="#waitlist" class="bg-ledger-700 text-white px-4 py-2 rounded-md text-sm font-medium">Get the free weekly issue</a>
+      <a href="/sample" class="border border-slate-300 px-4 py-2 rounded-md text-sm font-medium">Read a sample issue</a>
+      <a href="/pricing#pilot" class="px-4 py-2 rounded-md text-sm font-medium text-ledger-700 underline">Request a fund pilot</a>
+    </div>
+  </div>
+  <div class="lg:col-span-2">
+    <p class="text-xs uppercase tracking-widest text-slate-500 mb-2">A real signal from this week's feed</p>
+    {% if sig %}{% include "_signal_card.html" %}{% else %}<p class="text-sm text-slate-500">Run <code>ll ingest</code> to populate signals.</p>{% endif %}
+  </div>
+</section>
+
+<section class="mt-12 grid gap-6 md:grid-cols-3 text-sm">
+  <div><h2 class="font-semibold">1 · Ingest</h2><p class="text-slate-600 mt-1">Connectors pull filings and local-government data on a schedule, store every raw file with its hash, and respect each source's terms and robots.txt.</p></div>
+  <div><h2 class="font-semibold">2 · Map and rank</h2><p class="text-slate-600 mt-1">Each record is mapped to the tickers it affects and scored for significance. Rules come first; a model only adjusts the score at the margin.</p></div>
+  <div><h2 class="font-semibold">3 · Write and verify</h2><p class="text-slate-600 mt-1">An analyst agent writes what changed and why it matters. A fact-checker drops any claim that isn't in the cited text.</p></div>
+</section>
+
+<section id="waitlist" class="mt-12 grid gap-6 md:grid-cols-2">
+  <div class="border border-slate-200 rounded-md p-5">
+    <h2 class="font-semibold">Free weekly issue</h2>
+    <p class="text-sm text-slate-600 mt-1">The 5–8 most significant signals of the week, plus one deeper company note. Impersonal research, not advice.</p>
+    {% include "public/_waitlist_form.html" %}
+  </div>
+  <div class="border border-slate-200 rounded-md p-5" id="pilot">
+    <h2 class="font-semibold">Fund pilot</h2>
+    <p class="text-sm text-slate-600 mt-1">Platform access for your team: the full signal feed, company pages and the earnings war room. Four weeks, no cost.</p>
+    {% include "public/_pilot_form.html" %}
+  </div>
+</section>
+{% endblock %}

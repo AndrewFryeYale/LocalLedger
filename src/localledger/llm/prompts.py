@@ -1,13 +1,13 @@
 """Prompt files live in /prompts/*.md. Format:
 
-    ---
-    tier: fast            # fast | heavy
-    max_tokens: 2000
-    ---
-    ## system
-    ...
-    ## user
-    ... {{ jinja_variables }} ...
+---
+tier: fast            # fast | heavy
+max_tokens: 2000
+---
+## system
+...
+## user
+... {{ jinja_variables }} ...
 """
 
 from __future__ import annotations

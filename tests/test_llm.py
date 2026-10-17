@@ -36,8 +36,15 @@ def _fake_live(monkeypatch, cost=0.01):
 
     def fake_call(self, prompt_name, system, user, model, max_tokens):
         calls.append(prompt_name)
-        return LLMResult(data={"results": []}, text="{}", model=model, provider="portkey",
-                         input_tokens=100, output_tokens=50, cost_usd=cost)
+        return LLMResult(
+            data={"results": []},
+            text="{}",
+            model=model,
+            provider="portkey",
+            input_tokens=100,
+            output_tokens=50,
+            cost_usd=cost,
+        )
 
     monkeypatch.setattr(LLM, "_call", fake_call)
     return calls

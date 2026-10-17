@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}{{ company.ticker }} · {{ brand() }}{% endblock %}
+{% block content %}
+<div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+  <h1 class="text-2xl font-semibold"><span class="font-mono text-ledger-700">{{ company.ticker }}</span> {{ company.name }}</h1>
+  <span class="text-sm text-slate-500">{{ company.archetype }} · {{ company.size_band }} · ${{ '%.0f'|format(company.mkt_cap_musd or 0) }}M · coverage {{ company.analyst_coverage }} · priority <span class="num">{{ company.priority|num(1) }}</span>{% if company.state %} · {{ company.state }}{% endif %}</span>
+  {% if user %}<a href="/warroom/new?ticker={{ company.ticker }}" class="ml-auto text-sm border border-ledger-700 text-ledger-700 rounded px-3 py-1">Open earnings war room</a>{% endif %}
+</div>
+
+<div class="mt-5 grid gap-5 lg:grid-cols-3">
+  <section class="lg:col-span-2 space-y-5">
+    <div class="board-card p-4">
+      <h2 class="font-semibold text-sm uppercase tracking-wide text-slate-600">Drivers</h2>
+      <p class="mt-2 text-sm"><span class="text-slate-500">Local-gov driver:</span> {{ company.local_gov_driver }}</p>
+      <p class="mt-1 text-sm"><span class="text-slate-500">Public data:</span> {{ company.public_data }}</p>
+      {% if company.note %}<p class="mt-1 text-sm"><span class="text-slate-500">Note:</span> {{ company.note }}</p>{% endif %}
+    </div>
+
+    <div>
+      <h2 class="font-semibold text-sm uppercase tracking-wide text-slate-600">Signal timeline</h2>
+      <div class="mt-2 overflow-x-auto">
+      <table class="w-full text-sm border-collapse">
+        <thead><tr class="text-left border-b border-slate-300 text-slate-500 text-xs"><th class="py-1.5 pr-2">As of</th><th class="pr-2">Source</th><th class="pr-2">Signal</th><th class="pr-2 text-right">Sig.</th><th>Cite</th></tr></thead>
+        <tbody>
+        {% for s in signals %}
+        <tr class="border-b border-slate-100 align-top">
+          <td class="py-1.5 pr-2 num whitespace-nowrap">{{ s.as_of }}</td>
+          <td class="pr-2 text-xs font-mono text-slate-500">{{ s.source_id }}</td>
+          <td class="pr-2">{{ s.summary }}</td>
+          <td class="pr-2 text-right num">{{ '%.2f'|format(s.significance) }}</td>
+          <td><a class="text-ledger-700 underline whitespace-nowrap" href="{{ s.citation_url }}" target="_blank" rel="noopener">doc ↗</a></td>
+        </tr>
+        {% else %}<tr><td colspan="5" class="py-3 text-slate-500">No signals yet.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <div>
+      <h2 class="font-semibold text-sm uppercase tracking-wide text-slate-600">Notes</h2>
+      <div class="mt-2 space-y-3">
+      {% for n in notes %}
+        <article class="board-card p-4">
+          <div class="flex items-baseline gap-2 text-xs text-slate-500"><span class="uppercase">{{ n.kind }}</span><span>·</span><span>{{ n.status }}</span><span>·</span>
+            <span class="{{ 'text-ledger-700' if n.factcheck_passed else 'text-amber-700' }}">fact-check {{ 'passed' if n.factcheck_passed else 'failed' }}</span>
+            {% set dropped = n.factcheck_log|fromjson %}{% if dropped %}<span>· {{ dropped|length }} claim{{ 's' if dropped|length != 1 }} rejected</span>{% endif %}
+            <a href="/app/note/{{ n.id }}" class="ml-auto underline">detail</a></div>
+          <h3 class="font-semibold mt-1">{{ n.title }}</h3>
+          <div class="text-sm mt-1 prose-note">{{ n.body_md|md }}</div>
+        </article>
+      {% else %}<p class="text-sm text-slate-500">No notes yet.</p>{% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <aside class="space-y-5">
+    <div class="board-card p-4">
+      <h2 class="font-semibold text-sm uppercase tracking-wide text-slate-600">Data sources</h2>
+      <ul class="mt-2 text-sm space-y-1">
+        {% for sid, n in by_source.items() %}<li class="flex justify-between"><span>{{ sources[sid].name if sid in sources else sid }}</span><span class="num text-slate-500">{{ n }} signals</span></li>{% endfor %}
+        {% for m in mapped %}<li class="text-slate-600"><span class="text-xs font-mono">{{ m.source }}</span> {{ m.name }}{% if m.why %}: <span class="text-slate-500">{{ m.why }}</span>{% endif %}</li>{% endfor %}
+        {% if archetype %}<li class="text-slate-500 text-xs pt-1">Archetype datasets: {{ archetype.datasets }}</li>{% endif %}
+      </ul>
+    </div>
+    <div class="board-card p-4">
+      <h2 class="font-semibold text-sm uppercase tracking-wide text-slate-600">Thesis &amp; kill criteria</h2>
+      {% if thesis %}<div class="prose text-sm mt-2">{{ thesis|md }}</div>{% else %}<p class="text-sm text-slate-500 mt-2">No thesis on file (<code>theses/{{ company.ticker }}.md</code>).</p>{% endif %}
+    </div>
+    <div class="board-card p-4">
+      <h2 class="font-semibold text-sm uppercase tracking-wide text-slate-600">Filings</h2>
+      <ul class="mt-2 text-sm space-y-1">
+        {% for f in filings %}<li><a class="underline text-ledger-700" href="{{ f.url }}" target="_blank" rel="noopener">{{ f.title }}</a>{% if f.index_url %} <a class="text-xs text-slate-500 underline" href="{{ f.index_url }}" target="_blank" rel="noopener">index</a>{% endif %}</li>
+        {% else %}<li class="text-slate-500">No filings ingested.</li>{% endfor %}
+        {% if company.cik %}<li class="pt-1"><a class="text-xs underline text-slate-500" href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK={{ company.cik }}" target="_blank" rel="noopener">All EDGAR filings ↗</a></li>{% endif %}
+      </ul>
+    </div>
+    {% if sessions %}
+    <div class="board-card p-4">
+      <h2 class="font-semibold text-sm uppercase tracking-wide text-slate-600">War rooms</h2>
+      <ul class="mt-2 text-sm space-y-1">{% for w in sessions %}<li><a class="underline" href="/warroom/{{ w.id }}">#{{ w.id }} {{ w.title }}</a> <span class="text-slate-500 text-xs">{{ w.status }}</span></li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

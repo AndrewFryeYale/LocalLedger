@@ -63,14 +63,21 @@ def coverage() -> None:
     script = settings.data_dir / "coverage_check.py"
     xlsx = settings.data_dir / "Microcap_Local_Gov_Universe.xlsx"
     try:
-        proc = subprocess.run([sys.executable, str(script), str(xlsx)], cwd=settings.data_dir, timeout=1800,
-                              capture_output=True, text=True)
+        proc = subprocess.run(
+            [sys.executable, str(script), str(xlsx)],
+            cwd=settings.data_dir,
+            timeout=1800,
+            capture_output=True,
+            text=True,
+        )
         tail = (proc.stdout or "").strip().splitlines()[-1:] or [""]
         if proc.returncode == 0:
             typer.echo(f"coverage_check ok: {tail[0]}")
         else:
-            typer.echo(f"WARNING: coverage_check failed (exit {proc.returncode}); continuing with sheet values. "
-                       f"{(proc.stderr or '').strip().splitlines()[-1:]}")
+            typer.echo(
+                f"WARNING: coverage_check failed (exit {proc.returncode}); continuing with sheet values. "
+                f"{(proc.stderr or '').strip().splitlines()[-1:]}"
+            )
     except Exception as exc:  # noqa: BLE001
         typer.echo(f"WARNING: coverage_check could not run ({type(exc).__name__}); continuing.")
 
@@ -99,6 +106,59 @@ def ingest(
 
 
 @app.command()
+def signals(
+    limit: Annotated[int | None, typer.Option(help="Max analyst notes this run (default MAX_NOTES_PER_RUN)")] = None,
+    threshold: Annotated[float | None, typer.Option(help="Min significance for a note")] = None,
+    tickers: Annotated[str | None, typer.Option(help="Comma list of tickers")] = None,
+    redo: Annotated[bool, typer.Option(help="Rewrite notes that already exist")] = False,
+) -> None:
+    """Re-rank every signal, then write fact-checked analyst notes for the top signals."""
+    from localledger.llm.client import LLM
+    from localledger.models import Company, Signal
+    from localledger.research.analyst import run_research
+    from localledger.signals.scoring import rank_score
+
+    with session_scope() as s:
+        priorities = {c.ticker: c.priority for c in s.exec(select(Company)).all()}
+        rows = s.exec(select(Signal)).all()
+        for sig in rows:
+            sig.rank_score = rank_score(sig.significance, priorities.get(sig.ticker), sig.as_of)
+            s.add(sig)
+        s.commit()
+        typer.echo(f"Re-ranked {len(rows)} signals.")
+        summary = run_research(s, LLM("signals"), limit=limit, threshold=threshold, tickers=_csv(tickers), redo=redo)
+    typer.echo(
+        f"Analyst notes: {summary.attempted} attempted, {summary.passed} passed fact-check, "
+        f"{summary.failed} failed; {summary.rejected_claims} claims rejected and logged."
+    )
+    for err in summary.errors[:5]:
+        typer.echo(f"    {err[:220]}")
+
+
+@app.command()
+def newsletter(
+    week: Annotated[str | None, typer.Option(help="ISO week, e.g. 2026-W42 (default: this week)")] = None,
+    no_new_notes: Annotated[bool, typer.Option(help="Use existing notes only (no analyst calls)")] = False,
+) -> None:
+    """Build this week's issue (Markdown + email-safe HTML) in ./out/newsletter. Never sends anything."""
+    from localledger.gtm.newsletter import build_issue
+    from localledger.llm.client import LLM
+
+    with session_scope() as s:
+        result = build_issue(s, week, LLM("newsletter"), ensure_notes=not no_new_notes)
+    typer.echo(
+        f"Issue {result.week}: {result.items} signal items, fact-check "
+        f"{'PASSED' if result.factcheck_passed else 'FAILED'}"
+    )
+    typer.echo(f"  markdown: {result.path_md}\n  html:     {result.path_html}")
+    for line in result.excluded:
+        typer.echo(f"  excluded by compliance: {line}")
+    for line in result.warnings:
+        typer.echo(f"  warning: {line}")
+    typer.echo("  Not sent. Review, then paste the HTML into your email platform.")
+
+
+@app.command()
 def stats() -> None:
     """Counts by table and connector (real vs fixture), for the Definition of Done."""
     from localledger.models import Company, Document, Note, Signal, Source
@@ -114,7 +174,8 @@ def stats() -> None:
             .group_by(Signal.source_id)
         ).all()
         all_tickers = s.exec(
-            select(func.count(func.distinct(Signal.ticker))).join(Document, Document.id == Signal.document_id)
+            select(func.count(func.distinct(Signal.ticker)))
+            .join(Document, Document.id == Signal.document_id)
             .where(Document.origin == "real")
         ).one()
         typer.echo("real signals by source:")
@@ -133,9 +194,14 @@ def costs() -> None:
     settings = get_settings()
     with session_scope() as s:
         rows = s.exec(
-            select(LlmCall.command, LlmCall.provider, func.count(LlmCall.id), func.sum(LlmCall.input_tokens),
-                   func.sum(LlmCall.output_tokens), func.sum(LlmCall.est_cost_usd))
-            .group_by(LlmCall.command, LlmCall.provider)
+            select(
+                LlmCall.command,
+                LlmCall.provider,
+                func.count(LlmCall.id),
+                func.sum(LlmCall.input_tokens),
+                func.sum(LlmCall.output_tokens),
+                func.sum(LlmCall.est_cost_usd),
+            ).group_by(LlmCall.command, LlmCall.provider)
         ).all()
     for command, provider, n, tin, tout, cost in rows:
         typer.echo(f"{command:12} {provider:8} {n:5} calls  in={tin or 0:>9,} out={tout or 0:>8,}  ${cost or 0:.4f}")

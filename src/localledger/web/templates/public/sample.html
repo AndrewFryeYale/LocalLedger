@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Sample issue · {{ brand() }}{% endblock %}
+{% block content %}
+<div class="max-w-3xl">
+  <p class="text-xs uppercase tracking-widest text-ledger-700 font-semibold">Sample issue</p>
+  {% if issue %}
+  <h1 class="text-2xl font-semibold mt-1">{{ issue.title }}</h1>
+  <p class="text-sm text-slate-500 mt-1">Generated {{ issue.created_at.strftime('%Y-%m-%d') }} · fact-check {{ 'passed' if issue.factcheck_passed else 'pending' }} · <a class="underline" href="/sample/raw">email version</a></p>
+  <div class="mt-6 border border-slate-200 rounded-md overflow-hidden">
+    <iframe src="/sample/raw" title="Sample issue" class="w-full" style="height: 1400px; border: 0"></iframe>
+  </div>
+  {% else %}
+  <h1 class="text-2xl font-semibold mt-1">No issue generated yet</h1>
+  <p class="mt-2 text-slate-600">Run <code>ll newsletter</code> to build this week's issue from new signals.</p>
+  {% endif %}
+  <div class="mt-8 border border-slate-200 rounded-md p-5" id="waitlist">
+    <h2 class="font-semibold">Get it every week</h2>
+    {% include "public/_waitlist_form.html" %}
+  </div>
+</div>
+{% endblock %}

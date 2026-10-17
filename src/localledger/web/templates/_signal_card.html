@@ -1,0 +1,19 @@
+{# expects: sig, company (optional), note (optional) #}
+<article class="border border-slate-200 rounded-md p-4 bg-white">
+  <div class="flex items-baseline justify-between gap-3 text-xs text-slate-500">
+    <span class="font-mono">{{ sig.source_id }} · {{ sig.metric }}</span>
+    <span class="num">as of {{ sig.as_of }}</span>
+  </div>
+  <h3 class="mt-1 font-semibold">
+    <span class="font-mono text-ledger-700">{{ sig.ticker }}</span>{% if company %} <span class="text-slate-600 font-normal">{{ company.name }}</span>{% endif %}
+  </h3>
+  <p class="mt-1 text-sm">{{ sig.summary }}</p>
+  {% if note and note.factcheck_passed %}
+  <div class="mt-2 text-sm text-slate-700 prose-note border-l-2 border-ledger-600 pl-3">{{ note.body_md | md }}</div>
+  {% endif %}
+  <div class="mt-3 flex items-center gap-3 text-xs">
+    <div class="sigbar w-24" title="significance {{ '%.2f'|format(sig.significance) }}"><span style="width: {{ (sig.significance*100)|round|int }}%"></span></div>
+    <span class="num text-slate-500">significance {{ '%.2f'|format(sig.significance) }}</span>
+    <a href="{{ sig.citation_url }}" class="ml-auto text-ledger-700 underline" target="_blank" rel="noopener">Source document ↗</a>
+  </div>
+</article>

@@ -1,0 +1,8 @@
+<tr class="border-b border-slate-100 align-top" id="lead-{{ lead.id }}">
+  <td class="py-1.5 pr-2 text-right num text-slate-500">{{ lead.rank }}</td>
+  <td class="pr-2">{{ lead.fund_name }}<div class="text-xs text-slate-500">CIK {{ lead.cik }}{% if lead.city %} · {{ lead.city }}, {{ lead.state }}{% endif %}{% if lead.is_mega %} · index/mega manager{% endif %}</div></td>
+  <td class="pr-2 text-right num">{{ lead.overlap_count }}</td>
+  <td class="pr-2 text-right num">{{ lead.overlap_value_usd|money }}</td>
+  <td class="pr-2 text-xs font-mono">{{ lead.overlap_tickers }}</td>
+  <td><button hx-post="/admin/leads/{{ lead.id }}/toggle" hx-target="#lead-{{ lead.id }}" hx-swap="outerHTML" class="text-xs px-2 py-0.5 rounded {{ 'bg-ledger-50 text-ledger-700' if lead.contact_status == 'contacted' else 'bg-slate-100 text-slate-600' }}">{{ lead.contact_status.replace('_', ' ') }}</button></td>
+</tr>

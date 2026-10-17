@@ -1,0 +1,9 @@
+# Hosts whose robots.txt blocks generic agents, but where the publisher has given us permission.
+# Add an entry ONLY with a written basis (an email or a published data-access policy URL), never just
+# because a source is useful. Every fetch under a permission is still rate limited and declares our UA.
+#
+# Example (NOT active; www2.census.gov is currently blocked under an RFC 9309 reading of its robots.txt):
+#  - host: www2.census.gov
+#    paths: ["/econ/bps/"]
+#    basis: "Email from the Census BPS team (erd.building.permits@census.gov), 2026-MM-DD: automated monthly download OK"
+permissions: []

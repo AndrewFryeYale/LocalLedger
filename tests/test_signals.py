@@ -40,8 +40,9 @@ def test_rank_score_blends_priority_and_recency():
 
 def _doc(session):
     ensure_source(session, EdgarConnector)
-    return DocStore(session).save(source_id="edgar", url="https://www.sec.gov/x", content=b"{}",
-                                  content_type="application/json", origin="fixture")
+    return DocStore(session).save(
+        source_id="edgar", url="https://www.sec.gov/x", content=b"{}", content_type="application/json", origin="fixture"
+    )
 
 
 def test_signal_requires_citation(seeded):
@@ -53,15 +54,26 @@ def test_signal_requires_citation(seeded):
         make_signal(seeded, "edgar", SignalDraft(**base, citation_url="https://www.sec.gov/x", document_id=None))
     with pytest.raises(CitationError):
         make_signal(seeded, "edgar", SignalDraft(**base, citation_url="https://www.sec.gov/x", document_id=99999))
-    sig = make_signal(seeded, "edgar", SignalDraft(**base, citation_url="https://www.sec.gov/x", document_id=doc.id,
-                                                   value=12, prior_value=10))
+    sig = make_signal(
+        seeded,
+        "edgar",
+        SignalDraft(**base, citation_url="https://www.sec.gov/x", document_id=doc.id, value=12, prior_value=10),
+    )
     assert sig.delta == 2
 
 
 def test_signal_dedupes_on_rerun(seeded):
     doc = _doc(seeded)
-    draft = SignalDraft(ticker="PCYO", metric="m", as_of=date(2026, 10, 1), summary="s", period="P1",
-                        citation_url="https://www.sec.gov/x", document_id=doc.id, value=1)
+    draft = SignalDraft(
+        ticker="PCYO",
+        metric="m",
+        as_of=date(2026, 10, 1),
+        summary="s",
+        period="P1",
+        citation_url="https://www.sec.gov/x",
+        document_id=doc.id,
+        value=1,
+    )
     a = make_signal(seeded, "edgar", draft)
     draft.value = 2
     b = make_signal(seeded, "edgar", draft)

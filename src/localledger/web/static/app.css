@@ -1,0 +1,15 @@
+/* Small additions on top of Tailwind. Numbers line up in tables. */
+.num { font-variant-numeric: tabular-nums; }
+.prose-note p { margin: 0 0 .5rem 0; }
+.prose-note a { color: #1f6f54; text-decoration: underline; }
+.prose h1 { font-size: 1.5rem; font-weight: 600; margin: 1rem 0 .5rem; }
+.prose h2 { font-size: 1.125rem; font-weight: 600; margin: 1.25rem 0 .5rem; }
+.prose h3 { font-weight: 600; margin: 1rem 0 .25rem; }
+.prose p, .prose li { margin: .25rem 0; line-height: 1.55; }
+.prose ul { list-style: disc; padding-left: 1.25rem; }
+.prose a { color: #1f6f54; text-decoration: underline; }
+.sigbar { height: 6px; background: #e2e8f0; border-radius: 2px; overflow: hidden; }
+.sigbar > span { display: block; height: 100%; background: #1f6f54; }
+.board-card { border: 1px solid #e2e8f0; border-radius: 6px; }
+.fade-in { animation: fadein .4s ease-in; }
+@keyframes fadein { from { background: #fef9c3; } to { background: transparent; } }

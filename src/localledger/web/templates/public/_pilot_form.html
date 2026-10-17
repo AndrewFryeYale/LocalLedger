@@ -1,0 +1,13 @@
+<form hx-post="/pilot-request" hx-target="this" hx-swap="outerHTML" method="post" action="/pilot-request" class="mt-3 grid gap-2 sm:grid-cols-2 text-sm">
+  <input name="name" required placeholder="name" class="border border-slate-300 rounded px-3 py-2">
+  <input name="email" type="email" required placeholder="work email" class="border border-slate-300 rounded px-3 py-2">
+  <input name="fund" required placeholder="fund / firm" class="border border-slate-300 rounded px-3 py-2">
+  <select name="aum_band" class="border border-slate-300 rounded px-3 py-2">
+    <option value="">AUM (optional)</option><option>&lt;$100M</option><option>$100M–$500M</option><option>$500M–$2B</option><option>&gt;$2B</option>
+  </select>
+  <select name="interest" class="border border-slate-300 rounded px-3 py-2 sm:col-span-2">
+    <option value="">main interest (optional)</option><option>Community banks</option><option>Land / homebuilders / utilities</option><option>Energy &amp; royalty trusts</option><option>Gaming</option><option>Earnings war room</option>
+  </select>
+  <textarea name="message" rows="2" placeholder="names or datasets you care about (optional)" class="border border-slate-300 rounded px-3 py-2 sm:col-span-2"></textarea>
+  <button class="border border-ledger-700 text-ledger-700 rounded px-3 py-2 font-medium sm:col-span-2">Request a pilot</button>
+</form>
