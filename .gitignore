@@ -1,0 +1,17 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+.env
+*.db
+*.db-shm
+*.db-wal
+raw/
+out/
+.cache/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+data/*_checked.xlsx
+data/coverage_results.csv
+.DS_Store

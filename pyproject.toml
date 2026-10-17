@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "localledger"
+version = "0.1.0"
+description = "Local Ledger: independent microcap research from local and state public records"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn>=0.30",
+  "sqlmodel>=0.0.22",
+  "jinja2>=3.1",
+  "python-multipart>=0.0.9",
+  "itsdangerous>=2.2",
+  "httpx>=0.27",
+  "typer>=0.12",
+  "pyyaml>=6.0",
+  "python-dotenv>=1.0",
+  "openai>=1.40",
+  "openpyxl>=3.1",
+  "pdfplumber>=0.11",
+  "rapidfuzz>=3.9",
+  "beautifulsoup4>=4.12",
+  "markdown>=3.6",
+  "xhtml2pdf>=0.2.16",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.6"]
+coverage = ["yfinance>=0.2.40"]
+postgres = ["psycopg[binary]>=3.2"]
+
+[project.scripts]
+ll = "localledger.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+localledger = ["web/templates/**/*", "web/static/**/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "W"]
+ignore = ["B008"]
