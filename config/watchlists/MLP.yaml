@@ -1,0 +1,38 @@
+# Maui Land & Pineapple. Agenda keywords for the Council of the County of Maui and its committees.
+# Matching ignores macrons and okina, so "Kapalua"/"Hāliʻimaile"/"Hali'imaile" all match as written below.
+# Sources: "10-K" = FY2025 10-K filed 2026-04-01 (documents.id 45), land table in Item 2; "Note" = Note column /
+# coverage brief (Maui County & state water decisions; water-asset strategic review).
+ticker: MLP
+company:
+  - Maui Land & Pineapple              # 10-K registrant
+  - Maui Land and Pineapple
+  # MLP utility subsidiaries (PUC-regulated); not named in the FY2025 10-K text. Note column: water-asset review.
+  - {term: Kapalua Water Company, weight: 0.9}
+  - {term: Kapalua Waste Treatment, weight: 0.9}
+  - {term: Kapalua Club, weight: 0.7}  # 10-K: resort amenities
+projects:
+  - Kapalua                            # 10-K: Kapalua Resort (43 mentions); MLP's master-planned resort
+  - Kapalua Mauka                      # 10-K land table: Kapalua Resort - Mauka (922 acres)
+  - Kapalua Central Resort             # 10-K
+  - Honokeana                          # 10-K: Honokeana Homes Temporary Housing Project, Honokeana Farms
+  - Kahana Farms                       # 10-K land table (2,840 acres)
+  - Hali'imaile                        # 10-K land table: Hali'imaile Ranch / Farms / Farm Land (Upcountry)
+  - Honolua Farm Land                  # 10-K land table
+  - {term: Pulelehua, note: "Coverage brief; not named in the FY2025 10-K. Keep until confirmed sold."}
+parcels:
+  - Honokohau                          # 10-K: Honokohau Stream irrigation water dispute; Honokohau Farm Land
+  - Kapalua Ranch                      # 10-K land table
+  - Honolua ditch                      # 10-K: water assets (Honolua ditch system)
+  - Hali'imaile Water                  # 10-K: water assets (Hali'imaile water system)
+policy:
+  - {term: Commission on Water Resource Management, weight: 0.5}   # 10-K: state water code agency
+  - {term: interim instream flow standard, weight: 0.5}   # state water-code term (not in 10-K)
+generic:
+  # Kaanapali is a neighbouring resort owned by others (Kaanapali Land LLC is a separate company): context only.
+  - {term: Kaanapali, note: "Coverage brief; context only"}
+  - West Maui                          # 10-K
+  - Upcountry Maui                     # 10-K
+  - Napili                             # West Maui place name (not in 10-K)
+  - Lahaina
+exclude:
+  - Kapalua Bay Hotel                  # not MLP-owned

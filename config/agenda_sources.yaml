@@ -1,0 +1,20 @@
+# Agenda PDFs for towns that don't use Legistar. Add a town with one line (flow-style mapping).
+# Keys:
+#   id, name, tickers, body (label for the agenda's board), lookback_days (default 75), max_docs (default 6)
+#   index_url + link_pattern   an HTML page and a regex for agenda links on it (matched against the absolute URL,
+#                              raw or percent-decoded). Named groups m/d/y (or y/m/d) give the meeting date;
+#                              otherwise the date is parsed from the link text, aria-label, URL or table row.
+#   urls: [..]                 explicit agenda URLs instead of an index page
+#   platform: civicclerk       CivicClerk portals: public OData API https://{tenant}.api.civicclerk.com/v1/Events,
+#                              files at /v1/Meetings/GetMeetingFileStream(fileId=N,plainText=false). Optional
+#                              bodies: [..] (category-name substrings) and file_types (default [Agenda]).
+#   max_mb                     skip files bigger than this (checked with a HEAD request first)
+#   status                     ok (default) | blocked (kept for the record, never fetched)
+# robots.txt for every host below was checked on 2026-10-17 (HttpClient re-checks on every fetch).
+towns:
+  - {id: smithtown-ny, name: "Town of Smithtown, NY", tickers: [GYRO], platform: civicclerk, tenant: smithtownny, bodies: [Town Board, Planning Board], lookback_days: 75}
+  - {id: cortlandt-ny, name: "Town of Cortlandt, NY", tickers: [GYRO], index_url: "https://www.townofcortlandtny.gov/cn/meetings/", link_pattern: "/uppages/AGENDA-[^/]*\\.pdf$", body: "Town Board", lookback_days: 75, max_mb: 25}
+  - {id: asbury-park-nj-council, name: "City of Asbury Park, NJ", tickers: [STHO], platform: civicclerk, tenant: asburyparknj, bodies: [City Council], lookback_days: 75}
+  - {id: asbury-park-nj-planning, name: "City of Asbury Park, NJ", tickers: [STHO], index_url: "https://www.cityofasburypark.com/AgendaCenter/Planning-Board-9", link_pattern: "/AgendaCenter/ViewFile/Agenda/_(?P<m>\\d{2})(?P<d>\\d{2})(?P<y>\\d{4})-\\d+$", body: "Planning Board", lookback_days: 75}
+  - {id: la-county-bos, name: "Los Angeles County, CA", tickers: [TRC], index_url: "https://bos.lacounty.gov/board-meeting-agendas/", link_pattern: "/Agenda%20(?P<m>\\d{2})(?P<d>\\d{2})(?P<y>\\d{2})_links\\.pdf$", body: "Board of Supervisors", lookback_days: 75}
+  - {id: shakopee-mn, name: "City of Shakopee, MN", tickers: [CPHC], index_url: "https://shakopeemn.granicus.com/ViewPublisher.php?view_id=1", link_pattern: "AgendaViewer\\.php", body: "City Council", status: blocked, why: "Granicus robots.txt is User-agent: * / Disallow: /"}

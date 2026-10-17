@@ -1,0 +1,25 @@
+# Cadiz Inc. Agenda keywords for San Bernardino County (Board of Supervisors).
+# Sources: "10-K" = FY2025 10-K filed 2026-03-31 (documents.id 426); "Note" = Note column (California water
+# project - state/county approvals).
+ticker: CDZI
+company:
+  - Cadiz                              # 10-K registrant (Cadiz Inc.); the Cadiz Valley/Ranch are in San Bernardino County
+  - ATEC Water Systems                 # 10-K: ATEC (water filtration subsidiary)
+projects:
+  - Mojave Groundwater Bank            # 10-K (83 mentions)
+  - Northern Pipeline                  # 10-K
+  - Cadiz Ranch                        # 10-K
+  - Cadiz Water Project                # press/agency name for the project (not in 10-K, which says Mojave Groundwater Bank)
+  - {term: Fenner, weight: 0.9, note: "10-K: Fenner Valley / Fenner Gap, the project's groundwater basin"}
+parcels:
+  - Cadiz Valley                       # 10-K
+policy:
+  - {term: groundwater management, weight: 0.5, near: [Cadiz, Fenner, Mojave], window: 200}
+generic:
+  - Mojave Water Agency                # regional water agency (not in 10-K)
+  - Santa Margarita Water District     # 10-K: project participant
+  - Colorado River Aqueduct
+exclude:
+  - Cadiz, Ohio
+  - Cadiz, Kentucky
+  - Cadiz, Spain

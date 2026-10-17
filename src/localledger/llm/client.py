@@ -14,9 +14,11 @@ import json
 import logging
 import os
 import threading
+import time
 from dataclasses import dataclass, field
 
 from sqlalchemy import func
+from sqlalchemy.exc import OperationalError
 from sqlmodel import select
 
 from localledger.config import Settings, get_settings
@@ -238,16 +240,23 @@ class LLM:
             RUN_USAGE.input_tokens += result.input_tokens
             RUN_USAGE.output_tokens += result.output_tokens
             RUN_USAGE.cost_usd += result.cost_usd
-        with session_scope() as s:
-            s.add(
-                LlmCall(
-                    command=self.command,
-                    prompt_name=prompt_name,
-                    provider=result.provider,
-                    model=result.model,
-                    input_tokens=0 if result.cached else result.input_tokens,
-                    output_tokens=0 if result.cached else result.output_tokens,
-                    est_cost_usd=0.0 if result.cached else result.cost_usd,
-                    cached=result.cached,
-                )
-            )
+        row = LlmCall(
+            command=self.command,
+            prompt_name=prompt_name,
+            provider=result.provider,
+            model=result.model,
+            input_tokens=0 if result.cached else result.input_tokens,
+            output_tokens=0 if result.cached else result.output_tokens,
+            est_cost_usd=0.0 if result.cached else result.cost_usd,
+            cached=result.cached,
+        )
+        for attempt in range(5):  # the ledger must never fail a note because another writer holds the lock
+            try:
+                with session_scope() as s:
+                    s.add(LlmCall(**row.model_dump(exclude={"id"})))
+                return
+            except OperationalError:
+                time.sleep(2 * (attempt + 1))
+        log.warning(
+            "could not write LLM ledger row for %s (database busy); cost kept in this run's summary", prompt_name
+        )

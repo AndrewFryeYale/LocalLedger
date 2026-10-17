@@ -1,0 +1,39 @@
+# Legistar Web API clients -> universe tickers. One line per client (flow-style mapping).
+# API: https://webapi.legistar.com/v1/{client}/bodies | /events | /events/{id}/eventitems | /matters (no key for
+# most clients; webapi.legistar.com has no robots.txt, i.e. 4xx = allow under RFC 9309).
+# status: ok (fetched) | token_required (HTTP 403 "Token is required": we don't use tokens) | not_found (HTTP 500
+#   "LegistarConnectionString setting is not set up in InSite for client") | stale (answers, but no current data).
+# mode: events (default; /events + /eventitems) | matters (/matters filtered on MatterAgendaDate, for clients whose
+#   /events returns HTTP 400 "'Agenda Draft Status' ... is not setup in settings").
+# bodies: optional list of body-name substrings to keep. Citations go to the public InSite meeting/legislation page
+#   on {client}.legistar.com (the agenda PDFs live on {client}.legistar1.com, whose robots.txt disallows all agents,
+#   so we cite but never fetch them).
+# All statuses verified 2026-10-17 with the declared User-Agent.
+clients:
+  - {client: mauicounty, name: "Maui County, HI", tickers: [MLP], status: ok, why: "County Council and committees decide Kapalua/West Maui entitlements, zoning bills and water (Honokohau) items"}
+  - {client: arapahoe, name: "Arapahoe County, CO", tickers: [PCYO], status: ok, why: "Board of County Commissioners and Planning Commission act on Sky Ranch plats, rezonings and metro districts"}
+  - {client: sanbernardino, name: "San Bernardino County, CA", tickers: [CDZI], status: ok, why: "Board of Supervisors: county groundwater ordinance and Cadiz project approvals"}
+  - {client: westchestercountyny, name: "Westchester County, NY", tickers: [GYRO], status: ok, why: "Board of Legislators; Gyrodyne's Cortlandt Manor medical property is in the county (town approvals: pdf_agenda cortlandt-ny)"}
+  - {client: maricopa, name: "City of Maricopa, AZ", tickers: [GWRS], mode: matters, status: ok, why: "Global Water (GW-Santa Cruz, GW-Palo Verde) serves the city; rezonings, annexations and development agreements drive connections"}
+  - {client: boston, name: "City of Boston, MA", tickers: [NEN], status: ok, why: "City Council (rent stabilization) and Zoning Board of Appeal items on NEN's Boston buildings"}
+  - {client: lacounty, name: "Los Angeles County, CA", tickers: [TRC], status: stale, why: "Board of Supervisors events stop at 2026-06-22 and current matters are commissions only; BOS agendas come from pdf_agenda la-county-bos instead"}
+  - {client: sfgov, name: "City and County of San Francisco, CA", tickers: [INTG], status: stale, why: "/events returns HTTP 400 (agenda status setting) and /matters stops in 2020"}
+  - {client: nyc, name: "New York City Council", tickers: [CLPR, MAYS, NYC, SEG, DCGO], status: token_required, why: "HTTP 403 Token is required"}
+  - {client: kern, name: "Kern County, CA", tickers: [TRC], status: not_found, why: "also tried kerncounty; Kern uses Granicus (robots.txt disallows all agents)"}
+  - {client: loudoun, name: "Loudoun County, VA", tickers: [CHCI], status: not_found, why: "also tried loudouncounty, loudounva"}
+  - {client: fairfaxcounty, name: "Fairfax County, VA", tickers: [CHCI], status: not_found, why: "also tried fairfax, fairfaxva (Reston Station)"}
+  - {client: collier, name: "Collier County, FL", tickers: [ALCO], status: not_found, why: "also tried colliercounty, colliercountyfl"}
+  - {client: riorancho, name: "City of Rio Rancho, NM", tickers: [AXR], status: not_found, why: "also tried rioranchonm, sandoval, sandovalcounty"}
+  - {client: venturacounty, name: "Ventura County, CA", tickers: [LMNR], status: not_found, why: "also tried ventura, venturacountyca, santapaula, oxnard"}
+  - {client: cityofaurora, name: "City of Aurora, CO", tickers: [PCYO], status: not_found, why: "also tried aurora, auroragov, auroraco"}
+  - {client: shakopee, name: "City of Shakopee, MN", tickers: [CPHC], status: not_found, why: "also tried scottcounty, scottcountymn; Shakopee uses Granicus (robots.txt disallows all agents)"}
+  - {client: smithtown, name: "Town of Smithtown, NY", tickers: [GYRO], status: not_found, why: "also tried suffolkcounty, suffolkcountyny; Smithtown uses CivicClerk (pdf_agenda smithtown-ny)"}
+  - {client: cortlandt, name: "Town of Cortlandt, NY", tickers: [GYRO], status: not_found, why: "town site posts PDFs (pdf_agenda cortlandt-ny)"}
+  - {client: asburypark, name: "City of Asbury Park, NJ", tickers: [STHO], status: not_found, why: "also tried monmouthcounty; Asbury Park uses CivicClerk + CivicPlus (pdf_agenda asbury-park-nj-*)"}
+  - {client: maricopacounty, name: "Maricopa County, AZ", tickers: [GWRS], status: not_found, why: "also tried pinal, pinalcounty"}
+  - {client: warren, name: "City of Warren, OH", tickers: [AWX], status: not_found, why: "also tried trumbull, trumbullcounty"}
+  - {client: sussexcountyde, name: "Sussex County, DE", tickers: [ARTNA], status: not_found, why: "also tried sussex, newcastlede, nccde, wilmingtonde"}
+  - {client: chesterfield, name: "Chesterfield County, VA", tickers: [STHO], status: not_found, why: "Magnolia Green; also tried chesterfieldcounty, chesterfieldva"}
+# Probed and working (HTTP 200 on /bodies) but no universe link yet: sanjose, sacramento, phoenix, alexandria (ELME's
+# Riverside Apartments has an Alexandria mailing address but sits in Fairfax County), princegeorgescountymd,
+# montgomerycountymd (no events in window), richmondva, nashville, denver, miamidade, fortlauderdale, santabarbara.

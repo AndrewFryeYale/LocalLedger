@@ -66,6 +66,7 @@ class Connector(ABC):
         self.origin = origin
         self.tickers: set[str] | None = None
         ensure_source(session, type(self))
+        session.commit()  # a later per-target rollback must not discard the Source row
 
     # --- contract -------------------------------------------------------------------------------
     @abstractmethod

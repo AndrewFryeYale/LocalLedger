@@ -1,0 +1,21 @@
+# Pure Cycle Corp. Agenda keywords for Arapahoe County, CO (Board of County Commissioners, Planning Commission).
+# Sources: "10-K" = FY2025 10-K filed 2025-11-12 (documents.id 13); "Note" = Note column (Sky Ranch plats/permits).
+ticker: PCYO
+company:
+  - Pure Cycle                         # 10-K registrant
+  - Rangeview Metropolitan District    # 10-K: PCYO's water/wastewater provider vehicle (250 mentions of Rangeview)
+  # "Rangeview" is also a high school, streets and subdivisions in Aurora: require water-district context.
+  - {term: Rangeview, weight: 0.7, near: [Metropolitan District, water, wastewater, Pure Cycle, Lowry Ranch, Sky Ranch], window: 150}
+projects:
+  - Sky Ranch                          # 10-K (397 mentions): master-planned community off I-70
+  - Sky Ranch Community Authority      # 10-K
+  - {term: Lowry Ranch, weight: 0.9}   # 10-K: State Land Board land holding PCYO's water rights
+parcels:
+  - Sky Ranch Metropolitan District    # Sky Ranch districts (filed plats come through Arapahoe County)
+generic:
+  - Box Elder                          # 10-K: Box Elder Creek / wastewater plant area
+  - Watkins                            # 10-K
+  - Denver Water                       # 10-K
+exclude:
+  - Rangeview High School
+  - Rangeview Drive

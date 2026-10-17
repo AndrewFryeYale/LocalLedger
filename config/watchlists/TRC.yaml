@@ -1,0 +1,34 @@
+# Tejon Ranch Co. Agenda keywords for Kern County and Los Angeles County.
+# Schema and weights: see src/localledger/connectors/watchlist.py. Sources: "10-K" = FY2025 10-K filed
+# 2026-03-19 (documents.id 4); "Note" = the universe sheet's Note column.
+ticker: TRC
+company:
+  - Tejon Ranch            # 10-K, throughout
+  - Tejon Ranch Co         # 10-K, registrant name
+  - Centennial Founders    # 10-K: Centennial Founders, LLC (the Centennial project entity)
+projects:
+  # "Centennial" alone is a common word (high schools, a Colorado city, anniversaries): require project context.
+  - {term: Centennial, near: [Tejon, Specific Plan, State Route 138, Highway 138, Antelope Valley, Neenach, Gorman, Lebec, Centennial Founders], window: 200, note: "10-K: Centennial Approvals"}
+  - Centennial Specific Plan           # LA County entitlement name (10-K: "Centennial Approvals")
+  - Tejon Mountain Village             # 10-K: Mountain Village at Tejon Ranch
+  - Mountain Village at Tejon Ranch    # 10-K
+  - Grapevine at Tejon Ranch           # 10-K
+  - Grapevine North                    # 10-K
+  - {term: Grapevine Specific Plan, note: "Kern County plan name; not in 10-K (10-K: Grapevine at Tejon Ranch)"}
+  - Terra Vista at Tejon               # 10-K: multifamily at Tejon Ranch Commerce Center
+  - Tejon Ranch Commerce Center        # 10-K, Note column brief
+  - Outlets at Tejon                   # 10-K
+parcels:
+  - Pastoria Energy Facility           # 10-K: power plant lease on ranch land
+  - {term: Tejon Ranch Conservancy, weight: 0.7}   # not in 10-K text; conservation partner under the Ranch-wide Agreement
+policy:
+  - {term: Climate Resolve, weight: 0.6, note: "10-K: CEQA petitioner against the Centennial approvals"}
+generic:
+  - Antelope Valley                    # 10-K: Centennial is in the Antelope Valley; LA County water items use it too
+  - Kern Subbasin                      # 10-K: groundwater sustainability (water)
+  - White Wolf Subbasin                # 10-K
+  - Lebec                              # place name near the ranch (not in 10-K)
+  - Neenach                            # place name near Centennial (not in 10-K)
+exclude:
+  - Centennial High School
+  - Centennial Park

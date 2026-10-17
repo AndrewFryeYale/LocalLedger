@@ -1,0 +1,30 @@
+# Gyrodyne LLC. Agenda keywords for the Town of Smithtown (Flowerfield, St. James) and the Town of Cortlandt /
+# Westchester County (Cortlandt Manor). Sources: "10-K" = FY2025 10-K filed 2026-03-27 (documents.id 191);
+# "Note" = Note column (liquidating; Smithtown & Cortlandt, NY approvals).
+ticker: GYRO
+company:
+  - {term: Gyrodyne, weight: 1.0}      # 10-K registrant; unique name
+  - {term: GSD Cortlandt, weight: 0.9} # 10-K: property-owning subsidiary
+  - {term: GSD Flowerfield, weight: 0.9}
+projects:
+  - Flowerfield                        # 10-K: 63 acres in St. James incl. Flowerfield Industrial Park
+  - Flowerfield Subdivision            # 10-K: "Flowerfield Subdivision Application" (8-lot subdivision)
+  - Cortlandt Medical Center           # 10-K: 31,000 sf medical office at Cortlandt Manor
+  - Cortlandt Manor Medical Center     # 10-K
+  - Medical Oriented District          # short form of the 10-K's "Medical Oriented Zoning District (the MOD)"
+  - Medical Oriented Zoning District   # 10-K
+parcels:
+  - 1985 Crompond Road                 # 10-K: Cortlandt Manor property address (5.01 acres)
+policy:
+  - {term: Head of the Harbor, weight: 0.5, near: [Flowerfield, Gyrodyne, Article 78, subdivision], window: 300}  # 10-K: Article 78 petitioner
+generic:
+  # Hamlet names: everywhere in these towns' agendas (parades, addresses), so context only.
+  - St. James                          # 10-K: Flowerfield is in St. James
+  - Saint James                        # spelling variant (not in 10-K)
+  - Cortlandt Manor                    # 10-K property name, but also the hamlet / Town Clerk's address
+  - Crompond Road
+  - Stony Brook University             # 10-K: neighbour of Flowerfield
+exclude:
+  - Cortlandt Manor, NY                # Town of Cortlandt letterhead / addresses
+  - Cortlandt Manor, New York
+  - Cortlandt Manor NY

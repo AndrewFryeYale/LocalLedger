@@ -1,0 +1,67 @@
+# State oil & gas production -> tickers (connector: og_state).
+# Source: New Mexico Oil Conservation Division C-115 production reports, as published per well, per month in the
+# NM Tech PRRC GO-TECH county-year files (https://octane.nmt.edu/gotech/Petroleum_Data/county/{County}{yyyy}.zip).
+# Each entry sums the monthly oil (bbl) and gas (Mcf) of every well whose operator of record (CSV column OgridName,
+# matched exactly, case-insensitive) is in `operators`, in the listed `counties` (spelled as GO-TECH spells them).
+# Operator-wide totals are a PROXY for a royalty trust's interest: the trust's net interest is a subset of these wells.
+#
+# primary: the product that drives the ticker's revenue (gas | oil); the signal value is that product's volume.
+# distribution: royalty trusts only. lag_months = months between the production month and the month the trust
+#   declares the distribution that production funds (read off the trust's own 8-K Ex. 99.1). The connector reads the
+#   last declared distribution from the 8-K Ex. 99.1 the EDGAR connector stored.
+# "why" is shown on company pages; keep it to what the 10-K says.
+#
+# Universe "Oil & gas producer / royalty" names reviewed and NOT mapped (Oct 2026):
+#   CRT  - 90% NPI royalties in TX/OK/NM, but the 10-K names no NM operator or county to filter on.
+#   PVL  - NPI includes Permian NM properties (sponsor COERT), but the 10-K names no NM county or operator of record.
+#   PRT  - Underlying Properties are Permian Basin Texas counties only. VOC - Kansas and Texas only.
+#   EONR - 10-K: Grayburg-Jackson (Eddy) and South Justis (Lea) via LHO Operating; GO-TECH shows "LH Operating, LLC"
+#          reporting stopping after Mar 2026 (Eddy) / Feb 2026 (Lea). Operator-of-record change unresolved; mapping it
+#          now would print a false -100%. Re-check OCD operator transfers before adding.
+#   REI  - 10-K: Northwest Shelf in Lea County, NM, but no Ring-named OGRID appears in the Lea 2026 file.
+#   EPM  - NM interests are non-operated (Chaveroo operated by PEDEVCO; others by Texian Operating Company); operator
+#          totals would mostly be other owners' wells.
+#   MXC  - non-operated royalties/working interests across many operators. PNRG - sold its NM interests in 2024.
+entries:
+  - ticker: SJT
+    state: NM
+    basin: San Juan Basin
+    operators: ["HILCORP ENERGY COMPANY"]
+    counties: ["San Juan", "Rio Arriba", "Sandoval"]
+    primary: gas
+    # 10-K (FY2025): Subject Interests are 151,900 gross acres in San Juan, Rio Arriba and Sandoval Counties; Hilcorp
+    # operates the majority. The 8-K Ex. 99.1 filed 2026-09-18 (September 2026 declaration) reports the production
+    # month of July 2026, so the production-to-declaration lag is 2 months (paid to holders the month after).
+    # 10-K: 97.5% of 2025 Gross Proceeds were attributable to natural gas; 99.1% of proved reserves are gas.
+    distribution: {lag_months: 2}
+    why: "Royalty on Hilcorp-operated San Juan Basin gas (San Juan, Rio Arriba, Sandoval counties, NM)"
+  - ticker: MTR
+    state: NM
+    basin: San Juan Basin
+    operators: ["HILCORP ENERGY COMPANY"]
+    # 10-K (FY2025): "Hilcorp currently operates all of the San Juan Basin - New Mexico Properties". The 10-K does
+    # not list counties; these are the NM San Juan Basin counties. NM is one of three royalty groups (with Hugoton,
+    # Kansas, operated by Scout, and San Juan Basin - Colorado, operated by Simcoe/Red Willow); NM royalty income was
+    # $601,840 in 2025. No implied-distribution signal: MTR's releases don't state the production month and most of
+    # its income comes from properties outside NM.
+    counties: ["San Juan", "Rio Arriba", "Sandoval"]
+    primary: gas
+    why: "San Juan Basin - New Mexico royalty properties, all operated by Hilcorp (one of three MTR royalty groups)"
+  - ticker: EP
+    state: NM
+    basin: Permian Basin
+    # 10-K (FY2025): Empire New Mexico LLC, ~709 gross wells on 48,000 gross acres in Lea County, NM; primarily oil.
+    operators: ["Empire New Mexico LLC"]
+    counties: ["Lea"]
+    primary: oil
+    why: "Empire New Mexico LLC operated wells, Lea County, NM"
+  - ticker: PED
+    state: NM
+    basin: Permian Basin Northwest Shelf
+    # 10-K (FY2025): Permian assets are all in Chaves and Roosevelt Counties, NM, held by PEDCO and operated by its
+    # subsidiary Ridgeway Arizona Oil Corp. Ridgeway's totals include the Chaveroo wells it operates for partners
+    # (Evolution Petroleum holds a non-operated 50% WI there).
+    operators: ["RIDGEWAY ARIZONA OIL CORP."]
+    counties: ["Chaves", "Roosevelt"]
+    primary: oil
+    why: "Permian Basin (Northwest Shelf) wells operated by subsidiary Ridgeway Arizona Oil Corp., Chaves and Roosevelt counties, NM"

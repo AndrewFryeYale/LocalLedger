@@ -1,0 +1,131 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>OCD Permitting - Verification Required</title>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+    <link rel="preconnect" href="https://challenges.cloudflare.com" />
+    <style type="text/css">
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+            padding: 40px;
+            text-align: center;
+        }
+
+        #container {
+            margin: 0 auto;
+            max-width: 420px;
+            background: #fff;
+            padding: 30px;
+            border-radius: 6px;
+            box-shadow: 0 0 10px #ccc;
+        }
+
+        #verifyBtn {
+            margin-top: 20px;
+            padding: 12px 18px;
+            font-size: 16px;
+            background-color: #0066cc;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: not-allowed;
+        }
+
+        #verifyBtn.enabled {
+            cursor: pointer;
+            background-color: #009933;
+        }
+        .hidden{
+            display:none;
+        }
+        #status {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #333;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div id="container">
+        <h2>Human Verification Required</h2>
+        <p>Please complete verification to continue.</p>
+
+        <div class="cf-turnstile"
+             data-sitekey="0x4AAAAAACbMR3_iRNnsIlZw"
+             data-callback="onTurnstileSuccess">
+        </div> 
+        <input type="hidden" id="turnstileToken" />
+        <button id="verifyBtn" class="enabled hidden">Re-Verify</button>
+        <div id="status"></div>
+    </div>
+
+    <script>
+        // Enable the button once Turnstile returns a token
+        function onTurnstileSuccess(token) {
+            document.getElementById("turnstileToken").value = token;
+            validateToken();
+        }
+
+        function validateToken() {
+            const token = document.getElementById("turnstileToken").value;
+
+            if (!token) {
+                document.getElementById("status").textContent =
+                    "Verification token missing. Please retry.";
+                const btn = document.getElementById("verifyBtn");
+                btn.classList.remove("hidden");
+                return;
+            }
+
+            document.getElementById("status").textContent = "Verifying token…";
+
+            const params = new URLSearchParams(location.search);
+            const returnUrl = params.get("returnUrl") || "/";
+
+            fetch("../Services/Turnstile.asmx/ValidateToken", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json; charset=utf-8"
+                },
+                body: JSON.stringify({ token: token })
+            }).then(r => r.json())
+                .then(result => {
+                    if (result.d === true) {
+                        document.getElementById("status").textContent =
+                            "Verification successful. Redirecting…";
+                        if (returnUrl && returnUrl !== ""  && returnUrl !== "/") {
+                            window.location.replace(returnUrl);
+                        }
+                        else window.location = "../Default.aspx";
+                    } else {
+                        document.getElementById("status").textContent =
+                            "Verification failed. Please try again.";
+                        document.getElementById("turnstileToken").value = token;
+                        const btn = document.getElementById("verifyBtn");
+                        btn.classList.remove("hidden");
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById("status").textContent =
+                        "Server error during verification.";
+                    document.getElementById("turnstileToken").value = token;
+                    const btn = document.getElementById("verifyBtn");
+                    btn.classList.remove("hidden");
+                });
+        }
+
+        document.getElementById("verifyBtn").addEventListener("click", function () {
+            if (this.disabled) return;
+            window.location.reload();
+        });
+    </script>
+
+</body>
+</html>

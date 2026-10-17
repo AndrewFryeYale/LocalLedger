@@ -152,7 +152,20 @@ def write_signal_note(session: Session, signal: Signal, llm: LLM) -> Note | None
 def select_signals(session: Session, limit: int, threshold: float, redo: bool = False) -> list[Signal]:
     noted = set() if redo else {n.signal_id for n in session.exec(select(Note).where(Note.kind == "signal")).all()}
     rows = session.exec(select(Signal).where(Signal.significance >= threshold).order_by(Signal.rank_score.desc())).all()
-    return [s for s in rows if s.id not in noted][:limit]
+    return interleave_by_source([s for s in rows if s.id not in noted])[:limit]
+
+
+def interleave_by_source(signals: list[Signal]) -> list[Signal]:
+    """Round-robin across sources (each in rank order) so one prolific source can't crowd out local records."""
+    queues: dict[str, list[Signal]] = {}
+    for s in signals:
+        queues.setdefault(s.source_id, []).append(s)
+    out: list[Signal] = []
+    while any(queues.values()):
+        for source_id in list(queues):
+            if queues[source_id]:
+                out.append(queues[source_id].pop(0))
+    return out
 
 
 def run_research(

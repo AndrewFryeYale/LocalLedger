@@ -1,0 +1,27 @@
+# State gaming revenue -> tickers (connector: gaming_state).
+# Implemented state: Indiana Gaming Commission monthly revenue reports (one PDF per month, property-level):
+#   current year  https://www.in.gov/igc/publications/monthly-revenue/
+#   archives      https://www.in.gov/igc/publications/archived-monthly-revenue-reports/
+# `property` must match the name exactly as the IGC report prints it (the report rows start with it).
+# `licensee` is the owner's-license holder from the IGC licensee list (www.in.gov/igc/files/general/owners.pdf).
+# "why" is shown on company pages; keep it to what the 10-K says.
+properties:
+  - ticker: FLL
+    state: IN
+    property: "Rising Star Casino"
+    licensee: "Gaming Entertainment (Indiana) LLC"
+    location: "Rising Sun, IN"
+    # FLL 10-K (FY2025): Rising Star Casino Resort, Rising Sun, IN (riverboat casino, 190-room hotel, near Cincinnati).
+    why: "Rising Star Casino Resort (Rising Sun, IN), one of Full House Resorts' five casino properties"
+
+# Universe gaming names and other states (checked Oct 2026), not implemented:
+#   FLL American Place (Waukegan, IL): Illinois Gaming Board publishes property-level monthly AGR and admissions
+#     ("Casino Summary"; licensee row spelled "FHR-Illinois LLC") only through the form app
+#     https://igbapps.illinois.gov/CasinoReports_AEM.aspx (robots allows; no challenge; CSV/PDF export by POST).
+#     Not used yet because there is no per-month file URL to cite; see BLOCKERS.md.
+#   FLL Bronco Billy's / Chamonix and CNTY Central City / Cripple Creek (CO): sbg.colorado.gov answers automated
+#     requests (even robots.txt) with a CloudFront "Request blocked" 403; not worked around.
+#   CNTY Cape Girardeau / Caruthersville (MO): the bare host mgc.dps.mo.gov fails TLS hostname verification;
+#     https://www.mgc.dps.mo.gov/ answers (200) but its robots.txt redirects to an error page. Not evaluated further
+#     (one state per build); candidate next state for CNTY.
+#   CNTY Pahrump, FLL Stockman's / Grand Lodge (NV), FLL Silver Slipper (MS), CPHC (MN): not evaluated in this build.

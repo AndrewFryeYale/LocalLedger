@@ -1,0 +1,22 @@
+# Global Water Resources. Agenda keywords for the City of Maricopa, AZ (Council, Planning & Zoning).
+# Maricopa is served by GW-Santa Cruz (water) and GW-Palo Verde (wastewater/recycled water).
+# Sources: "10-K" = FY2025 10-K filed 2026-03-04 (documents.id 529), "Defined Terms"; "Note" = Note column
+# (Arizona Corporation Commission; Phoenix-area growth).
+ticker: GWRS
+company:
+  - Global Water Resources             # 10-K registrant
+  - Global Water                       # 10-K (87 mentions)
+  - Santa Cruz Water Company           # 10-K: Global Water - Santa Cruz Water Company, Inc.
+  - Palo Verde Utilities               # 10-K: Global Water - Palo Verde Utilities Company, Inc.
+  - GW-Santa Cruz                      # 10-K abbreviation
+  - GW-Palo Verde                      # 10-K abbreviation
+policy:
+  - {term: Certificate of Convenience and Necessity, weight: 0.6}   # utility service-area (CC&N) changes; 10-K uses "CC&N"
+  - {term: CC&N, weight: 0.6}
+generic:
+  - Arizona Corporation Commission     # 10-K, Note column
+  - Pinal County                       # 10-K
+exclude_items:
+  # 2026-09-01 Council item: a gala "to be held ... at Global Water Resources, 22590 N. Powers Parkway" (venue only).
+  - Special Event Liquor License
+  - Liquor License

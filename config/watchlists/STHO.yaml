@@ -1,0 +1,36 @@
+# Star Holdings. Agenda keywords for the City of Asbury Park, NJ (waterfront redevelopment) and Chesterfield
+# County, VA (Magnolia Green). Sources: "10-K" = FY2025 10-K filed 2026-02-17 (documents.id 165), "Our
+# Development Portfolio"; "Note" = Note column (Asbury Park, NJ waterfront redevelopment).
+ticker: STHO
+company:
+  - Star Holdings                      # 10-K registrant
+  - {term: iStar, weight: 0.7}         # 10-K: spun off from iStar; older city records name iStar
+  - Asbury Partners                    # 10-K: Asbury Partners, LLC, the waterfront JV STHO manages
+projects:
+  - Asbury Ocean Club                  # 10-K: 16-story condo/hotel on the waterfront
+  - Asbury Lanes                       # 10-K: music venue
+  # "The Asbury" is STHO's 110-key hotel, but "The Asbury Park Press" / "The Asbury Park Housing Authority" are not.
+  - {term: The Asbury, weight: 0.8, exclude: [Asbury Park]}
+  # 10-K: "Asbury Park Waterfront investment". City records also say "Asbury Park Waterfront Redevelopment Area"
+  # for the whole district (other redevelopers' parcels too): that phrase is scored by the area term below.
+  - {term: Asbury Park Waterfront, exclude: [Asbury Park Waterfront Redevelopment]}
+  # The city's plan/area governing STHO's sites (and its buyers'); seen in the 2026-09/10 Council agendas (not in
+  # the 10-K, which cites the "redevelopment agreement with the city of Asbury Park").
+  - {term: Waterfront Redevelopment Plan, weight: 0.7}
+  - {term: Waterfront Redevelopment Area, weight: 0.7}
+  - Magnolia Green                     # 10-K: ~1,900-acre master-planned community, Chesterfield County, VA
+parcels:
+  # Asbury Park Planning Board agenda 2026-08-03: "320 Asbury Avenue / Block 3801, Lot 1.02 / APW Redeveloper LLC &
+  # Asbury Partners LLC" (STHO's waterfront JV is a co-applicant). Not in the 10-K.
+  - 320 Asbury Avenue
+  - Block 3801
+policy:
+  - {term: redevelopment agreement, near: [waterfront, Asbury Partners, iStar, Star Holdings, Madison Marquette], window: 200}
+generic:
+  # Waterfront context, not in 10-K: boardwalk operator (not STHO) and landmarks.
+  - Madison Marquette
+  - Convention Hall
+  - boardwalk
+  - Ocean Avenue
+exclude:
+  - Asbury Park Press

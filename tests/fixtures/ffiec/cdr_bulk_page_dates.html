@@ -1,0 +1,480 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head id="Head1"><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><title>
+	Download Bulk Data - FFIEC Central Data Repository's Public Data Distribution
+</title><meta name="viewport" content="width=device-width" />
+        <link href="/public/includes/cdr.less/cdr.css?v=727285" rel="stylesheet" type="text/css" />
+        <link href="/public/Skins/CDR/Grid.CDR.css?v=727285" rel="stylesheet" type="text/css" />
+                        <link href="/public/datatables/css/datatables.css?v=727285" type="text/css" rel="stylesheet" />
+
+        
+        <noscript>
+            <style>
+                .nojs #footerMenuArea {
+                    display: block;
+                }
+            </style>
+        </noscript>
+    </head>
+<body class="nojs">
+    <div id="PleaseRead" class="hidden">
+        <p>Please Read this Important Notice</p>
+        <ol>
+            <li>Please note Peer Group 1 has been broken up into three new Peer Groups</li>
+            <li>Please refer the UBPR User's Guide and UBPR Peer Group changes memo dated April 13, 2018 for additional information.</li>
+        </ol>
+    </div>
+    <form method="post" action="./DownloadBulkData.aspx" id="form1">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="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" />
+
+<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="651D9554" />
+
+        <div id="frame" class="frameLP">
+            <a class="SkipLink" href="#EndSiteNav"><span class="HideAccessibilityLink">Skip Site Main Navigation</span></a>
+
+            <div id="topmenu" class="container" style="background-color: #e9f2f9;">
+                <div class="c-5"></div>
+                <div class="c-3">
+                    <ul class="nav navbar-nav" role="menubar">
+                        <li role="presentation">
+                            <a id="newLink" title="New Product and Services" href="/public/HelpFileContainers/WhatsNew.aspx" role="menuitem" class="title">News</a>
+                        </li>
+                        <li role="presentation">
+                            <a id="faqLink" title="Frequently Asked Questions" href="/public/HelpFileContainers/FAQ.aspx" role="menuitem" class="title">FAQs</a></li>
+                        <li role="presentation">
+                            <a id="helpLink" title="Click here for Help" href="/public/HelpFileContainers/HelpDeskForm.aspx" role="menuitem" class="title">Help</a>
+                        </li>
+                    </ul>
+
+                </div>
+                <div class="c-4"></div>
+            </div>
+
+            <div id="bannerFrame" style="display: none; background-color: #b7dcfa;">
+                <img id="Image2" src="/public/images/logotitle.png" alt="FFIEC - logo" border="0" />
+                <img id="Image1" src="/public/images/ffiecheader.png" alt="FFIEC" border="0" style="float:right"/>
+            </div>
+            <div>
+                <div id="stkmenu" role="navigation" style="z-index: 500; opacity: 1;">
+
+                    <div id="hiddentopmenu" class="container" style="background-color: #e9f2f9; display: none">
+                        <div class="c-5"></div>
+                        <div class="c-3">
+                            <ul class="nav navbar-nav" role="menubar">
+                                <li role="presentation">
+                                    <a id="newLink1" title="New Product and Services" href="/public/HelpFileContainers/WhatsNew.aspx" role="menuitem" class="title">News</a>
+                                </li>
+                                <li role="presentation">
+                                    <a id="faqLink1" title="Frequently Asked Questions" href="/public/HelpFileContainers/FAQ.aspx" role="menuitem" class="title">FAQs</a></li>
+                                <li role="presentation">
+                                    <a id="helpLink1" title="Click here for Help" href="/public/HelpFileContainers/HelpDeskForm.aspx" role="menuitem" class="title">Help</a>
+                                </li>
+                            </ul>
+
+                        </div>
+                        <div class="c-4"></div>
+                    </div>
+
+
+                    <div class="navbar navbar-default navbar-static-top" role="navigation">
+                        <div class="container">
+                            <div class="navbar-header">
+                                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#mainNav">
+                                    <span class="HideAccessibilityLink">Toggle navigation</span>
+                                    <span class="icon-bar"></span>
+                                    <span class="icon-bar"></span>
+                                    <span class="icon-bar"></span>
+                                </button>
+                            </div>
+
+                            <div class="collapse navbar-collapse" id="mainNav">
+                                <ul class="nav navbar-nav" role="menubar" id="menubartop">
+
+                                    <li role="presentation" style="display: none">
+                                        <img src="/public/images/ffieclogosticky.png" alt="FFIEC Logo" /></li>
+                                    <li role="presentation">
+                                        <a id="A1" title="Institution Reports" href="/public/ManageFacsimiles.aspx" role="menuitem">Institution Reports</a></li>
+                                    <li role="presentation">
+                                        <a id="A2" title="UBPR User's Guide" href="/public/DownloadUBPRUserGuide.aspx" role="menuitem">UBPR User's Guide</a></li>
+                                    <li role="presentation">
+                                        <a id="A3" title="Bulk Data" href="/public/PWS/DownloadBulkData.aspx" role="menuitem">Bulk Data</a></li>
+                                    <li role="presentation">
+                                        <a id="A4" title="Taxonomies" href="/public/DownloadTaxonomy.aspx" role="menuitem">Taxonomies</a></li>
+                                    <li role="presentation">
+                                        <a id="A5" title="PDD Web Services" href="/public/PWS/PWSPage.aspx" role="menuitem">PDD Web Services</a></li>
+                                    <li role="presentation" id="loginHolder" style="display: none">
+                                        <a id="A6" title="Public Login" href="/public/PWS/PublicLogin.aspx" role="menuitem">Public Login</a></li>
+                                    <li class="dropdown" role="presentation" id="UserPrefHolder" style="display: none">
+                                        <a href="../#" id="menuUserItems" class="dropdown-toggle" role="menuitem" aria-haspopup="true" data-toggle="dropdown">Current User<b class="caret"></b></a>
+                                        <ul class="dropdown-menu" id="subMenuHolder" role="menu" aria-expanded="true" aria-hidden="false" aria-labelledby="menuDrop">
+                                        </ul>
+                                    </li>
+                                </ul>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <a id="EndSiteNav"><span class="HideAccessibilityLink"></span></a>
+                
+                <div id="content">
+
+                    <div class="container">
+
+                        
+                        
+
+    <div id="Panel1" class="TopMenuArea">
+	
+	
+				<span id="pddHeaderLabel" class="mainheader">Bulk Data Download</span></TD>
+	
+
+</div>
+
+    <div class="c-r">
+        <div class="c-f">
+            <div id="TabStrip1">
+	<div class="tabStrip" role="toolbar">
+		<input type="submit" name="ctl00$MainContentHolder$TabStrip1$Download_0" value="Download" onclick="javascript:WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(&quot;ctl00$MainContentHolder$TabStrip1$Download_0&quot;, &quot;&quot;, true, &quot;&quot;, &quot;&quot;, false, false))" id="Download_0" /><input type="submit" name="ctl00$MainContentHolder$TabStrip1$Download_Taxonomy_1" value="Download Taxonomy" id="Download_Taxonomy_1" /><input type="submit" name="ctl00$MainContentHolder$TabStrip1$Cancel_2" value="Cancel" id="Cancel_2" />
+	</div>
+</div>
+        </div>
+    </div>
+    <div id="ScrollBox">
+
+        <div class="c-r">
+
+            <div class="c-f">
+                <div id="instructionPanel">
+	
+                    <div class="instructionArea">
+                        <div class="instruction">
+                            <span class="instructiontext">This page enables you to download bulk data in either
+                                Excel compatible or XBRL format. Please note that certain products are only available
+                                in a single format.</span>
+                        </div>
+                        <div class="instruction">
+                            <span class="instructiontext">To download a file --<br />
+                                1. Select the desired product from the list.
+                                <br />
+                                2. Select the reporting period end date or calendar year.
+                                <br />
+                                3. Select a file format (if applicable). </span>
+                        </div>
+                    </div>
+                    <br />
+                
+</div>
+                <div>
+                    <span id="StatusLabel" class="required"></span>
+                    
+                    
+                    <div id="BulkDownloadPanel">
+	
+                        
+                        <div class="c-r">
+                            <div class="c-f">
+                                <label for="ListBox1" id="ProductsLabel" class="captionlabel">
+					Available Products
+                                </label>
+                            </div>
+                        </div>
+                        <div class="c-r">
+                            <div class="c-f">
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <span id="NoteLabel1" class="captionlabel"><b>Note:</b> These products are for All Commercial Banks.</span>
+                            </div>
+                        </div>
+
+                        <div class="c-r">
+                            <div class="c-f">
+                                <div class="instructionArea">
+                                    <div class="instruction">
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <span id="UpdatedTextCDR" class="instructiontext">Call Updated: 10/15/2026</span>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <span id="UpdatedTextUBPR" class="instructiontext">UBPR Updated: 10/16/2026</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> 
+                    
+                <div class="c-r">
+                    <div class="c-10">
+
+                        <select size="6" name="ctl00$MainContentHolder$ListBox1" id="ListBox1" class="valuelabelN">
+		<option selected="selected" value="ReportingSeriesSinglePeriod">Call Reports -- Single Period</option>
+		<option value="ReportingSeriesSubsetSchedulesFourPeriods">Call Reports -- Balance Sheet, Income Statement, Past Due -- Four Periods</option>
+		<option value="PerformanceReportingSeriesSinglePeriod">UBPR Ratio -- Single Period</option>
+		<option value="PerformanceReportingSeriesFourPeriods">UBPR Ratio -- Four Periods</option>
+		<option value="PerformanceReportingSeriesRank">UBPR Rank -- Four Periods</option>
+		<option value="PerformanceReportingSeriesStats">UBPR Stats -- Four Periods</option>
+
+	</select>
+                    </div>
+                </div>
+
+                <div class="c-r">
+                    <div class="c-f">
+                        <label for="DatesDropDownList" id="DatesLabel1" class="captionlabel">
+							Reporting Period End Date <br /> <b>or</b> Year (Four Periods in a Calendar Year)
+                        </label>
+                    </div>
+                </div>
+                <div class="c-r">
+                    <div class="c3-f-fpg">
+
+                        <select name="ctl00$MainContentHolder$DatesDropDownList" id="DatesDropDownList" class="valuelabel">
+		<option selected="selected" value="152">06/30/2026</option>
+		<option value="151">03/31/2026</option>
+		<option value="150">12/31/2025</option>
+		<option value="149">09/30/2025</option>
+		<option value="147">06/30/2025</option>
+		<option value="146">03/31/2025</option>
+		<option value="145">12/31/2024</option>
+		<option value="144">09/30/2024</option>
+		<option value="142">06/30/2024</option>
+		<option value="141">03/31/2024</option>
+		<option value="140">12/31/2023</option>
+		<option value="139">09/30/2023</option>
+		<option value="137">06/30/2023</option>
+		<option value="136">03/31/2023</option>
+		<option value="135">12/31/2022</option>
+		<option value="134">09/30/2022</option>
+		<option value="132">06/30/2022</option>
+		<option value="131">03/31/2022</option>
+		<option value="130">12/31/2021</option>
+		<option value="129">09/30/2021</option>
+		<option value="127">06/30/2021</option>
+		<option value="126">03/31/2021</option>
+		<option value="125">12/31/2020</option>
+		<option value="124">09/30/2020</option>
+		<option value="122">06/30/2020</option>
+		<option value="121">03/31/2020</option>
+		<option value="120">12/31/2019</option>
+		<option value="119">09/30/2019</option>
+		<option value="116">06/30/2019</option>
+		<option value="115">03/31/2019</option>
+		<option value="114">12/31/2018</option>
+		<option value="111">09/30/2018</option>
+		<option value="110">06/30/2018</option>
+		<option value="108">03/31/2018</option>
+		<option value="107">12/31/2017</option>
+		<option value="106">09/30/2017</option>
+		<option value="105">06/30/2017</option>
+		<option value="102">03/31/2017</option>
+		<option value="101">12/31/2016</option>
+		<option value="95">09/30/2016</option>
+		<option value="90">06/30/2016</option>
+		<option value="87">03/31/2016</option>
+		<option value="86">12/31/2015</option>
+		<option value="85">09/30/2015</option>
+		<option value="83">06/30/2015</option>
+		<option value="82">03/31/2015</option>
+		<option value="81">12/31/2014</option>
+		<option value="80">09/30/2014</option>
+		<option value="79">06/30/2014</option>
+		<option value="78">03/31/2014</option>
+		<option value="76">12/31/2013</option>
+		<option value="75">09/30/2013</option>
+		<option value="74">06/30/2013</option>
+		<option value="73">03/31/2013</option>
+		<option value="72">12/31/2012</option>
+		<option value="71">09/30/2012</option>
+		<option value="69">06/30/2012</option>
+		<option value="68">03/31/2012</option>
+		<option value="67">12/31/2011</option>
+		<option value="66">09/30/2011</option>
+		<option value="65">06/30/2011</option>
+		<option value="64">03/31/2011</option>
+		<option value="63">12/31/2010</option>
+		<option value="62">09/30/2010</option>
+		<option value="61">06/30/2010</option>
+		<option value="60">03/31/2010</option>
+		<option value="58">12/31/2009</option>
+		<option value="57">09/30/2009</option>
+		<option value="56">06/30/2009</option>
+		<option value="54">03/31/2009</option>
+		<option value="52">12/31/2008</option>
+		<option value="51">09/30/2008</option>
+		<option value="50">06/30/2008</option>
+		<option value="48">03/31/2008</option>
+		<option value="47">12/31/2007</option>
+		<option value="46">09/30/2007</option>
+		<option value="45">06/30/2007</option>
+		<option value="44">03/31/2007</option>
+		<option value="43">12/31/2006</option>
+		<option value="40">09/30/2006</option>
+		<option value="39">06/30/2006</option>
+		<option value="38">03/31/2006</option>
+		<option value="37">12/31/2005</option>
+		<option value="33">09/30/2005</option>
+		<option value="30">06/30/2005</option>
+		<option value="29">03/31/2005</option>
+		<option value="26">12/31/2004</option>
+		<option value="27">09/30/2004</option>
+		<option value="25">06/30/2004</option>
+		<option value="24">03/31/2004</option>
+		<option value="28">12/31/2003</option>
+		<option value="1">09/30/2003</option>
+		<option value="2">06/30/2003</option>
+		<option value="3">03/31/2003</option>
+		<option value="4">12/31/2002</option>
+		<option value="5">09/30/2002</option>
+		<option value="6">06/30/2002</option>
+		<option value="7">03/31/2002</option>
+		<option value="23">12/31/2001</option>
+		<option value="22">09/30/2001</option>
+		<option value="21">06/30/2001</option>
+		<option value="20">03/31/2001</option>
+
+	</select>
+                    </div>
+                </div>
+
+                <div class="c-r">
+                    <div class="c-f">
+                        <span id="FormatsLabel" class="captionlabel">
+						Available File Formats
+                        </span><br />
+                        
+                        &nbsp;&nbsp;&nbsp;
+                                    <span class="captionlabel"><input id="TSVRadioButton" type="radio" name="ctl00$MainContentHolder$FormatType" value="TSVRadioButton" checked="checked" /><label for="TSVRadioButton">Tab Delimited</label></span><br />
+                        &nbsp;&nbsp;&nbsp;
+                                    <span class="captionlabel"><input id="XBRLRadiobutton" type="radio" name="ctl00$MainContentHolder$FormatType" value="XBRLRadiobutton" onclick="javascript:setTimeout(&#39;__doPostBack(\&#39;ctl00$MainContentHolder$XBRLRadiobutton\&#39;,\&#39;\&#39;)&#39;, 0)" /><label for="XBRLRadiobutton">eXtensible Business Reporting Language (XBRL)</label></span><br />
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <span id="NoteLabel2" class="captionlabel">
+						Note that the XBRL download option has received only limited instance validation testing.
+											
+                                    </span>
+                    </div>
+                </div>
+
+                <!-- <div class="c-r">
+                            <div class="c-f">
+                                
+                            </div>
+                        </div>-->
+                
+                    
+</div>
+            </div>
+        </div>
+    </div>
+
+
+    </div>
+
+                    </div>
+                </div>
+                <div class="pushLP"></div>
+            </div>
+            <div id="CustomizeMyUbprHolder"></div>
+        </div>
+        <div id="footerMenuArea" class="footerLP">
+            <hr />
+            <div class="container">
+                <div class="c-r">
+
+                    <div class="c-4">
+                    </div>
+                    <div class="c-8">
+                        <ul class="nav navbar-nav" role="menubar">
+                            <li role="presentation">
+                                <a href="/public/HelpFileContainers/WelcomeAdditionalInfo.aspx">About this Site</a></li>
+                            <li role="presentation">
+                                <a href="/public/HelpFileContainers/AdditionalNoticeInfo.aspx">Privacy Policy</a></li>
+
+                            <li role="presentation">
+                                <a href="/public/AccessibilityNotes.aspx" title="Accessibility Notes">Accessibility</a></li>
+                            <li role="presentation">
+                                <a href="/public/LegalNotice.aspx" title="Legal Notice">Legal Notice</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="c-r">
+                    <div class="c-f">
+                        <span id="disclaimerHeaderLabel" class="legalnoticefootnote">Access or use of this website constitutes consent to these terms.</span>
+                    </div>
+                </div>
+                <div class="c-r">
+                    <div class="c-f">
+                        <span id="disclaimerLabel" class="legalnoticefootnote">This is a protected U.S. Government web site. 
+				    To intentionally cause damage to it or to any FFIEC or agency electronic facility or data 
+				    through the knowing transmission of any program, information, code, or command is unlawful. 
+				    This system and related equipment are subject to monitoring. Information regarding users
+				    may be obtained and disclosed to authorized personnel, including law enforcement authorities,
+				    for official purposes. Access to or use of this web site constitutes consent to these terms.</span>
+                        &nbsp;
+                    </div>
+                </div>
+            </div>
+        </div>
+               
+        
+        <script src="/public/includes/lab.js?v=727285"></script>
+        
+        <script>  
+            var PDDhome = "/Public";
+            var AppPath = "/Public";
+            var _master = "PddSite";
+            var Ubprreportstr1 = "Reports/UbprPublicReport.aspx?rptCycleIds=INSERTRCIDS&rptid=283&idrssd=";
+            var Ubprreportstr2 = "&peerGroupType=&supplemental=";
+            var Ubprpgreportstr1 = "Reports/UbprCustomPG.aspx?rptCycleIds=INSERTRCIDS&rptid=288";
+            var ReportFirstPeriod = "3/31/2005";
+            var ReleaseFilter = "12/31/2002";
+            var customfirstperiod = "12/31/2003";
+            var dateFilter = "03/31/2001";
+            
+            <!--var Ubprpgreportstr2 = "";-->
+        var minHrs = "6";
+            var minDays = "0";
+        var showNotice = "False";
+            
+        var CurrentPage = "";
+            var urlhost = ('https:' == document.location.protocol ? "https://" : "http://") + "cdr.ffiec.gov";
+            var fmstr_userId;           
+        $LAB.setOptions({AlwaysPreserveOrder:true})
+              .script("/public/includes/respond.js?v=727285")
+              .script("/public/includes/jQuery-3.7.1.js?v=727285").wait()
+             
+               .script("/public/includes/cdr-widgets.js?v=727285").wait()
+              .script("/public/includes/utilities.js?v=727285")
+               .script("/public/datatables/datatables.js?v=727285").wait()
+    .script("/public/includes/DataTablesGrid.js?v=727285").wait()
+
+              .script("/public/Reports/MyUbprReport.js?v=727285")
+              .script("/public/PddSite.Master.js?v=727285")
+            .wait(function () {
+            InitiateMaster();               
+            (function (i, s, o, g, r, a, m) {
+                        i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                            (i[r].q = i[r].q || []).push(arguments)
+                        }, i[r].l = 1 * new Date(); a = s.createElement(o),
+                        m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+                    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+                    ga('create', 'UA-32462977-1', 'auto');
+                    ga('send', 'pageview');
+                    fmstr_userId = '';
+                var userID = '';
+    			if (fmstr_userId !== undefined)
+        			userID = fmstr_userId;
+    			localStorage.setItem('userID', userID);
+            })
+        
+        
+        ;                      
+        </script>
+    </form>
+</body>
+</html>
+
+
+
+

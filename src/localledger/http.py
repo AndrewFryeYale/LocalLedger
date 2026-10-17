@@ -134,6 +134,7 @@ class HttpClient:
         *,
         params: dict[str, Any] | None = None,
         data: dict[str, Any] | None = None,
+        json_body: Any | None = None,
         headers: dict[str, str] | None = None,
         interval: float | None = None,
         check_robots: bool = True,
@@ -149,7 +150,7 @@ class HttpClient:
         for attempt in range(retries):
             self._limiter.wait(host, wait)
             try:
-                resp = self._client.request(method, url, params=params, data=data, headers=headers)
+                resp = self._client.request(method, url, params=params, data=data, json=json_body, headers=headers)
             except httpx.HTTPError as exc:
                 last_exc = exc
                 time.sleep(2 * (attempt + 1))
@@ -281,7 +282,7 @@ class DocStore:
             meta_json=json.dumps(meta) if meta else None,
         )
         self.session.add(doc)
-        self.session.flush()
+        self.session.commit()  # short write transactions: other processes (web, war room, ledger) keep writing
         return doc
 
 
@@ -307,6 +308,13 @@ def read_document_text(doc: Document, settings: Settings | None = None) -> str:
         text = pdf_to_text(raw)
     elif doc.content_type == "text/html":
         text = html_to_text(raw)
+    elif doc.content_type == "application/zip":
+        import io
+        import zipfile
+
+        with zipfile.ZipFile(io.BytesIO(raw)) as z:
+            names = [n for n in z.namelist() if n.lower().endswith((".csv", ".txt"))]
+            text = z.read(names[0]).decode("utf-8", errors="replace").replace("\r\n", "\n") if names else ""
     else:
         return raw.decode("utf-8", errors="replace")
     # Extraction improved since this doc was stored: write a new versioned text file (raw bytes untouched).

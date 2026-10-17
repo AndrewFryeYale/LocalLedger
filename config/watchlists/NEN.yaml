@@ -1,0 +1,23 @@
+# New England Realty Associates LP. Agenda keywords for the City of Boston (Council, Zoning Board of Appeal, BPDA).
+# Sources: "10-K" = FY2025 10-K filed 2026-03-13 (documents.id 129), property table (Boston-proper addresses only;
+# Allston and Brighton are Boston neighbourhoods); "Note" = Note column (Boston-area apartments - rent policy).
+ticker: NEN
+company:
+  - New England Realty Associates      # 10-K registrant
+  - New England Realty
+  - Hamilton Company                   # 10-K: The Hamilton Company, Inc., NEN's property manager (applicant name)
+  - {term: NewReal, weight: 0.7}       # 10-K: NewReal, Inc., the general partner
+parcels:
+  - 62 Boylston Street                 # 10-K: Boylston Downtown L.P., 268 units, Boston
+  - 26-30 Rutland Street               # 10-K: South End mixed-use acquisition (2023)
+  - 105-117 West Concord Street        # 10-K: same acquisition
+  - 475 Shawmut Avenue                 # 10-K: same acquisition
+  - 154 North Beacon Street            # 10-K: Brighton
+  - 39 Brighton Avenue                 # 10-K: principal office, Allston
+  - 26 Brighton Avenue                 # 10-K: Allston
+policy:
+  - {term: rent stabilization, weight: 0.6}   # Note column: rent policy (not in 10-K)
+  - {term: rent control, weight: 0.6}
+generic:
+  - Allston
+  - Brighton

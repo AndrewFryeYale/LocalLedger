@@ -1,0 +1,33 @@
+# Canterbury Park Holding Corp. Agenda keywords for the City of Shakopee, MN (Council, EDA, Planning).
+# Sources: "10-K" = FY2025 10-K filed 2026-03-10 (documents.id 8); "Note" = Note column (Shakopee TIF; MN Racing
+# Commission; sports-betting bills). Shakopee's agendas are on Granicus, whose robots.txt disallows all agents,
+# so no connector feeds this list yet (BLOCKERS.md).
+ticker: CPHC
+company:
+  - Canterbury Park                    # 10-K
+  - Canterbury Park Holding            # 10-K registrant
+  - Canterbury Development             # 10-K: Canterbury Development LLC (real-estate subsidiary)
+  # Bare "Canterbury" is a common street/subdivision name: count it only next to track/development words.
+  - {term: Canterbury, weight: 0.6, near: [Park, Commons, racetrack, race track, horse racing, card casino, card club, Doran, Triple Crown, TIF], window: 80}
+projects:
+  - Canterbury Commons                 # 10-K: the ~140-acre redevelopment around the track (Note: Shakopee TIF)
+  - Doran Canterbury                   # 10-K: Doran Canterbury I/II apartment JVs
+  - Triple Crown Residences            # 10-K: Triple Crown Residences at Canterbury
+  - {term: Trackside Investments, weight: 0.8}   # 10-K: JV entity
+policy:
+  - {term: Racing Commission, weight: 0.5, near: [Minnesota, Canterbury], window: 120}   # Note column
+generic:
+  - Running Aces                       # 10-K: competitor track (context)
+  - Doran Companies                    # 10-K: development partner (also builds elsewhere)
+exclude:
+  - Canterbury Road
+  - Canterbury Lane
+  - Canterbury Drive
+  - Canterbury Court
+  - Canterbury Circle
+  - Canterbury Way
+  - Canterbury Street
+  - Canterbury Place
+  - Canterbury Trail
+  - Canterbury Tales
+  - Archbishop of Canterbury

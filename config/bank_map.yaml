@@ -1,0 +1,241 @@
+# Ticker -> FDIC-insured bank for the FFIEC Call Report connector (src/localledger/connectors/ffiec.py).
+#
+# overrides: set by hand; they always win. Give cert (FDIC certificate), rssd (Federal Reserve RSSD ID), bank, and a
+#            basis saying where you verified it (e.g. the 10-K's description of the bank subsidiary).
+# auto:      written by build_bank_map() on each run for tickers not yet mapped. It matches the holding company's EDGAR
+#            name (and the universe name) and business state against active FDIC BankFind institutions (holding-company
+#            name NAMEHCR, state STALPHCR/STALP). When a holding company owns several banks, the largest by total
+#            assets is used. Exact name matches (after expanding FDIC abbreviations like BCORP/FINL) are accepted;
+#            fuzzy matches only with the same state and a clear margin.
+# unmapped:  tickers with no confident match, and why. Low-confidence matches are never accepted. Fix with an override.
+#
+# Delete an auto entry to force a re-match on the next run.
+
+generated: '2026-10-17'
+source: https://api.fdic.gov/banks/institutions (active institutions; NAMEHCR, STALPHCR, ASSET)
+overrides:
+  BYFC: {cert: 34352, rssd: 2697963, bank: 'City First Bank, National Association', city: Washington, state: DC, holding_company: CITY FIRST ENTERPRISES INC, basis: 'Broadway Financial Corp 10-K for FY2025
+      (filed 2026-03-31) names City First Bank, National Association as its bank. FDIC BankFind lists that bank (cert 34352) under top-tier holder City First Enterprises Inc, so the EDGAR name can''t match
+      automatically. Verified 2026-10-17.'}
+  FGBI: {cert: 14028, rssd: 422433, bank: First Guaranty Bank, city: Hammond, state: LA, holding_company: SMITH&HOOD HOLDING CO L L C, basis: 'First Guaranty Bancshares 10-K for FY2025 (filed 2026-03-31)
+      and 10-Q (filed 2026-08-14): the bank is First Guaranty Bank, Hammond, LA. FDIC BankFind shows Smith & Hood Holding Co LLC as the top-tier holder of cert 14028, and the auto-matcher''s closest name
+      (Great Guaranty Bancshares) is a different bank. Verified 2026-10-17.'}
+  FRBA: {cert: 58481, rssd: 3401970, bank: First Bank, city: Hamilton, state: NJ, holding_company: null, basis: 'First Bank (Hamilton, NJ) is itself the Nasdaq-listed issuer, with no holding company (it
+      files with the FDIC, not the SEC). FDIC BankFind: First Bank, Hamilton NJ, cert 58481, $4.09B assets. The auto-match is ambiguous because many banks are named First Bank. Verified 2026-10-17.'}
+  KFFB: {cert: 29937, rssd: 741974, bank: First Federal Savings Bank of Kentucky, city: Frankfort, state: KY, holding_company: FIRST FEDERAL MHC, basis: 'Kentucky First Federal Bancorp 10-K (filed 2026-09-28)
+      names two banks: First Federal Savings and Loan Association of Hazard and First Federal Savings Bank of Kentucky. Both sit under top-tier holder First Federal MHC in FDIC BankFind. We use the larger:
+      Frankfort, cert 29937, $282.6M assets (Hazard is cert 31197, $81.3M). Verified 2026-10-17.'}
+auto:
+  ASRV: {cert: 7542, rssd: 928618, bank: Ameriserv Financial Bank, city: Johnstown, state: PA, holding_company: AMERISERV FINANCIAL INC, holding_rssd: 1117316, banks_in_holding: 1, bank_assets_k: 1458453,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: AmeriServ Financial}
+  ATLO: {cert: 1545, rssd: 820048, bank: 'First National Bank, Ames, Iowa', city: Ames, state: IA, holding_company: AMES NATIONAL CORP, holding_rssd: 1202258, banks_in_holding: 6, bank_assets_k: 1111663,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Ames National}
+  AUBN: {cert: 35, rssd: 749635, bank: AuburnBank, city: Auburn, state: AL, holding_company: AUBURN NATIONAL BCORP INC, holding_rssd: 1129533, banks_in_holding: 1, bank_assets_k: 1085002, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Auburn National Bancorporation}
+  AVBC: {cert: 90215, rssd: 619701, bank: Avidia Bank, city: Hudson, state: MA, holding_company: AVIDIA BCORP INC, holding_rssd: 6031006, banks_in_holding: 1, bank_assets_k: 2770996, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Avidia Bancorp}
+  AVBH: {cert: 57510, rssd: 3214059, bank: Avidbank, city: San Jose, state: CA, holding_company: AVIDBANK HOLDINGS INC, holding_rssd: 3680980, banks_in_holding: 1, bank_assets_k: 2652805, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Avidbank Holdings}
+  BAFN: {cert: 34997, rssd: 2771694, bank: BayFirst National Bank, city: Saint Petersburg, state: FL, holding_company: BAYFIRST FINANCIAL CORP, holding_rssd: 2881650, banks_in_holding: 1, bank_assets_k: 1136157,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: BayFirst Financial}
+  BCBP: {cert: 35541, rssd: 2954059, bank: BCB Community Bank, city: Bayonne, state: NJ, holding_company: BCB BCORP INC, holding_rssd: 3170539, banks_in_holding: 1, bank_assets_k: 3117295, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: BCB Bancorp}
+  BCML: {cert: 57716, rssd: 3281510, bank: United Business Bank, city: Walnut Creek, state: CA, holding_company: BAYCOM CORP, holding_rssd: 5069897, banks_in_holding: 1, bank_assets_k: 2564693, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: BayCom Corp}
+  BMRC: {cert: 32779, rssd: 1436204, bank: Bank of Marin, city: Novato, state: CA, holding_company: BANK OF MARIN BCORP, holding_rssd: 3590388, banks_in_holding: 1, bank_assets_k: 3856103, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Bank of Marin Bancorp}
+  BOTJ: {cert: 35207, rssd: 2787770, bank: Bank of the James, city: Lynchburg, state: VA, holding_company: BK JAMES FINL GROUP INC, holding_rssd: 3217032, banks_in_holding: 1, bank_assets_k: 1033600, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: BANK OF THE JAMES FINANCIAL GROUP INC}
+  BPRN: {cert: 58513, rssd: 3595271, bank: The Bank of Princeton, city: Princeton, state: NJ, holding_company: PRINCETON BCORP INC, holding_rssd: 5756133, banks_in_holding: 1, bank_assets_k: 2250271, fdic_repdte: 06/30/2026,
+    match: name_exact_unique (state differs), confidence: medium, score: 100.0, matched_on: Princeton Bancorp}
+  BRBS: {cert: 35274, rssd: 233527, bank: 'Blue Ridge Bank,  National Association', city: Martinsville, state: VA, holding_company: BLUE RIDGE BANKSHARES INC, holding_rssd: 1426960, banks_in_holding: 1,
+    bank_assets_k: 2310031, fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Blue Ridge Bankshares}
+  BSBK: {cert: 29941, rssd: 927479, bank: Bogota Savings Bank, city: Teaneck, state: NJ, holding_company: BOGOTA FINANCIAL MHC, holding_rssd: 5423547, banks_in_holding: 1, bank_assets_k: 871758, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Bogota Financial}
+  BVFL: {cert: 32527, rssd: 242976, bank: BayVanguard Bank, city: Baltimore, state: MD, holding_company: BV FINANCIAL INC, holding_rssd: 3364178, banks_in_holding: 1, bank_assets_k: 868706, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: BV Financial}
+  CBAN: {cert: 22257, rssd: 491934, bank: Colony Bank, city: Fitzgerald, state: GA, holding_company: COLONY BANKCORP INC, holding_rssd: 1085170, banks_in_holding: 1, bank_assets_k: 3613411, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Colony Bankcorp}
+  CBFV: {cert: 7848, rssd: 371924, bank: Community Bank, city: Carmichaels, state: PA, holding_company: CB FINANCIAL SERVICES INC, holding_rssd: 3333718, banks_in_holding: 1, bank_assets_k: 1656420, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: CB Financial Services}
+  CBK: {cert: 22354, rssd: 497039, bank: Commercial Bank, city: Harrogate, state: TN, holding_company: COMMERCIAL BANCGROUP INC, holding_rssd: 1080652, banks_in_holding: 1, bank_assets_k: 2355536, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Commercial Bancgroup}
+  CBNA: {cert: 58595, rssd: 3597211, bank: 'Chain Bridge Bank, National Association', city: Mclean, state: VA, holding_company: CHAIN BRIDGE BCORP INC, holding_rssd: 3597220, banks_in_holding: 1, bank_assets_k: 2192216,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Chain Bridge Bancorp}
+  CFBK: {cert: 28263, rssd: 767974, bank: 'CFBank, National Association', city: Columbus, state: OH, holding_company: CF BANKSHARES INC, holding_rssd: 3828577, banks_in_holding: 1, bank_assets_k: 2167338,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: CF Bankshares}
+  CFFI: {cert: 10363, rssd: 928421, bank: Citizens and Farmers Bank, city: West Point, state: VA, holding_company: C&F FINANCIAL CORP, holding_rssd: 2183493, banks_in_holding: 1, bank_assets_k: 2787917,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: C&F Financial}
+  CHMG: {cert: 597, rssd: 884303, bank: 'Chemung Canal Trust Company, National Association', city: Elmira, state: NY, holding_company: CHEMUNG FINANCIAL CORP, holding_rssd: 1133594, banks_in_holding: 1,
+    bank_assets_k: 2818102, fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Chemung Financial}
+  CLST: {cert: 29804, rssd: 420578, bank: Catalyst Bank, city: Opelousas, state: LA, holding_company: CATALYST BCORP INC, holding_rssd: 5587775, banks_in_holding: 1, bank_assets_k: 286787, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Catalyst Bancorp}
+  CMTV: {cert: 6271, rssd: 270504, bank: Community National Bank, city: Derby, state: VT, holding_company: COMMUNITY BCORP, holding_rssd: 1115040, banks_in_holding: 1, bank_assets_k: 1172186, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Community Bancorp}
+  COSO: {cert: 57756, rssd: 3274709, bank: Coastal States Bank, city: Hilton Head Island, state: SC, holding_company: COASTALSOUTH BANCSHARES INC, holding_rssd: 3274727, banks_in_holding: 1, bank_assets_k: 2418168,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: CoastalSouth Bancshares}
+  CPBI: {cert: 29476, rssd: 317379, bank: Home Federal Savings and Loan Association of Grand Island, city: Grand Island, state: NE, holding_company: CENTRAL PLAINS BANCSHARES INC, holding_rssd: 5860179,
+    banks_in_holding: 1, bank_assets_k: 562858, fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Central Plains Bancshares}
+  CZFS: {cert: 7593, rssd: 978118, bank: First Citizens Community Bank, city: Mansfield, state: PA, holding_company: CITIZENS FINL SERVICES INC, holding_rssd: 1118368, banks_in_holding: 1, bank_assets_k: 3187334,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Citizens Financial Services}
+  CZNC: {cert: 7799, rssd: 895710, bank: Citizens & Northern Bank, city: Wellsboro, state: PA, holding_company: CITIZENS&NORTHERN CORP, holding_rssd: 1143623, banks_in_holding: 1, bank_assets_k: 3143130,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Citizens & Northern}
+  CZWI: {cert: 57265, rssd: 962890, bank: CCFBank National Association, city: Altoona, state: WI, holding_company: CITIZENS COMMUNITY BCORP INC, holding_rssd: 3823929, banks_in_holding: 1, bank_assets_k: 1811475,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Citizens Community Bancorp}
+  EBMT: {cert: 30182, rssd: 685676, bank: Opportunity Bank of Montana, city: Helena, state: MT, holding_company: EAGLE BCORP MONTANA INC, holding_rssd: 4126609, banks_in_holding: 1, bank_assets_k: 2122995,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Eagle Bancorp Montana}
+  ECBK: {cert: 26444, rssd: 952172, bank: Everett Co-operative Bank, city: Everett, state: MA, holding_company: ECB BCORP INC, holding_rssd: 5723621, banks_in_holding: 1, bank_assets_k: 1671230, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: ECB Bancorp}
+  EFSI: {cert: 6123, rssd: 753324, bank: Bank Of Clarke, city: Berryville, state: VA, holding_company: EAGLE FINANCIAL SERVICES INC, holding_rssd: 1951770, banks_in_holding: 1, bank_assets_k: 1847024, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Eagle Financial Services}
+  FBLA: {cert: 28316, rssd: 255574, bank: FIDELITY BANK, city: New Orleans, state: LA, holding_company: FB BCORP INC, holding_rssd: 5926413, banks_in_holding: 1, bank_assets_k: 1226355, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: FB Bancorp}
+  FCAP: {cert: 31223, rssd: 716374, bank: First Harrison Bank, city: Corydon, state: IN, holding_company: FIRST CAPITAL INC, holding_rssd: 2867458, banks_in_holding: 1, bank_assets_k: 1287594, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: First Capital Inc}
+  FCBM: {cert: 35530, rssd: 2963266, bank: First Carolina Bank, city: Rocky Mount, state: NC, holding_company: FIRST CAROLINA FINL SERVICES, holding_rssd: 4346706, banks_in_holding: 1, bank_assets_k: 3405879,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: First Carolina Financial Services}
+  FCCO: {cert: 34047, rssd: 2328137, bank: First Community Bank, city: Lexington, state: SC, holding_company: FIRST COMMUNITY CORP, holding_rssd: 2337401, banks_in_holding: 1, bank_assets_k: 2380900, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: First Community Corp}
+  FDBC: {cert: 11868, rssd: 1007819, bank: The Fidelity Deposit and Discount Bank, city: Dunmore, state: PA, holding_company: FIDELITY D&D BCORP INC, holding_rssd: 2858773, banks_in_holding: 1, bank_assets_k: 2971307,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Fidelity D & D Bancorp}
+  FDSB: {cert: 27697, rssd: 837970, bank: Fifth District Savings Bank, city: New Orleans, state: LA, holding_company: FIFTH DISTRICT BCORP INC, holding_rssd: 5926918, banks_in_holding: 1, bank_assets_k: 531766,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Fifth District Bancorp}
+  FINW: {cert: 35323, rssd: 2880019, bank: FinWise Bank, city: Murray, state: UT, holding_company: FINWISE BCORP, holding_rssd: 3157549, banks_in_holding: 1, bank_assets_k: 915475, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: FinWise Bancorp}
+  FMAO: {cert: 5969, rssd: 214414, bank: The Farmers & Merchants State Bank, city: Archbold, state: OH, holding_company: FARMERS&MERCHANTS BCORP INC, holding_rssd: 1134630, banks_in_holding: 1, bank_assets_k: 3490494,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Farmers & Merchants Bancorp}
+  FNLC: {cert: 4256, rssd: 439404, bank: First National Bank, city: Damariscotta, state: ME, holding_company: FIRST BCORP INC THE, holding_rssd: 1133932, banks_in_holding: 1, bank_assets_k: 3180486, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: The First Bancorp}
+  FNRN: {cert: 3440, rssd: 783161, bank: First Northern Bank of Dixon, city: Dixon, state: CA, holding_company: FIRST NORTHERN COMMUNITY BCORP, holding_rssd: 2880626, banks_in_holding: 1, bank_assets_k: 1925947,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: First Northern Community Bancorp}
+  FNWB: {cert: 28405, rssd: 403179, bank: First Fed Bank, city: Port Angeles, state: WA, holding_company: FIRST NORTHWEST BCORP, holding_rssd: 4438366, banks_in_holding: 1, bank_assets_k: 2106581, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: First Northwest Bancorp}
+  FNWD: {cert: 29523, rssd: 568470, bank: Peoples Bank, city: Munster, state: IN, holding_company: FINWARD BCORP, holding_rssd: 2237118, banks_in_holding: 1, bank_assets_k: 2040214, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Finward Bancorp}
+  FRAF: {cert: 8405, rssd: 289515, bank: Farmers and Merchants Trust Company of Chambersburg, city: Chambersburg, state: PA, holding_company: FRANKLIN FINL SERVICES CORP, holding_rssd: 1118238, banks_in_holding: 1,
+    bank_assets_k: 2336081, fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Franklin Financial Services}
+  FRST: {cert: 57968, rssd: 3325759, bank: Primis Bank, city: Tappahannock, state: VA, holding_company: PRIMIS FINANCIAL CORP, holding_rssd: 3325740, banks_in_holding: 1, bank_assets_k: 4336833, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Primis Financial}
+  FSBW: {cert: 57633, rssd: 1018927, bank: 1st Security Bank of Washington, city: Mountlake Terrace, state: WA, holding_company: FS BCORP INC, holding_rssd: 4347208, banks_in_holding: 1, bank_assets_k: 3178672,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: FS Bancorp}
+  FSEA: {cert: 29744, rssd: 119872, bank: First Seacoast Bank, city: Dover, state: NH, holding_company: FIRST SEACOAST BCORP INC, holding_rssd: 5371479, banks_in_holding: 1, bank_assets_k: 576306, fdic_repdte: 06/30/2026,
+    match: name_exact, confidence: high, score: 100.0, matched_on: First Seacoast Bancorp}
+  FUNC: {cert: 4857, rssd: 61122, bank: First United Bank & Trust, city: Oakland, state: MD, holding_company: FIRST UNITED CORP, holding_rssd: 1132672, banks_in_holding: 1, bank_assets_k: 2054956, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: First United Corp}
+  FUSB: {cert: 17077, rssd: 259330, bank: First US Bank, city: Birmingham, state: AL, holding_company: FIRST US BANCSHARES INC, holding_rssd: 1086168, banks_in_holding: 1, bank_assets_k: 1147614, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: First US Bancshares}
+  FVCB: {cert: 58696, rssd: 3614976, bank: FVCbank, city: Fairfax, state: VA, holding_company: FVCBANKCORP INC, holding_rssd: 4875907, banks_in_holding: 1, bank_assets_k: 2362694, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: FVCBankcorp}
+  FXNC: {cert: 6917, rssd: 899428, bank: First Bank, city: Strasburg, state: VA, holding_company: FIRST NATIONAL CORP, holding_rssd: 1076123, banks_in_holding: 1, bank_assets_k: 2073688, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: First National Corp}
+  GBFH: {cert: 58626, rssd: 3636446, bank: GBank, city: Las Vegas, state: NV, holding_company: GBANK FINANCIAL HOLDINGS INC, holding_rssd: 5170805, banks_in_holding: 1, bank_assets_k: 1427371, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: GBank Financial Holdings}
+  HFBL: {cert: 27654, rssd: 804374, bank: Home Federal Bank, city: Shreveport, state: LA, holding_company: HOME FEDERAL BCORP INC OF LA, holding_rssd: 4253121, banks_in_holding: 1, bank_assets_k: 644022,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Home Federal Bancorp of Louisiana}
+  HNVR: {cert: 58675, rssd: 3793714, bank: Hanover Community Bank, city: Garden City Park, state: NY, holding_company: HANOVER BCORP INC, holding_rssd: 5010134, banks_in_holding: 1, bank_assets_k: 2334897,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Hanover Bancorp}
+  HWBK: {cert: 10619, rssd: 508346, bank: Hawthorn Bank, city: Jefferson City, state: MO, holding_company: HAWTHORN BANCSHARES INC, holding_rssd: 2038409, banks_in_holding: 1, bank_assets_k: 1759840, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Hawthorn Bancshares}
+  HYNE: {cert: 28747, rssd: 447070, bank: Hoyne Savings Bank, city: Chicago, state: IL, holding_company: HOYNE BCORP INC, holding_rssd: 6052850, banks_in_holding: 1, bank_assets_k: 479907, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Hoyne Bancorp}
+  INBK: {cert: 34607, rssd: 2758613, bank: First Internet Bank of Indiana, city: Fishers, state: IN, holding_company: FIRST INTERNET BCORP, holding_rssd: 3393178, banks_in_holding: 1, bank_assets_k: 5526397,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: First Internet Bancorp}
+  ISBA: {cert: 1005, rssd: 74140, bank: Isabella Bank, city: Mount Pleasant, state: MI, holding_company: ISABELLA BANK CORP, holding_rssd: 1401118, banks_in_holding: 1, bank_assets_k: 2170035, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Isabella Bank}
+  ISTR: {cert: 58316, rssd: 3449066, bank: 'Investar Bank, National Association', city: Baton Rouge, state: LA, holding_company: INVESTAR HOLDING CORP, holding_rssd: 4090054, banks_in_holding: 1, bank_assets_k: 3851603,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Investar Holding}
+  JMSB: {cert: 58243, rssd: 3419416, bank: John Marshall Bank, city: Reston, state: VA, holding_company: JOHN MARSHALL BCORP INC, holding_rssd: 5039724, banks_in_holding: 1, bank_assets_k: 2398504, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: John Marshall Bancorp}
+  LARK: {cert: 5826, rssd: 481177, bank: Landmark National Bank, city: Manhattan, state: KS, holding_company: LANDMARK BCORP INC, holding_rssd: 3030307, banks_in_holding: 1, bank_assets_k: 1601369, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Landmark Bancorp}
+  LCNB: {cert: 6623, rssd: 785923, bank: LCNB National Bank, city: Lebanon, state: OH, holding_company: LCNB CORP, holding_rssd: 2759900, banks_in_holding: 1, bank_assets_k: 2219306, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: LCNB Corp}
+  LSBK: {cert: 30530, rssd: 301574, bank: Lake Shore Bank, city: Dunkirk, state: NY, holding_company: LAKE SHORE BCORP INC, holding_rssd: 3793086, banks_in_holding: 1, bank_assets_k: 735882, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Lake Shore Bancorp}
+  MBBC: {cert: 29745, rssd: 596978, bank: Marathon Bank, city: Wausau, state: WI, holding_company: MARATHON BCORP INC, holding_rssd: 5557518, banks_in_holding: 1, bank_assets_k: 261059, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Marathon Bancorp}
+  MGYR: {cert: 30704, rssd: 548771, bank: Magyar Bank, city: New Brunswick, state: NJ, holding_company: MAGYAR BCORP INC, holding_rssd: 3382846, banks_in_holding: 1, bank_assets_k: 1047615, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Magyar Bancorp}
+  MNSB: {cert: 57742, rssd: 3248849, bank: MainStreet Bank, city: Fairfax, state: VA, holding_company: MAINSTREET BANCSHARES INC, holding_rssd: 4977397, banks_in_holding: 1, bank_assets_k: 2238825, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: MainStreet Bancshares}
+  MRBK: {cert: 57777, rssd: 3271799, bank: Meridian Bank, city: Wayne, state: PA, holding_company: MERIDIAN CORP, holding_rssd: 5033580, banks_in_holding: 1, bank_assets_k: 2591552, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Meridian Corp}
+  MVBF: {cert: 34603, rssd: 2757205, bank: 'MVB Bank, Inc', city: Fairmont, state: WV, holding_company: MVB FINANCIAL CORP, holding_rssd: 3211601, banks_in_holding: 1, bank_assets_k: 3497075, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: MVB Financial}
+  MYFW: {cert: 57607, rssd: 3158546, bank: First Western Trust Bank, city: Denver, state: CO, holding_company: FIRST WESTERN FINANCIAL INC, holding_rssd: 3189906, banks_in_holding: 1, bank_assets_k: 3236756,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: First Western Financial}
+  NECB: {cert: 29147, rssd: 823478, bank: NorthEast Community Bank, city: White Plains, state: NY, holding_company: NORTHEAST COMMUNITY BCORP INC, holding_rssd: 3435742, banks_in_holding: 1, bank_assets_k: 2111015,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Northeast Community Bancorp}
+  NEWT: {cert: 18734, rssd: 502111, bank: 'Newtek Bank, National Association', city: Miami, state: FL, holding_company: NEWTEKONE INC, holding_rssd: 5586741, banks_in_holding: 1, bank_assets_k: 2473353,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: NewtekOne}
+  NKSH: {cert: 6821, rssd: 754929, bank: The National Bank of Blacksburg, city: Blacksburg, state: VA, holding_company: NATIONAL BANKSHARES INC, holding_rssd: 1139925, banks_in_holding: 1, bank_assets_k: 1832140,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: National Bankshares}
+  NSTS: {cert: 27683, rssd: 775773, bank: North Shore Trust and Savings, city: Waukegan, state: IL, holding_company: NSTS BCORP INC, holding_rssd: 5654323, banks_in_holding: 1, bank_assets_k: 270259, fdic_repdte: 06/30/2026,
+    match: name_exact, confidence: high, score: 100.0, matched_on: NSTS Bancorp}
+  NWFL: {cert: 698, rssd: 59316, bank: Wayne Bank, city: Honesdale, state: PA, holding_company: NORWOOD FINANCIAL CORP, holding_rssd: 2365356, banks_in_holding: 1, bank_assets_k: 2905992, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Norwood Financial}
+  OPBK: {cert: 57944, rssd: 3357219, bank: Open Bank, city: Los Angeles, state: CA, holding_company: OP BCORP, holding_rssd: 4980409, banks_in_holding: 1, bank_assets_k: 2745961, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: OP Bancorp}
+  OPHC: {cert: 35430, rssd: 2953418, bank: OptimumBank, city: Fort Lauderdale, state: FL, holding_company: OPTIMUMBANK HOLDINGS INC, holding_rssd: 3251661, banks_in_holding: 1, bank_assets_k: 1386526, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: OptimumBank Holdings}
+  OVBC: {cert: 384, rssd: 498317, bank: The Ohio Valley Bank Company, city: Gallipolis, state: OH, holding_company: OHIO VALLEY BANC CORP, holding_rssd: 2012436, banks_in_holding: 1, bank_assets_k: 1646225,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Ohio Valley Banc}
+  OVLY: {cert: 33457, rssd: 1864197, bank: Oak Valley Community Bank, city: Oakdale, state: CA, holding_company: OAK VALLEY BCORP, holding_rssd: 3726440, banks_in_holding: 1, bank_assets_k: 2001344, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Oak Valley Bancorp}
+  PBFS: {cert: 20741, rssd: 237619, bank: 'Pioneer Bank, National Association', city: Albany, state: NY, holding_company: PIONEER BCORP MHC, holding_rssd: 5374461, banks_in_holding: 1, bank_assets_k: 2340761,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Pioneer Bancorp}
+  PBHC: {cert: 57497, rssd: 729310, bank: Pathfinder Bank, city: Oswego, state: NY, holding_company: PATHFINDER BCORP INC, holding_rssd: 2596776, banks_in_holding: 1, bank_assets_k: 1485888, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Pathfinder Bancorp}
+  PCB: {cert: 57463, rssd: 3212402, bank: PCB Bank, city: Los Angeles, state: CA, holding_company: PCB BCORP, holding_rssd: 3595084, banks_in_holding: 1, bank_assets_k: 3469065, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: PCB Bancorp}
+  PDLB: {cert: 31189, rssd: 897170, bank: 'Ponce Bank, National Association', city: Bronx, state: NY, holding_company: PONCE FINANCIAL GROUP INC, holding_rssd: 5653018, banks_in_holding: 1, bank_assets_k: 3485007,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Ponce Financial Group}
+  PEBK: {cert: 5956, rssd: 220527, bank: Peoples Bank, city: Newton, state: NC, holding_company: PEOPLES BCORP OF NC INC, holding_rssd: 2818245, banks_in_holding: 1, bank_assets_k: 1764418, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Peoples Bancorp of North Carolina}
+  PKBK: {cert: 34888, rssd: 2764212, bank: Parke Bank, city: Sewell, state: NJ, holding_company: PARKE BCORP INC, holding_rssd: 3347292, banks_in_holding: 1, bank_assets_k: 2302646, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Parke Bancorp}
+  PLBC: {cert: 23275, rssd: 670467, bank: Plumas Bank, city: Quincy, state: CA, holding_company: PLUMAS BCORP, holding_rssd: 3098576, banks_in_holding: 1, bank_assets_k: 2277465, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Plumas Bancorp}
+  PNBK: {cert: 33928, rssd: 2236821, bank: 'Patriot Bank, National Association', city: Stamford, state: CT, holding_company: PATRIOT NATIONAL BCORP INC, holding_rssd: 2840479, banks_in_holding: 1, bank_assets_k: 1322925,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Patriot National Bancorp}
+  PROV: {cert: 30879, rssd: 631570, bank: 'Provident Savings Bank, F.S.B.', city: Riverside, state: CA, holding_company: PROVIDENT FINL HOLDINGS INC, holding_rssd: 3632493, banks_in_holding: 1, bank_assets_k: 1208112,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Provident Financial Holdings}
+  QNBC: {cert: 7714, rssd: 852713, bank: QNB Bank, city: Quakertown, state: PA, holding_company: QNB CORP, holding_rssd: 1118434, banks_in_holding: 1, bank_assets_k: 2374999, fdic_repdte: 06/30/2026, match: name_exact+state,
+    confidence: high, score: 100.0, matched_on: QNB Corp}
+  RBB: {cert: 58816, rssd: 3835454, bank: Royal Business Bank, city: Los Angeles, state: CA, holding_company: RBB BCORP, holding_rssd: 4176855, banks_in_holding: 1, bank_assets_k: 4267264, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: RBB Bancorp}
+  RBKB: {cert: 16032, rssd: 195111, bank: Rhinebeck Bank, city: Rhinebeck, state: NY, holding_company: RHINEBECK BCORP MHC, holding_rssd: 3271230, banks_in_holding: 1, bank_assets_k: 1469845, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Rhinebeck Bancorp}
+  RMBI: {cert: 28533, rssd: 419675, bank: First Bank Midwest, city: Frankfort, state: IN, holding_company: RICHMOND MUTUAL BCORP INC, holding_rssd: 5371947, banks_in_holding: 1, bank_assets_k: 1546784,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Richmond Mutual Bancorporation}
+  RVSB: {cert: 29922, rssd: 921178, bank: Riverview Bank, city: Vancouver, state: WA, holding_company: RIVERVIEW BCORP INC, holding_rssd: 3180060, banks_in_holding: 1, bank_assets_k: 1468113, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Riverview Bancorp}
+  SBFG: {cert: 13339, rssd: 614313, bank: The State Bank and Trust Company, city: Defiance, state: OH, holding_company: SB FINANCIAL GROUP INC, holding_rssd: 1071454, banks_in_holding: 1, bank_assets_k: 1612519,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: SB Financial Group}
+  SFBC: {cert: 57451, rssd: 429487, bank: Sound Community Bank, city: Seattle, state: WA, holding_company: SOUND FINANCIAL BCORP INC, holding_rssd: 3843646, banks_in_holding: 1, bank_assets_k: 1065857,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Sound Financial Bancorp}
+  SRBK: {cert: 28778, rssd: 159971, bank: Somerset Regal Bank, city: Bound Brook, state: NJ, holding_company: SR BCORP INC, holding_rssd: 5805657, banks_in_holding: 1, bank_assets_k: 1189079, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: SR Bancorp}
+  SSBI: {cert: 32203, rssd: 561574, bank: Summit State Bank, city: Santa Rosa, state: CA, holding_company: null, holding_rssd: null, banks_in_holding: 1, bank_assets_k: 959783, fdic_repdte: 06/30/2026,
+    match: name_exact, confidence: high, score: 100.0, matched_on: Summit State Bank}
+  TCBS: {cert: 28868, rssd: 279, bank: Broadstreet Bank S S B, city: Mineola, state: TX, holding_company: TEXAS COMMUNITY BANCSHARES INC, holding_rssd: 5586862, banks_in_holding: 1, bank_assets_k: 442833,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Texas Community Bancshares}
+  TSBK: {cert: 28453, rssd: 294779, bank: Timberland Bank, city: Hoquiam, state: WA, holding_company: TIMBERLAND BCORP INC, holding_rssd: 2621548, banks_in_holding: 1, bank_assets_k: 2060726, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Timberland Bancorp}
+  UBCP: {cert: 9463, rssd: 584724, bank: Unified Bank, city: Martins Ferry, state: OH, holding_company: UNITED BCORP INC, holding_rssd: 1071502, banks_in_holding: 1, bank_assets_k: 871724, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: United Bancorp}
+  UNB: {cert: 14158, rssd: 333203, bank: Union Bank, city: Morrisville, state: VT, holding_company: UNION BANKSHARES INC, holding_rssd: 1114940, banks_in_holding: 1, bank_assets_k: 1558133, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: Union Bankshares}
+  USCB: {cert: 57369, rssd: 3146150, bank: U. S. Century Bank, city: Doral, state: FL, holding_company: USCB FINANCIAL HOLDINGS INC, holding_rssd: 5681262, banks_in_holding: 1, bank_assets_k: 3015990, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: USCB Financial Holdings}
+  VABK: {cert: 34755, rssd: 2708122, bank: Virginia National Bank, city: Charlottesville, state: VA, holding_company: VIRGINIA NATL BANKSHARES CORP, holding_rssd: 4517261, banks_in_holding: 1, bank_assets_k: 1636058,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Virginia National Bankshares}
+  WNEB: {cert: 90300, rssd: 892205, bank: Westfield Bank, city: Westfield, state: MA, holding_company: WESTERN NEW ENGLAND BCORP INC, holding_rssd: 3866382, banks_in_holding: 1, bank_assets_k: 2727921,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Western New England Bancorp}
+  WSBF: {cert: 28513, rssd: 310978, bank: 'WaterStone Bank, SSB', city: Wauwatosa, state: WI, holding_company: WATERSTONE FINANCIAL INC, holding_rssd: 4523431, banks_in_holding: 1, bank_assets_k: 2252894,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Waterstone Financial}
+  WSBK: {cert: 90308, rssd: 899008, bank: Winchester Savings Bank, city: Winchester, state: MA, holding_company: WINCHESTER BCORP MHC, holding_rssd: 6006899, banks_in_holding: 1, bank_assets_k: 1087221,
+    fdic_repdte: 06/30/2026, match: name_exact+state, confidence: high, score: 100.0, matched_on: Winchester Bancorp}
+  WTBA: {cert: 15614, rssd: 139740, bank: West Bank, city: West Des Moines, state: IA, holding_company: WEST BCORP INC, holding_rssd: 1210066, banks_in_holding: 1, bank_assets_k: 4029129, fdic_repdte: 06/30/2026,
+    match: name_exact+state, confidence: high, score: 100.0, matched_on: West Bancorporation}
+unmapped: {}
