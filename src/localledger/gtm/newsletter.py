@@ -28,7 +28,7 @@ from localledger.research.retrieval import filing_passages, signal_excerpt
 from localledger.signals.store import CitationError
 
 log = logging.getLogger(__name__)
-MAX_ITEMS, MIN_ITEMS, MAX_PER_TICKER = 8, 5, 2
+MAX_ITEMS, MIN_ITEMS, MAX_PER_TICKER, MAX_PER_SOURCE = 8, 5, 1, 3
 
 
 @dataclass
@@ -73,11 +73,17 @@ def select_items(session: Session, exclude_ids: set[int]) -> list[tuple[Signal, 
         .order_by(Signal.rank_score.desc())
     ).all()
     per_ticker: dict[str, int] = defaultdict(int)
+    per_source: dict[str, int] = defaultdict(int)
     out = []
     for sig, note, company in rows:
-        if sig.id in exclude_ids or per_ticker[sig.ticker] >= MAX_PER_TICKER:
+        if (
+            sig.id in exclude_ids
+            or per_ticker[sig.ticker] >= MAX_PER_TICKER
+            or per_source[sig.source_id] >= MAX_PER_SOURCE
+        ):
             continue
         per_ticker[sig.ticker] += 1
+        per_source[sig.source_id] += 1
         out.append((sig, note, company))
         if len(out) >= MAX_ITEMS:
             break

@@ -36,6 +36,7 @@ REVENUE_TAGS = [
     "InterestAndDividendIncomeOperating",
 ]
 INCOME_TAGS = ["NetIncomeLoss"]
+BANK_REVENUE_TAGS = ["InterestAndDividendIncomeOperating"]
 
 # 8-K items worth a signal, with rules-based significance.
 ITEM_SIGNIFICANCE = {
@@ -440,8 +441,11 @@ class EdgarConnector(Connector):
             by_key[(r["ticker"], r["tag"], r["period"])] = r
         drafts = []
         tickers = {r["ticker"] for r in rows}
+        archetypes = {c.ticker: c.archetype for c in self.session.exec(select(Company)).all()}
         for ticker in tickers:
-            for metric, tags in (("revenue_yoy", REVENUE_TAGS), ("net_income_yoy", INCOME_TAGS)):
+            # Banks tag "Revenues" inconsistently; total interest income is the comparable top line for them.
+            revenue_tags = BANK_REVENUE_TAGS if archetypes.get(ticker) == "Community bank" else REVENUE_TAGS
+            for metric, tags in (("revenue_yoy", revenue_tags), ("net_income_yoy", INCOME_TAGS)):
                 for current, prior in recent_quarters(self.today):
                     pair = next(
                         (

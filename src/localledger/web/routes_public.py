@@ -38,7 +38,7 @@ def landing(request: Request, session: Session = Depends(get_session)):
     stats = {
         "companies": session.exec(select(func.count()).select_from(Company)).one(),
         "uncovered": session.exec(
-            select(func.count()).select_from(Company).where(Company.analyst_coverage.in_(["0 (checked)", "Unverified"]))
+            select(func.count()).select_from(Company).where(Company.analyst_coverage == "0 (checked)")
         ).one(),
         "signals": session.exec(select(func.count()).select_from(Signal)).one(),
         "sources": session.exec(select(func.count()).select_from(Source).where(Source.status != "unavailable")).one(),
