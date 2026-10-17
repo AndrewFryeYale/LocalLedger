@@ -1,0 +1,48 @@
+{% set t = c.thread %}{% set o = c.out %}
+<section id="card-{{ c.agent }}" class="board-card p-3 bg-white fade-in" data-version="{{ t.version }}">
+  <header class="flex items-center gap-2">
+    <h3 class="font-semibold text-sm">{{ c.label }}</h3>
+    <span class="text-[11px] px-1.5 py-0.5 rounded {{ {'running': 'bg-amber-100 text-amber-800', 'done': 'bg-ledger-50 text-ledger-700', 'error': 'bg-red-100 text-red-800', 'claimed': 'bg-sky-100 text-sky-800'}.get(t.status, 'bg-slate-100 text-slate-600') }}">{{ 'held by ' ~ t.claimed_by if t.claimed_by else t.status }}</span>
+    <span class="text-[11px] text-slate-400 num">v{{ t.version }}</span>
+    <div class="ml-auto flex gap-1 text-[11px]">
+      {% if not t.claimed_by %}
+      <button hx-post="/warroom/{{ session_id }}/claim" hx-vals='{"agent": "{{ c.agent }}"}' hx-swap="none" class="border border-slate-300 rounded px-1.5 py-0.5 hover:bg-slate-50">Claim</button>
+      {% elif user and t.claimed_by == user.name %}
+      <button hx-post="/warroom/{{ session_id }}/release" hx-vals='{"agent": "{{ c.agent }}", "rerun": "true"}' hx-swap="none" class="border border-slate-300 rounded px-1.5 py-0.5 hover:bg-slate-50">Hand back + rerun</button>
+      <button hx-post="/warroom/{{ session_id }}/release" hx-vals='{"agent": "{{ c.agent }}"}' hx-swap="none" class="border border-slate-300 rounded px-1.5 py-0.5 hover:bg-slate-50">Hand back</button>
+      {% endif %}
+    </div>
+  </header>
+  <div class="mt-2 text-sm space-y-2">
+    {% if o.error %}<p class="text-red-700 text-xs">{{ o.error }}</p>{% endif %}
+    {% if o.edited_by %}<p class="text-[11px] text-sky-700">edited by {{ o.edited_by }}</p>{% endif %}
+    {% if c.agent == 'reader' %}
+      {% if o.summary %}<p>{{ o.summary }}</p>{% endif %}
+      {% if o.kpis %}<div class="overflow-x-auto"><table class="w-full text-xs border-collapse"><thead><tr class="text-left text-slate-500 border-b"><th class="py-1 pr-2">KPI</th><th class="pr-2">Current</th><th class="pr-2">Prior</th><th>Change</th></tr></thead><tbody>
+      {% for k in o.kpis %}<tr class="border-b border-slate-100 align-top" title="{{ k.quote }}"><td class="py-1 pr-2">{{ k.kpi }}</td><td class="pr-2 num">{{ k.current }}</td><td class="pr-2 num text-slate-500">{{ k.prior }}</td><td class="num">{{ k.change }}</td></tr>{% endfor %}
+      </tbody></table></div>{% endif %}
+      {% if o.guidance %}<ul class="list-disc pl-4 text-xs text-slate-700">{% for g in o.guidance %}<li><span class="font-medium">{{ g.item }}:</span> {{ g.text }}</li>{% endfor %}</ul>{% endif %}
+    {% elif c.agent == 'model' %}
+      {% if o.drivers %}<table class="w-full text-xs border-collapse"><tbody>{% for d in o.drivers %}<tr class="border-b border-slate-100"><td class="py-1 pr-2">{{ d.name }}</td><td class="pr-2 num text-slate-500">{{ d.prior }}</td><td class="pr-2">→</td><td class="pr-2 num font-medium">{{ d.new }}</td><td class="text-[11px] {{ 'text-ledger-700' if d.status == 'updated' else 'text-slate-400' }}">{{ d.status }}</td></tr>{% endfor %}</tbody></table>{% endif %}
+      {% for line in o.takeaways or [] %}<p class="text-xs text-slate-700">{{ line }}</p>{% endfor %}
+    {% elif c.agent == 'thesis' %}
+      <ul class="space-y-1">{% for k in o.checks or [] %}<li class="text-xs"><span class="px-1 rounded {{ {'intact': 'bg-ledger-50 text-ledger-700', 'watch': 'bg-amber-100 text-amber-800', 'broken': 'bg-red-100 text-red-800'}.get(k.status, 'bg-slate-100 text-slate-600') }}">{{ k.status }}</span> <span class="text-slate-500">{{ k.kind }}</span> {{ k.criterion }}<div class="text-slate-500 pl-2">{{ k.evidence }}</div></li>{% endfor %}</ul>
+      {% if o.summary %}<p class="text-xs">{{ o.summary }}</p>{% endif %}
+    {% elif c.agent == 'read_across' %}
+      <ul class="list-disc pl-4 text-xs space-y-1">{% for i in o.implications or [] %}<li><span class="font-mono">{{ i.about }}</span>: {{ i.text }}</li>{% endfor %}</ul>
+    {% elif c.agent in ('bull', 'bear') %}
+      {% if o.argument %}<p>{{ o.argument }}</p>{% endif %}
+      {% if o.assumptions %}<p class="text-[11px] text-slate-500">Assumptions: {{ o.assumptions|join('; ') }}</p>{% endif %}
+      {% if user and t.claimed_by == user.name %}
+      <form hx-post="/warroom/{{ session_id }}/edit" hx-swap="none" class="mt-1"><input type="hidden" name="agent" value="{{ c.agent }}"><textarea name="text" rows="4" class="w-full border border-slate-300 rounded p-1.5 text-xs">{{ o.argument }}</textarea><button class="text-xs border border-sky-700 text-sky-700 rounded px-2 py-0.5">Save my version (reruns Moderator + Note)</button></form>
+      {% endif %}
+    {% elif c.agent == 'moderator' %}
+      {% if o.summary %}<p>{{ o.summary }}</p>{% endif %}
+      {% for d in o.open_disagreements or [] %}<div class="text-xs border-l-2 border-amber-500 pl-2"><div class="font-medium">{{ d.topic }}</div><div><span class="text-ledger-700">Bull:</span> {{ d.bull }}</div><div><span class="text-red-700">Bear:</span> {{ d.bear }}</div><div class="text-slate-500">Resolves with: {{ d.what_would_resolve }}</div></div>{% endfor %}
+    {% elif c.agent == 'note_writer' %}
+      {% if o.headline %}<p class="font-medium">{{ o.headline }}</p>{% endif %}
+      {% if o.kept is defined %}<p class="text-xs {{ 'text-ledger-700' if o.passed else 'text-amber-700' }}">Fact-check: {{ o.kept }} claims kept, {{ o.dropped }} rejected, {{ 'passed' if o.passed else 'failed' }}.</p>{% endif %}
+    {% endif %}
+    {% if not o and t.status != 'running' %}<p class="text-xs text-slate-400">Waiting…</p>{% endif %}
+  </div>
+</section>

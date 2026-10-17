@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}War room · {{ brand() }}{% endblock %}
+{% block content %}
+<div class="flex items-baseline justify-between flex-wrap gap-3">
+  <h1 class="text-xl font-semibold">Earnings war room</h1>
+  <form method="post" action="/warroom/new" class="flex gap-2 text-sm">
+    <select name="ticker" class="border border-slate-300 rounded px-2 py-1.5">{% for t in tickers %}<option>{{ t }}</option>{% endfor %}</select>
+    <button class="bg-ledger-700 text-white rounded px-3 py-1.5 font-medium">Open a room on the latest print</button>
+  </form>
+</div>
+<p class="text-sm text-slate-600 mt-2 max-w-3xl">A crew of agents (Reader, Model, Thesis, Read-across, Bull, Bear, Moderator, Note writer) works the latest 8-K Ex. 99.1 against the prior 10-Q, stored notes and public-records signals. Everyone in the room sees the same board live, can redirect an agent, take over a thread, and approve the final note. Replay from the CLI: <code>ll warroom --ticker PCYO --replay</code>.</p>
+<table class="w-full text-sm border-collapse mt-5">
+  <thead><tr class="text-left border-b border-slate-300 text-xs text-slate-500"><th class="py-1.5 pr-2">#</th><th class="pr-2">Room</th><th class="pr-2">Ticker</th><th class="pr-2">Status</th><th class="pr-2">Opened by</th><th class="pr-2">Created</th><th>Approved</th></tr></thead>
+  <tbody>
+  {% for w in sessions %}<tr class="border-b border-slate-100"><td class="py-1.5 pr-2 num">{{ w.id }}</td><td class="pr-2"><a class="underline text-ledger-700" href="/warroom/{{ w.id }}">{{ w.title }}</a></td><td class="pr-2 font-mono">{{ w.ticker }}</td><td class="pr-2">{{ w.status }}</td><td class="pr-2">{{ w.created_by }}</td><td class="pr-2 num text-slate-500">{{ w.created_at.strftime('%Y-%m-%d %H:%M') }}</td><td>{{ w.approved_by or '' }}</td></tr>
+  {% else %}<tr><td colspan="7" class="py-3 text-slate-500">No rooms yet.</td></tr>{% endfor %}
+  </tbody>
+</table>
+{% endblock %}

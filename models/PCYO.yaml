@@ -1,0 +1,15 @@
+# Simple driver model for PCYO (fiscal year ends Aug 31). The war-room Model agent maps reported KPIs onto
+# these drivers and writes the updated version to out/models/PCYO.yaml (this seed file is left unchanged).
+ticker: PCYO
+basis: fiscal quarter
+units: USD thousands unless noted
+drivers:
+  - {name: net_income, unit: USD thousands, value: 2256, kpi_aliases: ["net income"]}
+  - {name: ebitda, unit: USD thousands, value: 3628, kpi_aliases: ["ebitda"]}
+  - {name: diluted_eps, unit: USD per share, value: 0.09, kpi_aliases: ["diluted", "earnings per share"]}
+  - {name: lot_sales_revenue, unit: USD thousands, value: null, kpi_aliases: ["lot sales", "land development"]}
+  - {name: water_wastewater_revenue, unit: USD thousands, value: null, kpi_aliases: ["water and wastewater", "metered water"]}
+  - {name: tap_fees, unit: USD thousands, value: null, kpi_aliases: ["tap fees", "taps"]}
+  - {name: single_family_rental_revenue, unit: USD thousands, value: null, kpi_aliases: ["single-family rental", "rental"]}
+  - {name: acre_feet_delivered, unit: acre-feet, value: null, kpi_aliases: ["acre-feet", "water delivered"]}
+  - {name: cash, unit: USD thousands, value: null, kpi_aliases: ["cash and cash equivalents", "cash"]}

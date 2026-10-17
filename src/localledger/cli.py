@@ -159,6 +159,163 @@ def newsletter(
 
 
 @app.command()
+def warroom(
+    ticker: Annotated[str | None, typer.Option(help="Ticker to open a room on")] = None,
+    replay: Annotated[bool, typer.Option(help="Replay the most recent real quarter end-to-end")] = False,
+    session: Annotated[int | None, typer.Option(help="Existing room id (for --redirect)")] = None,
+    redirect: Annotated[str | None, typer.Option(help="Redirect text to post into an existing room")] = None,
+    agent: Annotated[str, typer.Option(help="Agent the redirect targets (or 'room')")] = "bear",
+    actor: Annotated[str, typer.Option("--as", help="Name to post as")] = "cli",
+    no_fetch: Annotated[bool, typer.Option(help="Don't fetch missing filings from EDGAR")] = False,
+) -> None:
+    """Earnings war room: the agent crew works a real 8-K Ex. 99.1 against the prior 10-Q, notes and signals."""
+    from localledger.warroom import board
+    from localledger.warroom.crew import create_session, run_sync
+
+    def show(event) -> None:
+        import json as _json
+
+        p = _json.loads(event.payload_json or "{}")
+        detail = p.get("text") or p.get("status") or p.get("error") or ""
+        if event.type == "note":
+            detail = f"{p.get('kept')} claims kept, {p.get('dropped')} rejected, fact-check " + (
+                "PASSED" if p.get("passed") else "FAILED"
+            )
+        typer.echo(
+            f"  [{event.created_at:%H:%M:%S}] {board.LABELS.get(event.agent or '', 'room'):12} {event.type:8} {detail}"
+        )
+
+    if session and redirect:
+        target = agent if agent in board.AGENTS else "room"
+        board.emit(session, "redirect", target, actor, text=redirect)
+        agents = board.AGENTS if target == "room" else board.downstream(target)
+        typer.echo(f"Redirect posted to room #{session} ({target}); rerunning {', '.join(agents)}")
+        run_sync(session, agents, actor=actor, on_event=show, fetch=not no_fetch)
+        room_id = session
+    elif ticker:
+        if not replay:
+            typer.echo("Tip: --replay runs the full crew on the latest real quarter.")
+        room_id = create_session(ticker, created_by=actor, title=f"{ticker.upper()} earnings replay")
+        typer.echo(f"War room #{room_id} for {ticker.upper()}: running the crew")
+        run_sync(room_id, actor=actor, on_event=show, fetch=not no_fetch)
+    else:
+        typer.echo("Pass --ticker TICKER --replay, or --session ID --redirect TEXT.")
+        raise typer.Exit(1)
+
+    from localledger.models import Note, WarroomSession
+
+    with session_scope() as s:
+        ws = s.get(WarroomSession, room_id)
+        note = s.get(Note, ws.final_note_id) if ws.final_note_id else None
+        if note:
+            typer.echo(
+                f"\nFinal note ({'fact-check PASSED' if note.factcheck_passed else 'fact-check FAILED'}): "
+                f"{note.title}\n{note.body_md}\n"
+            )
+        typer.echo(
+            f"Room #{room_id}: {ws.status}. Open http://127.0.0.1:8000/warroom/{room_id} (make serve) "
+            "to watch, redirect and approve."
+        )
+
+
+@app.command()
+def leads() -> None:
+    """Fund target list from SEC 13F data sets (funds holding >= 2 universe names) -> ./out/leads.csv."""
+    from localledger.gtm.leads13f import build_leads
+
+    with session_scope() as s:
+        r = build_leads(s)
+    typer.echo(f"13F set: {r.zip_url}")
+    typer.echo(f"CUSIPs mapped: {r.mapped} ({r.verified} verified via OpenFIGI); report period {r.report_period}")
+    typer.echo(f"Funds holding >= 2 universe names: {r.funds_with_overlap} -> {r.path}")
+
+
+@app.command()
+def outreach(top: Annotated[int, typer.Option(help="How many top leads to draft for")] = 50) -> None:
+    """Personalized ~90-word outreach drafts for the top leads -> ./out/outreach (drafts only, never sent)."""
+    from localledger.gtm.outreach import build_outreach
+    from localledger.llm.client import LLM
+
+    with session_scope() as s:
+        r = build_outreach(s, LLM("outreach"), top=top)
+    typer.echo(
+        f"{r.drafts} drafts written to {r.out_dir} ({r.fallbacks} used the deterministic template). Nothing was sent."
+    )
+
+
+@app.command()
+def pdfs() -> None:
+    """Fund one-pager and sample-issue PDFs -> ./out/pdf (same templates as the site and newsletter)."""
+    from localledger.gtm.pdfs import build_pdfs
+
+    with session_scope() as s:
+        for path in build_pdfs(s):
+            typer.echo(f"wrote {path}")
+
+
+@app.command()
+def publish(
+    note_id: Annotated[int, typer.Option(help="Note to mark published")],
+    disclose: Annotated[bool, typer.Option(help="Note carries the author-holdings disclosure")] = False,
+) -> None:
+    """Mark a fact-checked note published, after the compliance checks. Prints trading-blackout reminders."""
+    from localledger.compliance import PublishBlocked, blackout_reminders, check_publish, lint_impersonal
+    from localledger.models import Note, utcnow
+
+    with session_scope() as s:
+        note = s.get(Note, note_id)
+        if note is None:
+            typer.echo("no such note")
+            raise typer.Exit(1)
+        problems = [] if note.factcheck_passed else ["note did not pass fact-check"]
+        problems += [f"recommendation language: {p}" for p in lint_impersonal(note.body_md)]
+        try:
+            check_publish([note.ticker] if note.ticker else [], disclosure_flag=disclose or note.disclosure_flag)
+        except PublishBlocked as exc:
+            problems.append(str(exc))
+        if problems:
+            typer.echo("BLOCKED: " + "; ".join(problems))
+            raise typer.Exit(2)
+        note.status, note.disclosure_flag, note.updated_at = "published", note.disclosure_flag or disclose, utcnow()
+        s.add(note)
+    typer.echo(f"Note {note_id} marked published (this does not send or post anything).")
+    for line in blackout_reminders([note.ticker] if note.ticker else []):
+        typer.echo(f"  {line}")
+
+
+@app.command("check-citations")
+def check_citations(limit: Annotated[int | None, typer.Option(help="Check at most N URLs")] = None) -> None:
+    """HTTP-check every distinct signal citation URL (polite, rate-limited). Writes ./out/citation_check.csv."""
+    import csv
+
+    from localledger.http import HttpClient
+    from localledger.models import Signal
+
+    settings = get_settings()
+    with session_scope() as s:
+        urls = sorted({u for u in s.exec(select(Signal.citation_url)).all()})
+    if limit:
+        urls = urls[:limit]
+    http, rows, bad = HttpClient(), [], 0
+    for url in urls:
+        try:
+            resp = http.get(url, check_robots=True, retries=2)
+            code = resp.status_code
+        except Exception as exc:  # noqa: BLE001
+            code = f"error: {type(exc).__name__}"
+        ok = code == 200
+        bad += not ok
+        rows.append({"url": url, "status": code, "ok": ok})
+    path = settings.out_dir / "citation_check.csv"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="") as fh:
+        w = csv.DictWriter(fh, fieldnames=["url", "status", "ok"])
+        w.writeheader()
+        w.writerows(rows)
+    typer.echo(f"Checked {len(urls)} citation URLs: {len(urls) - bad} OK, {bad} not OK -> {path}")
+
+
+@app.command()
 def stats() -> None:
     """Counts by table and connector (real vs fixture), for the Definition of Done."""
     from localledger.models import Company, Document, Note, Signal, Source

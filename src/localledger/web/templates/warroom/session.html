@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}{{ ws.ticker }} war room · {{ brand() }}{% endblock %}
+{% block content %}
+<div class="flex flex-wrap items-baseline gap-x-4 gap-y-2">
+  <h1 class="text-xl font-semibold"><span class="font-mono text-ledger-700">{{ ws.ticker }}</span> {{ company.name }}: earnings war room <span class="text-slate-400 text-base num">#{{ ws.id }}</span></h1>
+  <span id="room-status" class="text-xs px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">{{ ws.status }}</span>
+  <div class="ml-auto text-sm flex items-center gap-2"><span class="text-slate-500 text-xs">In the room:</span><span id="presence" class="flex gap-1">{% for p in present %}<span class="text-xs bg-sky-50 text-sky-800 rounded px-1.5 py-0.5">{{ p }}</span>{% endfor %}</span></div>
+</div>
+<p class="text-xs text-slate-500 mt-1">Inputs: {% for d in inputs.get('documents', []) %}<a class="underline" href="{{ d.url }}" target="_blank" rel="noopener">{{ d.title }}</a>{{ ' · ' if not loop.last }}{% endfor %}</p>
+
+<form hx-post="/warroom/{{ ws.id }}/redirect" hx-swap="none" hx-on::after-request="this.reset()" class="mt-3 flex flex-wrap gap-2 text-sm">
+  <select name="agent" class="border border-slate-300 rounded px-2 py-1.5"><option value="room">whole room</option>{% for c in cards %}<option value="{{ c.agent }}" {{ 'selected' if c.agent == 'bear' }}>{{ c.label }}</option>{% endfor %}</select>
+  <input name="text" required maxlength="500" placeholder='Redirect, e.g. "rerun bear case assuming lower volumes"' class="border border-slate-300 rounded px-2 py-1.5 flex-1 min-w-[16rem]">
+  <button class="border border-ledger-700 text-ledger-700 rounded px-3 py-1.5 font-medium">Send redirect</button>
+</form>
+
+<div class="mt-4 grid gap-4 lg:grid-cols-3">
+  <div class="lg:col-span-2 grid gap-3 md:grid-cols-2 items-start">
+    {% for c in cards %}{% set session_id = ws.id %}{% include "warroom/_card.html" %}{% endfor %}
+  </div>
+  <aside class="space-y-4">
+    {% include "warroom/_note.html" %}
+    <div class="board-card p-3 bg-white">
+      <h2 class="font-semibold text-sm uppercase tracking-wide text-slate-600">Activity</h2>
+      <ol id="log" class="mt-2 text-xs space-y-1 max-h-[28rem] overflow-y-auto num">
+        {% for e in events|reverse %}<li><span class="text-slate-400">{{ e.created_at.strftime('%H:%M:%S') }}</span> <span class="font-medium">{{ e.actor }}</span> {{ e.type }}{% if e.agent %} · {{ warroom_labels.get(e.agent, e.agent) }}{% endif %} <span class="text-slate-500">{{ (e.payload_json|fromjson).get('text') or (e.payload_json|fromjson).get('status') or (e.payload_json|fromjson).get('error') or '' }}</span></li>{% endfor %}
+      </ol>
+    </div>
+  </aside>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+(() => {
+  const sid = {{ ws.id }};
+  const labels = {{ warroom_labels|tojson }};
+  const log = document.getElementById('log');
+  const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+  const refreshCard = (agent) => htmx.ajax('GET', `/warroom/${sid}/card/${agent}`, {target: `#card-${agent}`, swap: 'outerHTML'});
+  const refreshNote = () => htmx.ajax('GET', `/warroom/${sid}/note`, {target: '#final-note', swap: 'outerHTML'});
+  const es = new EventSource(`/warroom/${sid}/stream?after={{ last_id }}`);
+  es.addEventListener('board', (msg) => {
+    const ev = JSON.parse(msg.data);
+    const p = ev.payload || {};
+    const detail = p.text || p.status || p.error || (ev.type === 'note' ? `${p.kept} kept / ${p.dropped} rejected` : '');
+    const li = document.createElement('li');
+    li.className = 'fade-in';
+    li.innerHTML = `<span class="text-slate-400">${esc(ev.at)}</span> <span class="font-medium">${esc(ev.actor)}</span> ${esc(ev.type)}${ev.agent ? ' · ' + esc(labels[ev.agent] || ev.agent) : ''} <span class="text-slate-500">${esc(detail)}</span>`;
+    log.prepend(li);
+    if (ev.agent && ['output', 'status', 'claim', 'release', 'error'].includes(ev.type)) refreshCard(ev.agent);
+    if (['note', 'approve'].includes(ev.type) || (ev.type === 'error' && ev.agent === 'note_writer')) refreshNote();
+    if (!ev.agent && p.status) document.getElementById('room-status').textContent = p.status;
+  });
+  es.addEventListener('presence', (msg) => {
+    document.getElementById('presence').innerHTML = JSON.parse(msg.data)
+      .map((n) => `<span class="text-xs bg-sky-50 text-sky-800 rounded px-1.5 py-0.5">${esc(n)}</span>`).join('');
+  });
+})();
+</script>
+{% endblock %}

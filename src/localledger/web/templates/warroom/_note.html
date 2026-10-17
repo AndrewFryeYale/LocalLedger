@@ -1,0 +1,16 @@
+<div id="final-note" class="board-card p-4 bg-white">
+  <div class="flex items-center gap-2"><h2 class="font-semibold text-sm uppercase tracking-wide text-slate-600">Post-earnings note</h2>
+  {% if note %}<span class="text-[11px] px-1.5 py-0.5 rounded {{ 'bg-ledger-50 text-ledger-700' if note.factcheck_passed else 'bg-amber-100 text-amber-800' }}">fact-check {{ 'passed' if note.factcheck_passed else 'failed' }}</span><span class="text-[11px] text-slate-500">{{ note.status }}{% if note.approved_by %} by {{ note.approved_by }}{% endif %}</span>{% endif %}</div>
+  {% if note %}
+  <h3 class="font-semibold mt-2">{{ note.title }}</h3>
+  <div class="text-sm mt-1 prose-note">{{ note.body_md|md }}</div>
+  {% set dropped = note.factcheck_log|fromjson %}
+  {% if dropped %}<details class="mt-2 text-xs"><summary class="cursor-pointer text-amber-800">{{ dropped|length }} claim{{ 's' if dropped|length != 1 }} rejected by fact-check</summary><ul class="mt-1 space-y-1">{% for d in dropped %}<li><span class="line-through text-slate-500">{{ d.claim.text }}</span> <span class="text-amber-800">({{ d.reason }})</span></li>{% endfor %}</ul></details>{% endif %}
+  {% if note.status != 'approved' %}
+  <form hx-post="/warroom/{{ ws.id }}/approve" hx-swap="none" class="mt-3 flex items-center gap-3 text-sm">
+    <label class="text-xs flex items-center gap-1"><input type="checkbox" name="disclose" value="true"> note carries author-holdings disclosure</label>
+    <button class="bg-ledger-700 text-white rounded px-3 py-1 font-medium">Approve note</button>
+  </form>
+  {% endif %}
+  {% else %}<p class="text-sm text-slate-500 mt-2">The Note writer hasn't finished yet.</p>{% endif %}
+</div>
