@@ -21,7 +21,7 @@ Log in with passcode `ledger-pilot` (or `ledger-admin` for the admin pages). Sta
 
 - `./demo` is a 4 MB snapshot of a real run: 237 companies, 2,121 stored documents, 1,070 cited signals, 52 fact-checked notes, 474 company models, 4 war rooms and the 13F leads, plus the backtest, tokenomics and red-team results and 346 cached gpt-6-luna responses. `make quickstart` never overwrites an existing database (`ll demo-load --force` replaces it and keeps a `.bak` copy).
 - **With a key:** put `PORTKEY_API_KEY=...` in `.env` in this folder or in the folder above it. Then `make demo` reruns the PCYO war room live (about 45 seconds, about $0.01) and `ll signals --limit 3` writes new notes. **Without a key** the same commands run on the deterministic mock.
-- To rebuild everything from the live public sources instead, use the full setup below. The full `make ingest` is a 30+ minute run; the demo data lets you skip it.
+- To rebuild everything from the live public sources instead, use the full setup below. `make ingest` fetches thousands of documents under polite rate limits and takes far longer than the demo path.
 
 ## Setup
 
