@@ -23,6 +23,8 @@
       </tbody></table></div>{% endif %}
       {% if o.guidance %}<ul class="list-disc pl-4 text-xs text-slate-700">{% for g in o.guidance %}<li><span class="font-medium">{{ g.item }}:</span> {{ g.text }}</li>{% endfor %}</ul>{% endif %}
     {% elif c.agent == 'model' %}
+      {% if o.surprise and o.surprise.quarter %}<p class="text-xs"><span class="font-medium">Surprise vs our model:</span> {{ o.surprise.quarter }} reported {{ o.surprise.reported }} vs P50 {{ o.surprise.forecast_p50 }} ({{ o.surprise.vs_p50 }}, {{ o.surprise.in_range }})</p>{% endif %}
+      {% if o.next_quarter_implication %}<p class="text-xs text-slate-700">{{ o.next_quarter_implication }}</p>{% endif %}
       {% if o.drivers %}<table class="w-full text-xs border-collapse"><tbody>{% for d in o.drivers %}<tr class="border-b border-slate-100"><td class="py-1 pr-2">{{ d.name }}</td><td class="pr-2 num text-slate-500">{{ d.prior }}</td><td class="pr-2">→</td><td class="pr-2 num font-medium">{{ d.new }}</td><td class="text-[11px] {{ 'text-ledger-700' if d.status == 'updated' else 'text-slate-400' }}">{{ d.status }}</td></tr>{% endfor %}</tbody></table>{% endif %}
       {% for line in o.takeaways or [] %}<p class="text-xs text-slate-700">{{ line }}</p>{% endfor %}
     {% elif c.agent == 'thesis' %}

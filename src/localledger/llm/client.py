@@ -76,10 +76,33 @@ def estimate_tokens(text: str) -> int:
     return max(1, int(len(text) / 3.2))
 
 
+_pending: list[LlmCall] = []  # ledger rows not yet written (database busy); they still count toward the cap
+
+
 def spent_usd() -> float:
-    with session_scope() as s:
-        total = s.exec(select(func.sum(LlmCall.est_cost_usd)).where(LlmCall.provider == "portkey")).one()
-    return float(total or 0.0)
+    try:
+        with session_scope() as s:
+            total = s.exec(select(func.sum(LlmCall.est_cost_usd)).where(LlmCall.provider == "portkey")).one()
+    except OperationalError:
+        log.warning("ledger read failed (database busy); budget check uses this run's spend only")
+        return RUN_USAGE.cost_usd
+    return float(total or 0.0) + sum(r.est_cost_usd for r in _pending if r.provider == "portkey")
+
+
+_pending_lock = threading.Lock()
+
+
+def flush_pending() -> None:
+    """Write ledger rows that couldn't be written earlier (called on every new call and at exit). Thread-safe:
+    war-room agents record calls concurrently."""
+    with _pending_lock:
+        while _pending:
+            try:
+                with session_scope() as s:
+                    s.add(LlmCall(**_pending[0].model_dump(exclude={"id"})))
+            except OperationalError:
+                return
+            _pending.pop(0)
 
 
 def _cost(settings: Settings, tokens_in: int, tokens_out: int) -> float:
@@ -250,13 +273,11 @@ class LLM:
             est_cost_usd=0.0 if result.cached else result.cost_usd,
             cached=result.cached,
         )
-        for attempt in range(5):  # the ledger must never fail a note because another writer holds the lock
-            try:
-                with session_scope() as s:
-                    s.add(LlmCall(**row.model_dump(exclude={"id"})))
+        with _pending_lock:
+            _pending.append(row)
+        for attempt in range(3):  # never fail a note because another writer holds the lock
+            flush_pending()
+            if not _pending:
                 return
-            except OperationalError:
-                time.sleep(2 * (attempt + 1))
-        log.warning(
-            "could not write LLM ledger row for %s (database busy); cost kept in this run's summary", prompt_name
-        )
+            time.sleep(1 + attempt)
+        log.warning("LLM ledger write for %s deferred (database busy); it still counts toward the cap", prompt_name)

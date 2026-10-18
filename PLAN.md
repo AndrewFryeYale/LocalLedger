@@ -128,3 +128,34 @@ All six milestones were built and committed (`git log`). Deviations from the ori
 - Public pages render with disclosures; the waitlist and pilot forms write to the DB (tests).
 - `out/leads.csv` has 860 funds (97 research buyers after filters); `out/outreach/` has 50 drafts.
 - `pytest`: 113 passed; `ruff check`: clean.
+
+---
+
+## Milestone 7: company models, valuation and the "so what" (requested 2026-10-17)
+
+Goal: every company has a model and a valuation, and every signal states how it moves them: revenue for the quarter the news lands in vs the next, the probability revenue grows year over year, and value per share.
+
+Decisions (Andrew): full valuation inside the gated app; the newsletter shows only the impact on estimates and value sensitivity at the current multiple (no fair values or targets; the impersonal-research lint stays). Claude Code builds and curates the base models over time; the Portkey LLM only *updates* them when news arrives. The budget cap stays at $10.
+
+Design:
+- `modeling/history.py`: SEC XBRL company facts (`data.sec.gov/api/xbrl/companyfacts`) -> quarterly series derived from period start/end dates (Q4 = FY - 9M YTD), latest balance sheet, shares. Banks use NII + noninterest income as revenue.
+- `modeling/engine.py`: deterministic base model per company. Quarters are fiscal: unreported-ended, current, next. Seasonal + run-rate baseline, volatility from a backtest of the same method, seeded Monte Carlo -> P10/P50/P90, P(revenue up y/y). Discrete events carry probabilities by quarter. Valuation by archetype (banks: P/TBV peer + ROTE-justified; insurers/land: P/B; others: EV/EBITDA or EV/Revenue vs universe peers; pre-revenue: not modeled) and NTM-based.
+- `models/{TICKER}.yaml`: curated overlays (drivers, events with probabilities, valuation overrides), maintained by Claude Code over time.
+- `modeling/impacts.py`: signal -> adjustments. Deterministic rules first (call-report loan growth vs trend, deposit-mix funding cost, credit risk premia, monthly gaming AGR vs trend, production vs trend, permits elasticity, agenda approvals shift event timing, 8-K risk events). Then a bounded, quote-verified LLM updater (`prompts/model_update.md`) for news no rule covers. Each impact records before/after per quarter and per share.
+- Tables `company_models` and `model_impacts`; `ll models` builds base models, then replays signals.
+- Surfaces: a company-page model and valuation panel (gated), a model-impact column in the signal feed, a "So what for our model" line in each newsletter item (impact only), and model context for the war-room Model agent.
+
+### Milestone 7 status (2026-10-17)
+Built and verified:
+- **Valuation coverage:** 237 company models; 228 valued. The other 9 each carry an explicit reason (BLOCKERS.md).
+- **Signal replay:** 1,070 signals replayed, of which about 180 moved a model. The LLM updater ran within its cap and is mostly conservative.
+- **Newsletter:** the 2026-W42 issue was regenerated with "So what for our model" lines and passed fact-check.
+- **Tests:** 127 passing.
+
+Forecast guards were added after review:
+- outlier-quarter removal;
+- median-centred ranges with capped volatility;
+- bounded seasonal ratios;
+- step-change (acquisition) detection;
+- a sequential production rule;
+- materiality thresholds (0.5%).

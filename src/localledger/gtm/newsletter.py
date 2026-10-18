@@ -21,7 +21,8 @@ from localledger.config import get_settings
 from localledger.http import read_document_text
 from localledger.llm.client import LLM
 from localledger.llm.mock import register_mock
-from localledger.models import Company, Document, NewsletterIssue, Note, Signal, utcnow
+from localledger.modeling.impacts import MATERIAL, STATUS_WORD
+from localledger.models import Company, Document, ModelImpact, NewsletterIssue, Note, Signal, utcnow
 from localledger.research.analyst import MIN_CLAIMS_TO_PASS, _verbatim_span, render_note_md, run_research
 from localledger.research.factcheck import deterministic_check, fact_check, validate_claims
 from localledger.research.retrieval import filing_passages, signal_excerpt
@@ -64,6 +65,17 @@ def _featured_before(session: Session, week: str) -> tuple[set[int], set[str]]:
     return sig_ids, tickers
 
 
+def model_bonus(impact: ModelImpact | None) -> float:
+    if impact is None:
+        return 0.0
+    data = json.loads(impact.impact_json or "{}")
+    revenue_moved = any(
+        q.get("p50_before") and abs(q["p50_after"] / q["p50_before"] - 1) >= MATERIAL for q in data.get("quarters", [])
+    )
+    value_moved = abs((data.get("sensitivity") or {}).get("pct") or 0) >= MATERIAL
+    return 0.25 if (revenue_moved or value_moved) else 0.1
+
+
 def select_items(session: Session, exclude_ids: set[int]) -> list[tuple[Signal, Note, Company]]:
     rows = session.exec(
         select(Signal, Note, Company)
@@ -72,6 +84,9 @@ def select_items(session: Session, exclude_ids: set[int]) -> list[tuple[Signal, 
         .where(Note.factcheck_passed == True, Note.kind == "signal")  # noqa: E712
         .order_by(Signal.rank_score.desc())
     ).all()
+    # Readers want the "so what": signals that materially moved a model's revenue estimate or value rank higher.
+    impacts = {i.signal_id: i for i in session.exec(select(ModelImpact).where(ModelImpact.changed == True)).all()}  # noqa: E712
+    rows = sorted(rows, key=lambda r: -(r[0].rank_score + model_bonus(impacts.get(r[0].id))))
     per_ticker: dict[str, int] = defaultdict(int)
     per_source: dict[str, int] = defaultdict(int)
     out = []
@@ -170,13 +185,35 @@ def new_to_universe(session: Session, exclude: set[str], used: set[str]) -> tupl
     return None
 
 
-def _item_md(i: int, sig: Signal, note: Note, company: Company) -> str:
+def _item_md(i: int, sig: Signal, note: Note, company: Company, impact: ModelImpact | None = None) -> str:
+    so_what = ""
+    if impact is not None:
+        # Impact only (estimate deltas, P(up y/y), sensitivity at the current multiple): no fair values or targets.
+        so_what = f"**So what for our model:** {impact.summary_public}\n\n"
     return (
         f"### {i}. {company.ticker}: {note.title}\n"
         f"*{company.name} · {company.archetype}*\n\n"
         f"{note.body_md}\n\n"
+        f"{so_what}"
         f"Signal: {sig.summary} Significance {sig.significance:.2f}. [Source document]({sig.citation_url})\n"
     )
+
+
+def model_snapshot_md(session: Session, ticker: str) -> str:
+    """Estimates only (no valuation): this quarter vs next, with ranges and P(up y/y)."""
+    from localledger.modeling.store import load_model
+
+    m = load_model(session, ticker)
+    if m is None or m.status != "modeled":
+        return ""
+    rows = []
+    for q in m.visible_quarters():
+        yoy = f", P(up y/y) {q.p_yoy:.0%}" if q.p_yoy is not None else ""
+        rows.append(
+            f"{q.label} ({STATUS_WORD.get(q.status, q.status)}): ${q.p50 / 1e6:,.1f}M "
+            f"(P10-P90 ${q.p10 / 1e6:,.1f}M-${q.p90 / 1e6:,.1f}M{yoy})"
+        )
+    return "**Our revenue model (estimates):** " + "; ".join(rows) + ".\n"
 
 
 def methodology_md(settings) -> str:
@@ -185,7 +222,9 @@ def methodology_md(settings) -> str:
         "agendas, bank call reports, state production and gaming data), maps them to 237 under-covered US "
         "microcaps, and ranks signals by rule-based significance blended with company priority. Analyst agents "
         "write each item; a fact-check pass drops any claim not supported verbatim or numerically by its cited "
-        "document. Full method and source register: /methodology."
+        'document. Each company also has a model built from its filings; "So what for our model" lines show how a '
+        "signal moves our revenue estimates (ranges, P(up y/y)) and value sensitivity at the current market "
+        "multiple. They're estimates, not recommendations. Full method and source register: /methodology."
     )
 
 
@@ -234,10 +273,18 @@ def build_issue(session: Session, week: str | None, llm: LLM, ensure_notes: bool
         "",
     ]
     for i, (sig, note, company) in enumerate(kept_items, 1):
-        parts.append(_item_md(i, sig, note, company))
+        impact = session.exec(select(ModelImpact).where(ModelImpact.signal_id == sig.id)).first()
+        parts.append(_item_md(i, sig, note, company, impact))
     if deep and deep.factcheck_passed:
         c = session.get(Company, deep.ticker)
-        parts += [f"## Company note: {c.ticker} ({c.name})", f"**{deep.title}**", "", deep.body_md, ""]
+        parts += [
+            f"## Company note: {c.ticker} ({c.name})",
+            f"**{deep.title}**",
+            "",
+            deep.body_md,
+            "",
+            model_snapshot_md(session, c.ticker),
+        ]
     elif deep:
         warnings.append(f"deep note for {deep.ticker} failed fact-check; omitted")
     if nu:

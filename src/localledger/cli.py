@@ -32,6 +32,12 @@ def _main(verbose: Annotated[bool, typer.Option("--verbose", "-v")] = False) -> 
 
 
 def _print_usage() -> None:
+    from localledger.llm.client import flush_pending
+
+    try:
+        flush_pending()
+    except Exception:  # noqa: BLE001
+        pass
     typer.echo(RUN_USAGE.summary())
     for note in RUN_USAGE.notes:
         typer.echo(f"  note: {note}")
@@ -313,6 +319,27 @@ def check_citations(limit: Annotated[int | None, typer.Option(help="Check at mos
         w.writeheader()
         w.writerows(rows)
     typer.echo(f"Checked {len(urls)} citation URLs: {len(urls) - bad} OK, {bad} not OK -> {path}")
+
+
+@app.command()
+def models(
+    tickers: Annotated[str | None, typer.Option(help="Comma list of tickers to (re)fetch and replay")] = None,
+    no_fetch: Annotated[bool, typer.Option(help="Use stored XBRL company facts only")] = False,
+    no_llm: Annotated[bool, typer.Option(help="Deterministic rules only (no LLM model updates)")] = False,
+    max_llm: Annotated[int | None, typer.Option(help="Cap on LLM model updates this run")] = None,
+) -> None:
+    """Build every company's model + valuation, then replay signals to record each one's impact (the so-what)."""
+    from localledger.llm.client import LLM
+    from localledger.modeling.store import build_models
+
+    with session_scope() as s:
+        r = build_models(
+            s, tickers=_csv(tickers), fetch=not no_fetch, llm=None if no_llm else LLM("models"), max_llm=max_llm
+        )
+    typer.echo(f"Models: {r.models} ({r.modeled} modeled, {r.no_xbrl} without XBRL, {r.pre_revenue} pre-revenue).")
+    typer.echo(f"Signal impacts: {r.impacts} replayed, {r.changed} moved a model; {r.llm_updates} LLM model updates.")
+    for err in r.errors[:5]:
+        typer.echo(f"    {err}")
 
 
 @app.command()

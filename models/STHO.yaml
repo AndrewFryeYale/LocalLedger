@@ -1,0 +1,8 @@
+# Curated overlay (Claude Code), from STHO's 10-K/10-Q: Asbury Park Waterfront carrying value ~$120.9M (Jun 30, 2026).
+note: "Asset monetization: future Asbury Park Waterfront and Magnolia Green parcel sales require municipal approvals."
+events:
+  - name: Asbury Park Waterfront parcel approvals
+    kind: milestone
+    keywords: [Waterfront Redevelopment Area, Waterfront Redevelopment Plan, Block 3801, 320 Asbury Avenue, Asbury Ocean Club]
+    probs: {current: 0.3, next: 0.3}
+    note: "10-K: future parcel sales subject to approvals from local municipalities."

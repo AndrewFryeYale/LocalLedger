@@ -10,10 +10,31 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlmodel import Session, func, select
 
 from localledger.config import get_settings
-from localledger.models import Archetype, Company, Document, Note, Signal, Source, WarroomSession
+from localledger.modeling.store import load_model
+from localledger.models import Archetype, Company, Document, ModelImpact, Note, Signal, Source, WarroomSession
 from localledger.web.deps import get_session, render, require_pilot
 
 router = APIRouter(prefix="/app")
+
+
+def compact_impact(impact: ModelImpact) -> dict:
+    """Short feed label: the biggest per-quarter revenue move and the per-share sensitivity."""
+    data = json.loads(impact.impact_json or "{}")
+    best = None
+    for q in data.get("quarters", []):
+        b, a = q.get("p50_before"), q.get("p50_after")
+        if b and a and abs(a / b - 1) >= 0.001 and (best is None or abs(a / b - 1) > abs(best[1])):
+            best = (q["label"].replace("Q ending ", "Q/E "), a / b - 1)
+    risk = (data.get("risk_after") or 0) - (data.get("risk_before") or 0)
+    sens = data.get("sensitivity") or {}
+    return {
+        "changed": impact.changed,
+        "quarter": best[0] if best else None,
+        "pct": best[1] if best else None,
+        "risk_bp": round(risk * 1e4) if abs(risk) >= 0.0001 else None,
+        "per_share": sens.get("per_share") if abs(sens.get("pct") or 0) >= 0.001 else None,
+        "summary": impact.summary_app,
+    }
 
 
 def _signal_counts(session: Session) -> tuple[Counter, dict]:
@@ -128,10 +149,18 @@ def company_page(
         select(WarroomSession).where(WarroomSession.ticker == company.ticker).order_by(WarroomSession.id.desc())
     ).all()
     archetype = session.get(Archetype, company.archetype)
+    model = load_model(session, company.ticker)
+    impacts = {
+        i.signal_id: i for i in session.exec(select(ModelImpact).where(ModelImpact.ticker == company.ticker)).all()
+    }
+    moved = [(s, impacts[s.id]) for s in signals if s.id in impacts and impacts[s.id].changed]
     return render(
         request,
         "pilot/company.html",
         company=company,
+        model=model,
+        impacts=impacts,
+        moved=moved,
         signals=signals,
         notes=notes,
         filings=filings,
@@ -163,9 +192,19 @@ def signal_feed(
         stmt = stmt.where(Signal.significance >= min_sig)
     rows = session.exec(stmt.order_by(Signal.rank_score.desc()).limit(limit)).all()
     notes = {n.signal_id: n for n in session.exec(select(Note).where(Note.kind == "signal")).all()}
+    ids = [sig.id for sig, _ in rows]
+    impacts = (
+        {
+            i.signal_id: compact_impact(i)
+            for i in session.exec(select(ModelImpact).where(ModelImpact.signal_id.in_(ids))).all()
+        }
+        if ids
+        else {}
+    )
     ctx = {
         "rows": rows,
         "notes": notes,
+        "impacts": impacts,
         "sources": session.exec(select(Source).order_by(Source.id)).all(),
         "archetypes": [a.name for a in session.exec(select(Archetype).order_by(Archetype.name)).all()],
         "f": {"source": source, "archetype": archetype, "min_sig": min_sig},

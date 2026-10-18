@@ -1,0 +1,60 @@
+{# Company model & valuation (gated). expects: model (CompanyModel or None), moved [(signal, impact)] #}
+<div class="board-card p-4" id="model">
+  <div class="flex flex-wrap items-baseline gap-2">
+    <h2 class="font-semibold text-sm uppercase tracking-wide text-slate-600">Model &amp; valuation</h2>
+    <span class="text-[11px] text-slate-500">Local Ledger model estimates, for discussion. Not a recommendation or a price target.</span>
+  </div>
+  {% if not model %}
+    <p class="text-sm text-slate-500 mt-2">No model built yet. Run <code>ll models</code>.</p>
+  {% elif model.status == 'no_xbrl' %}
+    <p class="text-sm text-slate-600 mt-2">No XBRL financials (common for royalty trusts), so there's no revenue model; this company is tracked through its signals. {{ model.valuation.note or '' }}</p>
+  {% else %}
+    {% set v = model.valuation %}
+    <div class="mt-3 grid gap-4 md:grid-cols-2">
+      <div>
+        {% if model.status in ('stale', 'call_report_only', 'balance_only') %}
+        <p class="text-xs text-slate-600">{{ model.overlay_note }}</p>
+        {% else %}
+        <h3 class="text-xs font-semibold text-slate-500 uppercase">Revenue: the quarter the news lands in vs the next</h3>
+        <table class="w-full text-xs border-collapse mt-1">
+          <thead><tr class="text-left text-slate-500 border-b"><th class="py-1 pr-2">Quarter</th><th class="pr-2 text-right">P10</th><th class="pr-2 text-right">P50</th><th class="pr-2 text-right">P90</th><th class="pr-2 text-right">Yr ago</th><th class="text-right">P(up y/y)</th></tr></thead>
+          <tbody>
+          {% for q in model.visible_quarters() %}
+          <tr class="border-b border-slate-100 align-top"><td class="py-1 pr-2">{{ q.label.replace('Q ending ', 'Q/E ') }}<div class="text-[10px] text-slate-400">{{ {'unreported': 'ended, not yet reported', 'current': 'current quarter', 'next': 'next quarter'}[q.status] }}</div></td>
+            <td class="pr-2 text-right num text-slate-500">{{ q.p10|money }}</td><td class="pr-2 text-right num font-medium">{{ q.p50|money }}</td><td class="pr-2 text-right num text-slate-500">{{ q.p90|money }}</td>
+            <td class="pr-2 text-right num text-slate-500">{{ q.prior_year|money }}</td><td class="text-right num">{{ '%.0f%%'|format(q.p_yoy * 100) if q.p_yoy is not none else '-' }}</td></tr>
+          {% if q.notes %}<tr><td colspan="6" class="pb-1 text-[10px] text-sky-800">{{ q.notes|join('; ') }}</td></tr>{% endif %}
+          {% endfor %}
+          </tbody>
+        </table>
+        <p class="text-[10px] text-slate-500 mt-1">TTM revenue {{ model.ttm.revenue|money }} through {{ model.ttm.through }} · trend {{ '%+.1f%%'|format(model.trend_growth * 100) }} y/y · quarterly volatility {{ '%.0f%%'|format(model.sigma * 100) }} (backtested) · source: {{ model.revenue_tag }} (SEC XBRL). {{ model.overlay_note }}</p>
+        {% endif %}
+        {% if model.events %}
+        <h3 class="text-xs font-semibold text-slate-500 uppercase mt-3">Modeled events</h3>
+        <ul class="text-xs mt-1 space-y-1">{% for e in model.events %}<li><span class="font-medium">{{ e.name }}</span> {{ e.amount|money }} ({{ e.kind }}) · {% set qlabels = dict(model.forecast|map(attribute='end')|zip(model.forecast|map(attribute='label'))) if false else {} %}{% for k, p in e.probs.items() if p >= 0.005 %}{{ k }}: {{ '%.0f%%'|format(p * 100) }}{{ ', ' if not loop.last }}{% endfor %}{% if e.note %}<div class="text-slate-500">{{ e.note }}</div>{% endif %}</li>{% endfor %}</ul>
+        {% endif %}
+      </div>
+      <div>
+        <h3 class="text-xs font-semibold text-slate-500 uppercase">Valuation ({{ v.method|replace('_', ' ')|upper }})</h3>
+        {% if v.per_share %}
+        <div class="mt-1 grid grid-cols-4 gap-2 text-center text-xs">
+          <div class="border border-slate-200 rounded p-1"><div class="text-slate-500">Price</div><div class="num font-medium">{{ '$%.2f'|format(v.price) if v.price else '-' }}</div></div>
+          {% for k in ['low', 'base', 'high'] %}<div class="border border-slate-200 rounded p-1 {{ 'bg-ledger-50' if k == 'base' }}"><div class="text-slate-500">{{ k }}</div><div class="num font-medium">${{ '%.2f'|format(v.per_share[k]) }}</div>{% if v.vs_price %}<div class="num text-[10px] text-slate-500">{{ '%+.0f%%'|format(v.vs_price[k] * 100) }}</div>{% endif %}</div>{% endfor %}
+        </div>
+        <ul class="text-[11px] text-slate-600 mt-2 space-y-0.5">
+          {% if v.multiples %}<li>Multiples low/base/high: {{ '%.2f'|format(v.multiples.low) }}x / {{ '%.2f'|format(v.multiples.base) }}x / {{ '%.2f'|format(v.multiples.high) }}x ({{ v.multiples.peers }})</li>{% endif %}
+          {% if v.justified_multiple %}<li>ROE/ROTE-justified multiple {{ '%.2f'|format(v.justified_multiple) }}x (NTM ROE {{ '%.1f%%'|format(v.roe_ntm * 100) }}, cost of equity {{ '%.1f%%'|format(v.coe * 100) }})</li>{% endif %}
+          <li>NTM revenue {{ v.ntm.revenue|money }}{% if v.ntm.net_income is not none %} · NTM net income {{ v.ntm.net_income|money }}{% endif %}{% if v.ntm.ebitda %} · NTM EBITDA {{ v.ntm.ebitda|money }}{% endif %}{% if v.net_debt is defined %} · net debt {{ v.net_debt|money }}{% endif %}</li>
+          {% if model.risk_premium %}<li>Risk premium from signals: +{{ '%.0f'|format(model.risk_premium * 1e4) }} bp</li>{% endif %}
+          {% if v.note %}<li class="text-amber-800">{{ v.note }}</li>{% endif %}
+        </ul>
+        {% else %}<p class="text-xs text-slate-500 mt-1">{{ v.note or 'Not valued.' }}</p>{% endif %}
+      </div>
+    </div>
+    <h3 class="text-xs font-semibold text-slate-500 uppercase mt-4">What moved the model</h3>
+    <ul class="mt-1 space-y-2 text-xs">
+      {% for s, i in moved %}<li class="border-l-2 border-ledger-600 pl-2"><span class="num text-slate-500">{{ s.as_of }}</span> <span class="font-mono text-slate-500">{{ s.source_id }}</span> {{ s.summary }} <a class="underline text-ledger-700" href="{{ s.citation_url }}" target="_blank" rel="noopener">source ↗</a><div class="text-slate-700 mt-0.5">{{ i.summary_app }}</div><div class="text-[10px] text-slate-400">{{ i.method }}</div></li>
+      {% else %}<li class="text-slate-500">No signal has moved this model yet.</li>{% endfor %}
+    </ul>
+  {% endif %}
+</div>

@@ -1,0 +1,8 @@
+# Curated overlay (Claude Code), from CPHC's 10-K: Canterbury Commons development with City of Shakopee TIF.
+note: "Racing + card casino; Canterbury Commons land monetization (e.g. 37 acres sold to Swervo for ~$8.8M in Apr 2023) and TIF reimbursements."
+events:
+  - name: Next Canterbury Commons land sale or JV
+    kind: milestone
+    keywords: [Canterbury Commons, Canterbury Park, TIF]
+    probs: {next: 0.15, "+2": 0.15}
+    note: "No pending sale disclosed; tracked for Shakopee agenda activity (agenda host currently robots-blocked)."

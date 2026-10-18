@@ -34,6 +34,11 @@ Context to share with counsel: Local Ledger publishes impersonal research on US-
 19. Can we say "independent", "no issuer compensation", "every claim cited" and "fact-checked" in marketing, and what substantiation should we keep?
 20. Testimonials or pilot-customer logos: what restrictions apply (Advisers Act marketing rule, if it applies at all)?
 
+## 5b. Models and valuations
+24. The gated platform shows model valuations (value ranges per share and vs the market price) to subscribers and pilot funds. The free newsletter shows only how news moves our revenue estimates and value sensitivity at the current market multiple, with no fair values or targets. Is that line meaningful for the publisher's exclusion and for "impersonal" advice? Should valuations be removed from the paid app too?
+25. Do probability statements ("P(revenue up year over year) 89%") or scenario values need specific disclaimers?
+26. Licensing: can we display third-party price data (currently Yahoo Finance via yfinance) to paying subscribers, or do we need a licensed market-data feed?
+
 ## 6. Entity, insurance and contracts
 21. Recommended entity structure and whether to carry media liability or E&O insurance before launch.
 22. What should the subscriber terms of service and the fund-pilot agreement say about no advice, no reliance, limitation of liability, confidentiality of pilot feedback, and data usage?

@@ -6,8 +6,9 @@
   <td class="pr-2 text-xs font-mono text-slate-500">{{ s.source_id }}</td>
   <td class="pr-2">{{ s.summary }}<div class="text-xs text-slate-500">{{ c.name }} · {{ c.archetype }}</div></td>
   <td class="pr-2 text-right num">{{ '%.2f'|format(s.significance) }}</td>
+  <td class="pr-2 text-xs num whitespace-nowrap">{% set i = impacts.get(s.id) %}{% if i and i.changed %}<span title="{{ i.summary }}">{% if i.pct is not none %}<span class="{{ 'text-ledger-700' if i.pct > 0 else 'text-red-700' }}">{{ '%+.1f%%'|format(i.pct * 100) }}</span> {{ i.quarter }}{% endif %}{% if i.per_share is not none %}<div class="text-slate-500">{{ '%+.2f'|format(i.per_share) }}/sh</div>{% endif %}{% if i.risk_bp %}<div class="text-amber-700">{{ '%+d'|format(i.risk_bp) }} bp risk</div>{% endif %}</span>{% endif %}</td>
   <td class="pr-2">{% set n = notes.get(s.id) %}{% if n %}<a class="underline text-xs {{ 'text-ledger-700' if n.factcheck_passed else 'text-amber-700' }}" href="/app/note/{{ n.id }}">{{ 'checked' if n.factcheck_passed else 'failed' }}</a>{% endif %}</td>
   <td><a class="text-ledger-700 underline" href="{{ s.citation_url }}" target="_blank" rel="noopener">doc ↗</a></td>
 </tr>
-{% else %}<tr><td colspan="8" class="py-4 text-slate-500">No signals match.</td></tr>
+{% else %}<tr><td colspan="9" class="py-4 text-slate-500">No signals match.</td></tr>
 {% endfor %}

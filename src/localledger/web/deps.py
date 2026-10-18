@@ -27,7 +27,7 @@ def _md(text: str | None) -> Markup:
 
 
 def _money(value: float | None) -> str:
-    if value is None:
+    if not isinstance(value, (int, float)):
         return "-"
     if abs(value) >= 1e9:
         return f"${value / 1e9:,.2f}B"

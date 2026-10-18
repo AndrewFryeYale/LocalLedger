@@ -3,7 +3,7 @@ VENV := venv
 LL := $(VENV)/bin/ll
 WEEK ?= $(shell date +%G-W%V)
 
-.PHONY: setup seed ingest signals newsletter demo warroom leads outreach pdfs serve test lint check stats costs citations
+.PHONY: setup seed ingest models signals newsletter demo warroom leads outreach pdfs serve test lint check stats costs citations
 
 $(VENV)/bin/python:
 	$(PY) -m venv $(VENV)
@@ -20,7 +20,10 @@ seed: ## load 237 companies + archetypes, register sources
 ingest: ## run every connector (graceful when a source is down)
 	$(LL) ingest
 
-signals: ## rank signals, write analyst notes, fact-check them
+models: ## company models + valuation, then replay signals to record each one's impact (the so-what)
+	$(LL) models
+
+signals: models ## rank signals, write analyst notes, fact-check them
 	$(LL) signals
 
 newsletter: ## build this week's issue to ./out/newsletter (never sent)

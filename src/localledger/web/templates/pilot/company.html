@@ -16,6 +16,8 @@
       {% if company.note %}<p class="mt-1 text-sm"><span class="text-slate-500">Note:</span> {{ company.note }}</p>{% endif %}
     </div>
 
+    {% include "pilot/_model_panel.html" %}
+
     <div>
       <h2 class="font-semibold text-sm uppercase tracking-wide text-slate-600">Signal timeline</h2>
       <div class="mt-2 overflow-x-auto">
@@ -26,7 +28,7 @@
         <tr class="border-b border-slate-100 align-top">
           <td class="py-1.5 pr-2 num whitespace-nowrap">{{ s.as_of }}</td>
           <td class="pr-2 text-xs font-mono text-slate-500">{{ s.source_id }}</td>
-          <td class="pr-2">{{ s.summary }}</td>
+          <td class="pr-2">{{ s.summary }}{% set i = impacts.get(s.id) %}{% if i and i.changed %}<div class="text-[11px] text-sky-800 mt-0.5">Model: {{ i.summary_app }}</div>{% endif %}</td>
           <td class="pr-2 text-right num">{{ '%.2f'|format(s.significance) }}</td>
           <td><a class="text-ledger-700 underline whitespace-nowrap" href="{{ s.citation_url }}" target="_blank" rel="noopener">doc ↗</a></td>
         </tr>

@@ -12,6 +12,9 @@
     <li><strong>Write.</strong> For signals above a threshold, an analyst agent writes 3–5 claims on what changed and why it matters. Each claim must cite a stored document and quote it verbatim.</li>
     <li><strong>Verify.</strong> A fact-check pass rejects any claim whose quote isn't verbatim in the cited document, whose numbers aren't in that document, or that a second agent can't support from the cited text. Rejected claims are logged and never published.</li>
   </ol>
+  <h2>Company models: the "so what"</h2>
+  <p>Every company has a model built from its own filings (SEC XBRL financials, plus call reports for banks). It forecasts revenue for each quarter that has ended but isn't reported yet, the current quarter and the next one, as a range (P10–P90) with the probability that revenue is up year over year. The baseline blends seasonal growth with run-rate. The range comes from backtesting that method on the company's own history, and discrete events (a land sale closing, an approval) carry probabilities by quarter.</p>
+  <p>When a signal arrives, deterministic rules translate it into model changes, and each rule states its assumptions. Examples: loan growth versus trend for banks, deposit-mix funding costs, monthly casino revenue versus trend, production versus trend, and agenda approvals that move an event's timing. We then report how the signal moves the revenue estimate for the quarter it lands in versus the next, and how it moves value at the current market multiple. These are estimates, not recommendations or price targets.</p>
   <h2>Sources</h2>
 </div>
 <div class="max-w-5xl overflow-x-auto mt-2">

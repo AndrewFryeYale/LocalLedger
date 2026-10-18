@@ -42,7 +42,8 @@ All commands are `ll <command>` (the console script lives at `venv/bin/ll`; `pyt
 | `ll seed` | Import the universe workbook (prefers the coverage-checked copy) and register sources |
 | `ll coverage` | Run `data/coverage_check.py` (yfinance analyst counts). Failure is a warning |
 | `ll ingest [--source a,b] [--tickers T1,T2] [--limit N]` | Run connectors and write cited signals |
-| `ll signals [--limit N] [--threshold X] [--tickers ..] [--redo]` | Re-rank, then analyst notes + fact-check for top signals |
+| `ll models [--tickers ..] [--no-fetch] [--no-llm] [--max-llm N]` | Company models + valuation for all 237, then replay signals to record each one's impact |
+| `ll signals [--limit N] [--threshold X] [--tickers ..] [--redo]` | Re-rank, then analyst notes + fact-check for top signals (model-moving signals first) |
 | `ll newsletter [--week 2026-W42] [--no-new-notes]` | Weekly issue: 5–8 fact-checked signals, 1 deeper company note, "new to the universe", methodology, disclosures -> `out/newsletter/` |
 | `ll warroom --ticker PCYO --replay` | Run the full crew on the latest real 8-K Ex. 99.1 vs the prior 10-Q, notes and signals |
 | `ll warroom --session ID --redirect "..." [--agent bear] [--as NAME]` | Post a redirect into an existing room and rerun the affected agents |
@@ -54,7 +55,7 @@ All commands are `ll <command>` (the console script lives at `venv/bin/ll`; `pyt
 | `ll stats` | Companies, documents, notes, and real signals by connector |
 | `ll costs` | LLM spend vs `LLM_BUDGET_USD` |
 
-Make targets: `setup seed ingest signals newsletter demo warroom leads outreach pdfs serve test lint check stats costs citations`.
+Make targets: `setup seed ingest models signals newsletter demo warroom leads outreach pdfs serve test lint check stats costs citations`.
 
 ## Connectors
 
@@ -69,6 +70,17 @@ Each connector implements `discover() / fetch() / parse() / to_signals()` (`src/
 | `pdf_agenda` | Agenda PDFs for non-Legistar towns (Smithtown, Asbury Park ×2, Cortlandt, LA County BOS). **Adding a town is a one-line edit** | live (Shakopee blocked by robots.txt) | `config/agenda_sources.yaml` |
 | `og_state` | New Mexico C-115 production (via NM Tech GO-TECH; OCD's own pages are behind a bot challenge) -> SJT/MTR distribution direction, EP/PED production | live | `config/og_map.yaml` |
 | `gaming_state` | Indiana Gaming Commission property-level AGR (FLL Rising Star). Colorado is CloudFront-blocked; see BLOCKERS.md | live | `config/gaming_map.yaml` |
+
+## Company models and the "so what"
+
+`ll models` (also run by `make signals`) gives every company a model and a valuation, then replays every signal through it:
+
+- **History** comes from SEC XBRL company facts. Fiscal quarters are derived from period dates (Q4 = FY - 9M), and mis-tagged outlier quarters are dropped. Banks use NII + noninterest income. Foreign filers' IFRS facts are used when reported in USD. Royalty trusts use monthly 8-K distributions x units. Banks whose holding company isn't an SEC filer use their FFIEC call report.
+- **Forecast** covers each unreported quarter, the current quarter and the next. The baseline blends seasonal growth with run-rate and is bounded on acquisition step-changes. The range is P10/P50/P90, with volatility backtested on the company's own history (seeded Monte Carlo), plus P(revenue up y/y). Discrete events (a land sale, an approval) carry probabilities by quarter.
+- **Valuation** is NTM-based and set by archetype: banks P/TBV (peer range + ROTE-justified), insurers P/B (ROE-justified), others EV/EBITDA or EV/Revenue vs universe peers, trusts by distribution yield, and liquidation-basis companies by curated NAV. Land carried at historical cost shows "NAV pending" rather than a misleading book multiple. Values more than 5x away from the price are flagged low-confidence.
+- **Impacts:** deterministic rules translate signals into model changes, and each rule states its assumptions. Examples: loan growth vs trend, deposit-mix funding cost, credit and CRE risk premia, monthly casino AGR vs trend, sequential production, permits elasticity, agenda approvals shifting event timing, and 8-K risk events. A capped, quote-verified LLM updater (`prompts/model_update.md`, `--max-llm`) handles news no rule covers, and it usually concludes "no quantifiable change". Each impact records the revenue estimate for the quarter the news lands in vs the next, P(up y/y), and value per share, before and after.
+- **Where it shows:** the company page has a "Model & valuation" panel (gated: full valuation), the signal feed has a model-impact column, and each newsletter item gets a "So what for our model" line. The newsletter shows estimates and value sensitivity at the current multiple only: no fair values or targets.
+- **Curated overlays** (`models/{TICKER}.yaml`) add events, NAVs and notes; Claude Code maintains them over time. Seeded so far: PCYO, TRC, MLP, GYRO, STHO, CPHC, CDZI.
 
 ## Web app
 

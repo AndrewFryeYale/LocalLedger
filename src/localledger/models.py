@@ -252,3 +252,33 @@ def as_date(value: date | datetime | str) -> date:
     if isinstance(value, date):
         return value
     return date.fromisoformat(str(value)[:10])
+
+
+class CompanyModelRow(SQLModel, table=True):
+    """A company's model: kind='base' (from filings + curated overlay) or 'current' (after replaying signals)."""
+
+    __tablename__ = "company_models"
+    __table_args__ = (UniqueConstraint("ticker", "kind", name="uq_company_model_kind"),)
+
+    id: int | None = Field(default=None, primary_key=True)
+    ticker: str = Field(foreign_key="companies.ticker", index=True)
+    kind: str = "current"
+    status: str = "modeled"
+    model_json: str = Field(sa_column=Column(Text, nullable=False))
+    built_at: datetime = Field(default_factory=utcnow)
+
+
+class ModelImpact(SQLModel, table=True):
+    """How one signal moved a company's model: per-quarter revenue estimates, P(up y/y), value per share."""
+
+    __tablename__ = "model_impacts"
+
+    id: int | None = Field(default=None, primary_key=True)
+    signal_id: int = Field(foreign_key="signals.id", unique=True)
+    ticker: str = Field(index=True)
+    method: str
+    impact_json: str = Field(sa_column=Column(Text, nullable=False))
+    summary_public: str = Field(sa_column=Column(Text, nullable=False))
+    summary_app: str = Field(sa_column=Column(Text, nullable=False))
+    changed: bool = False
+    created_at: datetime = Field(default_factory=utcnow)

@@ -102,11 +102,11 @@ def test_two_browsers_share_one_live_board(room):
     assert r.status_code == 200
     for t in listeners:
         t.join(timeout=60)
-    server.should_exit = True
     seqs = {n: [(d["id"], d["type"], d["agent"]) for k, d in got[n] if k == "board"] for n in got}
     assert seqs["Alice"] == seqs["Bob"] and ("redirect" in [t for _, t, _ in seqs["Bob"]])
     assert all(any(k == "presence" for k, _ in got[n]) for n in got)  # presence is streamed to each browser
     bear = clients["Bob"].get(f"/warroom/{room}/card/bear").text
+    server.should_exit = True
     assert "lower volumes" in bear
 
 

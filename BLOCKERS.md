@@ -44,3 +44,8 @@ _(none yet)_
 
 ## Build-time compliance notes (disclosed for the record)
 - During build verification a few requests went out before the target host's robots.txt had been read: two GETs to `*.legistar1.com` agenda PDFs (Maui, San Bernardino), one GET to `shakopeemn.granicus.com/ViewPublisher.php`, and the two Census probe requests noted above. Nothing from the legistar1/Granicus requests was stored or used, and no connector contacts those hosts; the production HTTP layer checks robots.txt before every request.
+
+## Company models: known gaps (Milestone 7)
+- **Market data licensing:** prices come from the yfinance market-cap refresh (Yahoo), which is fine for internal research but not licensed for redistribution. **Next step:** pick a licensed EOD price feed before the paid tier shows valuations vs price.
+- **Unvalued (9 of 237), each with a stated reason:** AEC and PBK report in CAD (no FX source yet); BSRT has no SEC XBRL; FTW is a new filer with no XBRL yet; MLP and FPI carry land at historical cost (curated parcel NAV queued); SJT and MTR have paid no distributions in 12 months (excess costs being recovered); FIP is valued on EV/Revenue but flagged low-confidence (negative book).
+- **Curated overlays** exist for 7 names so far; the rest run on the deterministic base model. **Next step (Claude Code, over time):** add parcel NAVs for land companies and event calendars for names with active agendas.

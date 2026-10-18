@@ -1,0 +1,8 @@
+# Curated overlay (Claude Code), from CDZI's 10-Q: Northern Pipeline financing via WIFIA (up to $194M invited) and a JPA.
+note: "Pre-revenue water infrastructure; value depends on project financing and offtake."
+events:
+  - name: Northern Pipeline financing close (WIFIA / JPA revenue bonds)
+    kind: milestone
+    keywords: [Fenner Gap, Joint Powers Authority, Cadiz, Northern Pipeline]
+    probs: {next: 0.2, "+2": 0.2}
+    note: "10-Q: EPA invited a WIFIA application for up to $194M; JPA formed by Fenner Gap Mutual Water Company and San Bernardino County in Apr 2026."

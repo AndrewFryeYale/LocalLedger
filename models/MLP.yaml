@@ -1,0 +1,14 @@
+# Curated overlay (Claude Code), from MLP's 10-Q (Aug 14, 2026).
+note: "Lumpy land sales on top of leasing revenue; Maui County is considering acquiring MLP's West Maui/Upcountry water infrastructure."
+events:
+  - name: Kapalua Lot 2-D sale to DC Kapalua 1 Property
+    kind: revenue
+    amount: 10000000   # $10.0M for 8.783 acres (+$1,138,565/acre for up to 3.5 more acres); agreement May 27, 2026, 90-day due diligence
+    keywords: [Kapalua, Lot 2-D, DC Kapalua]
+    probs: {current: 0.35, next: 0.30, "+2": 0.15}
+    note: "Purchase and Sale Agreement dated May 27, 2026 (10-Q); closing timing not disclosed, so probabilities are judgment."
+  - name: Maui County acquisition of MLP water infrastructure
+    kind: milestone
+    keywords: [water infrastructure, Maui Land & Pineapple, water assets]
+    probs: {next: 0.1, "+2": 0.15}
+    note: "County committee item on acquiring MLP's water infrastructure assets (Jul 29, 2026); no price disclosed."

@@ -58,6 +58,7 @@ class Crew:
         if not model_path.exists():
             model_path = settings.models_dir / f"{self.ticker}.yaml"
         self.model_yaml = model_path.read_text() if model_path.exists() else "drivers: []"
+        self.model_yaml += model_snapshot_yaml(self.ticker)
         threads = board.get_threads(session_id)
         self.outputs = {a: board.thread_output(t) for a, t in threads.items()}
         self._instructions = board.instructions_for(session_id)
@@ -164,6 +165,38 @@ class Crew:
             }
         self._emit("note", "note_writer", **result)
         return result
+
+
+def model_snapshot_yaml(ticker: str) -> str:
+    """The company model (history, forecast ranges, valuation) so the Model agent can size the surprise."""
+    from localledger.modeling.store import load_model
+
+    with session_scope() as s:
+        m = load_model(s, ticker)
+    if m is None or m.status != "modeled":
+        return ""
+    snap = {
+        "local_ledger_model": {
+            "last_reported_quarters": [
+                {"quarter": h["label"], "revenue": h["revenue"], "net_income": h["net_income"]} for h in m.history[-4:]
+            ],
+            "forecast": [
+                {
+                    "quarter": q.label,
+                    "status": q.status,
+                    "p10": q.p10,
+                    "p50": q.p50,
+                    "p90": q.p90,
+                    "prior_year": q.prior_year,
+                    "p_up_yoy": q.p_yoy,
+                }
+                for q in m.visible_quarters()
+            ],
+            "ttm": m.ttm,
+            "valuation": {k: m.valuation.get(k) for k in ("method", "price", "per_share", "multiples")},
+        }
+    }
+    return "\n# Company model built by Local Ledger from filings (estimates)\n" + yaml.safe_dump(snap, sort_keys=False)
 
 
 def create_session(ticker: str, created_by: str = "cli", title: str | None = None) -> int:

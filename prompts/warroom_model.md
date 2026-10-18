@@ -15,5 +15,7 @@ Current driver model (YAML):
 Reported KPIs from the Reader:
 {{ reader_json }}
 
+If the YAML includes a Local Ledger model forecast for the reported quarter, compute the surprise: reported revenue vs the forecast P50, and where it falls in the P10-P90 range. Then say what the print implies for the next quarter's estimate.
+
 Return JSON:
-{"drivers": [{"name": "driver name from the model", "prior": "prior model value", "new": "updated value", "delta": "new - prior, or n/a", "unit": "...", "source_kpi": "kpi name or null", "status": "updated|unchanged|new"}], "takeaways": ["1-3 short lines on what moved the model"], "summary": "1 sentence"}
+{"surprise": {"quarter": "...", "reported": "...", "forecast_p50": "...", "vs_p50": "+x%", "in_range": "below P10 | P10-P90 | above P90"}, "next_quarter_implication": "1 sentence", "drivers": [{"name": "driver name from the model", "prior": "prior model value", "new": "updated value", "delta": "new - prior, or n/a", "unit": "...", "source_kpi": "kpi name or null", "status": "updated|unchanged|new"}], "takeaways": ["1-3 short lines on what moved the model"], "summary": "1 sentence"}

@@ -1,14 +1,67 @@
-# Simple driver model for TRC (calendar year). Updated versions are written to out/models/TRC.yaml.
+# Curated overlay + war-room driver model (Claude Code). Drivers feed the war room; events and notes feed the company model.
 ticker: TRC
 basis: calendar quarter
 units: USD millions unless noted
 drivers:
-  - {name: revenues_and_other_income, unit: USD millions, value: 11.1, kpi_aliases: ["revenues and other income", "total revenues"]}
-  - {name: net_income_to_common, unit: USD millions, value: -1.7, kpi_aliases: ["net income attributable", "net income"]}
-  - {name: adjusted_ebitda, unit: USD millions, value: 5.7, kpi_aliases: ["adjusted ebitda"]}
-  - {name: commercial_industrial_revenue, unit: USD millions, value: 5.1, kpi_aliases: ["commercial/industrial", "segment revenues"]}
-  - {name: mineral_resources_revenue, unit: USD millions, value: 1.5, kpi_aliases: ["mineral resources"]}
-  - {name: farming_revenue, unit: USD millions, value: 0.6, kpi_aliases: ["farming"]}
-  - {name: trcc_industrial_occupancy, unit: "%", value: 100, kpi_aliases: ["industrial portfolio", "leased"]}
-  - {name: terra_vista_leased, unit: "%", value: null, kpi_aliases: ["terra vista"]}
-  - {name: total_liquidity, unit: USD millions, value: null, kpi_aliases: ["liquidity"]}
+- name: revenues_and_other_income
+  unit: USD millions
+  value: 11.1
+  kpi_aliases:
+  - revenues and other income
+  - total revenues
+- name: net_income_to_common
+  unit: USD millions
+  value: -1.7
+  kpi_aliases:
+  - net income attributable
+  - net income
+- name: adjusted_ebitda
+  unit: USD millions
+  value: 5.7
+  kpi_aliases:
+  - adjusted ebitda
+- name: commercial_industrial_revenue
+  unit: USD millions
+  value: 5.1
+  kpi_aliases:
+  - commercial/industrial
+  - segment revenues
+- name: mineral_resources_revenue
+  unit: USD millions
+  value: 1.5
+  kpi_aliases:
+  - mineral resources
+- name: farming_revenue
+  unit: USD millions
+  value: 0.6
+  kpi_aliases:
+  - farming
+- name: trcc_industrial_occupancy
+  unit: '%'
+  value: 100
+  kpi_aliases:
+  - industrial portfolio
+  - leased
+- name: terra_vista_leased
+  unit: '%'
+  value: null
+  kpi_aliases:
+  - terra vista
+- name: total_liquidity
+  unit: USD millions
+  value: null
+  kpi_aliases:
+  - liquidity
+note: Lumpy land sales at TRCC plus recurring leasing, farming and mineral royalties; Centennial re-entitlement
+  before LA County is the key value event.
+events:
+- name: Centennial re-entitlement (LA County Board of Supervisors)
+  kind: milestone
+  keywords:
+  - Centennial
+  - Tejon
+  probs:
+    current: 0.25
+    next: 0.35
+  note: '10-Q: RPDEIR circulating; hearings before the Regional Planning Commission and Board of Supervisors targeted
+    for late 2026.'

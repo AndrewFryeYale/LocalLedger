@@ -1,0 +1,12 @@
+# Curated overlay (Claude Code). Gyrodyne reports on the liquidation basis, so it's valued on net assets in liquidation.
+note: "Liquidation basis: value = estimated distributions per share; entitlements at Flowerfield (Smithtown) and Cortlandt Manor drive sale timing."
+valuation:
+  method: nav
+  nav_per_share: 12.30   # 10-Q (Jun 30, 2026): net assets in liquidation $27.06M = $12.30/share on 2,199,308 shares
+  source: "Net assets in liquidation $27.06M = $12.30/share (10-Q, Jun 30, 2026): https://www.sec.gov/Archives/edgar/data/1589061/000143774926027458/gyrllc20260630_10q.htm"
+events:
+  - name: Flowerfield final subdivision approval (Smithtown)
+    kind: milestone
+    keywords: [Gyrodyne, Flowerfield]
+    probs: {current: 0.15, next: 0.45, "+2": 0.25}
+    note: "10-Q: hearing with possible final approval expected in Q1 2027; conditional preliminary approval extended to Mar 30, 2027 (Smithtown Planning Board, Oct 7, 2026)."

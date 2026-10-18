@@ -152,6 +152,12 @@ def write_signal_note(session: Session, signal: Signal, llm: LLM) -> Note | None
 def select_signals(session: Session, limit: int, threshold: float, redo: bool = False) -> list[Signal]:
     noted = set() if redo else {n.signal_id for n in session.exec(select(Note).where(Note.kind == "signal")).all()}
     rows = session.exec(select(Signal).where(Signal.significance >= threshold).order_by(Signal.rank_score.desc())).all()
+    # Signals that moved a company model get notes first: that's where the "so what" is quantified.
+    from localledger.gtm.newsletter import model_bonus
+    from localledger.models import ModelImpact
+
+    impacts = {i.signal_id: i for i in session.exec(select(ModelImpact).where(ModelImpact.changed == True)).all()}  # noqa: E712
+    rows = sorted(rows, key=lambda r: -(r.rank_score + model_bonus(impacts.get(r.id))))
     return interleave_by_source([s for s in rows if s.id not in noted])[:limit]
 
 
