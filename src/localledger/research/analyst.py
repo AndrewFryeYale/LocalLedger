@@ -158,7 +158,31 @@ def select_signals(session: Session, limit: int, threshold: float, redo: bool = 
 
     impacts = {i.signal_id: i for i in session.exec(select(ModelImpact).where(ModelImpact.changed == True)).all()}  # noqa: E712
     rows = sorted(rows, key=lambda r: -(r.rank_score + model_bonus(impacts.get(r.id))))
-    return interleave_by_source([s for s in rows if s.id not in noted])[:limit]
+    return interleave_by_source(one_per_document([s for s in rows if s.id not in noted], session, redo))[:limit]
+
+
+def one_per_document(rows: list[Signal], session: Session, redo: bool = False) -> list[Signal]:
+    """Several signals computed from one document (a bank's call-report extract yields loans, deposits, CRE and
+    credit) share the same evidence, so one note covers them: keep the best-ranked signal per (ticker, document),
+    and skip documents that already have a note."""
+    covered = set()
+    if not redo:
+        covered = {
+            (t, d)
+            for t, d in session.exec(
+                select(Signal.ticker, Signal.document_id)
+                .join(Note, Note.signal_id == Signal.id)
+                .where(Note.kind == "signal")
+            ).all()
+        }
+    out = []
+    for r in rows:
+        key = (r.ticker, r.document_id)
+        if key in covered:
+            continue
+        covered.add(key)
+        out.append(r)
+    return out
 
 
 def interleave_by_source(signals: list[Signal]) -> list[Signal]:

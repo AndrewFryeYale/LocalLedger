@@ -1,0 +1,63 @@
+{# Architecture diagram: deterministic steps (outlined), LLM agents (green), humans (amber). #}
+{% macro box(x, y, w, h, title, sub, kind) -%}
+  {%- set fill = {'llm': '#1f6f54', 'det': '#ffffff', 'human': '#fff7ed', 'data': '#f1f5f9'}[kind] -%}
+  {%- set stroke = {'llm': '#175841', 'det': '#94a3b8', 'human': '#c2410c', 'data': '#cbd5e1'}[kind] -%}
+  {%- set ink = '#ffffff' if kind == 'llm' else '#0f172a' -%}
+  {%- set sink = '#cfe5da' if kind == 'llm' else '#64748b' -%}
+  <g><rect x="{{ x }}" y="{{ y }}" width="{{ w }}" height="{{ h }}" rx="8" fill="{{ fill }}" stroke="{{ stroke }}" stroke-width="1.2" {% if kind == 'det' %}stroke-dasharray="4 3"{% endif %}/>
+  <text x="{{ x + w / 2 }}" y="{{ y + h / 2 - (4 if sub else -4) }}" text-anchor="middle" font-weight="600" font-size="12.5" fill="{{ ink }}">{{ title }}</text>
+  {% if sub %}<text x="{{ x + w / 2 }}" y="{{ y + h / 2 + 12 }}" text-anchor="middle" font-size="10.5" fill="{{ sink }}">{{ sub }}</text>{% endif %}</g>
+{%- endmacro %}
+{% macro arrow(x1, y1, x2, y2) -%}<line x1="{{ x1 }}" y1="{{ y1 }}" x2="{{ x2 }}" y2="{{ y2 }}" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#ah)"/>{%- endmacro %}
+<svg viewBox="0 0 1120 560" class="w-full h-auto" font-family="Inter, ui-sans-serif" role="img" aria-label="Local Ledger agent architecture">
+  <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs>
+
+  <text x="0" y="18" font-size="11" font-weight="600" fill="#64748b" letter-spacing="1.2">WEEKLY RESEARCH PIPELINE (BATCH, SHARED BY EVERY READER)</text>
+  {{ box(0, 34, 150, 62, 'Public records', '7 connectors', 'data') }}
+  {{ arrow(150, 65, 176, 65) }}
+  {{ box(178, 34, 140, 62, 'Signal rules', 'map + score (no LLM)', 'det') }}
+  {{ arrow(318, 65, 344, 65) }}
+  {{ box(346, 34, 150, 62, 'Company models', 'forecast + value (no LLM)', 'det') }}
+  {{ box(346, 120, 150, 54, 'Model updater', 'only if rules can\'t', 'llm') }}
+  <line x1="421" y1="96" x2="421" y2="118" stroke="#94a3b8" stroke-width="1.4" stroke-dasharray="3 3"/>
+  {{ arrow(496, 65, 522, 65) }}
+  {{ box(524, 34, 140, 62, 'Analyst', 'cited claims', 'llm') }}
+  {{ arrow(664, 65, 690, 65) }}
+  {{ box(692, 34, 170, 62, 'Fact-check', 'gate (code) + verifier (LLM)', 'llm') }}
+  {{ arrow(862, 65, 888, 65) }}
+  {{ box(890, 34, 228, 62, 'Newsletter + app', 'impact-only issue · full models in app', 'data') }}
+  <text x="594" y="114" text-anchor="middle" font-size="10.5" fill="#64748b">BM25 over 10-K / 10-Q</text>
+  <text x="594" y="128" text-anchor="middle" font-size="10.5" fill="#64748b">input filter runs first</text>
+  <text x="777" y="114" text-anchor="middle" font-size="10.5" fill="#64748b">drops unverifiable quotes,</text>
+  <text x="777" y="128" text-anchor="middle" font-size="10.5" fill="#64748b">numbers, taint and advice</text>
+
+  <text x="0" y="222" font-size="11" font-weight="600" fill="#64748b" letter-spacing="1.2">EARNINGS WAR ROOM (INTERACTIVE, PER FUND · ASYNCIO DAG · SHARED BOARD OVER SSE)</text>
+  {{ box(0, 300, 120, 62, 'Reader', '8-K Ex. 99.1 + 10-Q', 'llm') }}
+  {{ arrow(120, 331, 158, 260) }}{{ arrow(120, 331, 158, 331) }}{{ arrow(120, 331, 158, 402) }}
+  {{ box(160, 232, 130, 56, 'Model', 'vs our forecast', 'llm') }}
+  {{ box(160, 303, 130, 56, 'Thesis', 'kill criteria', 'llm') }}
+  {{ box(160, 374, 130, 56, 'Read-across', 'peers + signals', 'llm') }}
+  {{ arrow(290, 260, 338, 290) }}{{ arrow(290, 331, 338, 296) }}{{ arrow(290, 331, 338, 366) }}{{ arrow(290, 402, 338, 372) }}
+  {{ box(340, 262, 120, 56, 'Bull', '', 'llm') }}
+  {{ box(340, 344, 120, 56, 'Bear', '', 'llm') }}
+  {{ arrow(460, 290, 498, 325) }}{{ arrow(460, 372, 498, 337) }}
+  {{ box(500, 303, 130, 56, 'Moderator', 'agree / disagree', 'llm') }}
+  {{ arrow(630, 331, 662, 331) }}
+  {{ box(664, 303, 130, 56, 'Note writer', 'cited note', 'llm') }}
+  {{ arrow(794, 331, 826, 331) }}
+  {{ box(828, 303, 120, 56, 'Fact-check', 'every claim', 'llm') }}
+  {{ arrow(948, 331, 980, 331) }}
+  {{ box(982, 303, 136, 56, 'Analyst approves', 'compliance check', 'human') }}
+  {{ box(160, 470, 470, 62, 'Fund analysts in the room', 'redirect any agent · claim a thread and edit it · downstream agents rerun', 'human') }}
+  <line x1="395" y1="470" x2="395" y2="404" stroke="#c2410c" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#ah)"/>
+  <line x1="565" y1="470" x2="565" y2="362" stroke="#c2410c" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#ah)"/>
+  <text x="650" y="494" font-size="10.5" fill="#64748b">Loop guard: at most {{ max_runs }} runs per room per hour;</text>
+  <text x="650" y="509" font-size="10.5" fill="#64748b">queued redirects merge into one rerun.</text>
+
+  <g transform="translate(960, 470)" font-size="10.5" fill="#334155">
+    <rect width="14" height="10" rx="2" fill="#1f6f54"/><text x="20" y="9">LLM agent (gpt-6-luna)</text>
+    <rect y="18" width="14" height="10" rx="2" fill="#fff" stroke="#94a3b8" stroke-dasharray="3 2"/><text x="20" y="27">deterministic code</text>
+    <rect y="36" width="14" height="10" rx="2" fill="#fff7ed" stroke="#c2410c"/><text x="20" y="45">human</text>
+    <rect y="54" width="14" height="10" rx="2" fill="#f1f5f9" stroke="#cbd5e1"/><text x="20" y="63">data in / out</text>
+  </g>
+</svg>

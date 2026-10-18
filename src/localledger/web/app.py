@@ -5,7 +5,8 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
@@ -38,6 +39,13 @@ def create_app() -> FastAPI:
     application.include_router(routes_pilot.router)
     application.include_router(routes_warroom.router)
     application.include_router(routes_admin.router)
+
+    from localledger.warroom.crew import RerunLimited
+
+    @application.exception_handler(RerunLimited)
+    async def _rerun_limited(_request: Request, exc: RerunLimited):
+        return JSONResponse({"ok": False, "error": f"Loop guard: {exc}"}, status_code=429)
+
     return application
 
 

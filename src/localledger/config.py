@@ -10,7 +10,9 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 ROOT = Path(os.environ.get("LL_ROOT") or Path(__file__).resolve().parents[2])
+# The repo's own .env first, then the folder above it (graders keep one shared .env there). Neither overrides the shell.
 load_dotenv(ROOT / ".env", override=False)
+load_dotenv(ROOT.parent / ".env", override=False)
 
 
 def _env(name: str, default: str) -> str:
@@ -39,6 +41,8 @@ class Settings:
     budget_usd: float
     price_in_per_mtok: float
     price_out_per_mtok: float
+    price_cached_in_per_mtok: float
+    reasoning_effort: str
     pilot_passcode: str
     admin_passcode: str
     secret_key: str
@@ -95,11 +99,13 @@ def get_settings() -> Settings:
         contact_email=_env("CONTACT_EMAIL", "aceamf25@gmail.com"),
         llm_provider=_env("LLM_PROVIDER", "portkey"),
         llm_base_url=_env("LLM_BASE_URL", "https://api.portkey.ai/v1"),
-        model_heavy=_env("LLM_MODEL_HEAVY", "gpt-5.6-luna"),
-        model_fast=_env("LLM_MODEL_FAST", "gpt-5.6-luna"),
+        model_heavy=_env("LLM_MODEL_HEAVY", "gpt-6-luna"),
+        model_fast=_env("LLM_MODEL_FAST", "gpt-6-luna"),
         budget_usd=float(_env("LLM_BUDGET_USD", "10")),
-        price_in_per_mtok=float(_env("LLM_PRICE_IN_PER_MTOK", "3.0")),
-        price_out_per_mtok=float(_env("LLM_PRICE_OUT_PER_MTOK", "15.0")),
+        price_in_per_mtok=float(_env("LLM_PRICE_IN_PER_MTOK", "0.10")),
+        price_out_per_mtok=float(_env("LLM_PRICE_OUT_PER_MTOK", "0.50")),
+        price_cached_in_per_mtok=float(_env("LLM_PRICE_CACHED_IN_PER_MTOK", "0.01")),
+        reasoning_effort=_env("LLM_REASONING_EFFORT", "prompt"),
         pilot_passcode=_env("PILOT_PASSCODE", "ledger-pilot"),
         admin_passcode=_env("ADMIN_PASSCODE", "ledger-admin"),
         secret_key=_env("SECRET_KEY", "dev-only-change-me"),

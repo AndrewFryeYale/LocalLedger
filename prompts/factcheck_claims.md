@@ -1,6 +1,7 @@
 ---
 tier: fast
 max_tokens: 2500
+reasoning_effort: low
 ---
 ## system
 You are the fact-checker for {{ brand }}, an independent research publisher. Credibility is the product.

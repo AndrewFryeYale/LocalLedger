@@ -44,6 +44,30 @@ def init_db() -> None:
     from localledger import models  # noqa: F401  (registers tables)
 
     SQLModel.metadata.create_all(get_engine())
+    _add_missing_columns()
+
+
+def _add_missing_columns() -> None:
+    """Additive migrations: new nullable/defaulted columns on existing tables (no data is rewritten or dropped)."""
+    from sqlalchemy import inspect, text
+
+    engine = get_engine()
+    insp = inspect(engine)
+    with engine.begin() as conn:
+        for table in SQLModel.metadata.sorted_tables:
+            if not insp.has_table(table.name):
+                continue
+            have = {c["name"] for c in insp.get_columns(table.name)}
+            for col in table.columns:
+                if col.name in have or col.primary_key:
+                    continue
+                default = col.default.arg if col.default is not None and not callable(col.default.arg) else None
+                ddl = col.type.compile(engine.dialect)
+                literal = (
+                    "" if default is None else f" DEFAULT {int(default) if isinstance(default, bool) else default!r}"
+                )
+                null = "" if col.nullable or default is not None else " DEFAULT 0"
+                conn.execute(text(f'ALTER TABLE {table.name} ADD COLUMN "{col.name}" {ddl}{literal}{null}'))
 
 
 @contextmanager

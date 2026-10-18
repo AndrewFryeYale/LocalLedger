@@ -32,6 +32,7 @@ dependencies = [
 dev = ["pytest>=8", "ruff>=0.6"]
 coverage = ["yfinance>=0.2.40"]
 postgres = ["psycopg[binary]>=3.2"]
+screenshots = ["playwright>=1.48"]  # scripts/screenshots.py, uses the installed Google Chrome
 
 [project.scripts]
 ll = "localledger.cli:app"

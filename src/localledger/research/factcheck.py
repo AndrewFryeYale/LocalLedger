@@ -25,7 +25,9 @@ _NUM = re.compile(
 _SCALE = {"million": 1e6, "mm": 1e6, "m": 1e6, "billion": 1e9, "bn": 1e9, "b": 1e9, "thousand": 1e3, "k": 1e3}
 # Recommendation language (not ordinary business verbs: a homebuilder "buys lots", a utility "sells water").
 RECOMMENDATION = re.compile(
-    r"\b(?:(?:we|i|investors should|you should) (?:would )?(?:buy|sell|short|accumulate)|"
+    r"\b(?:(?:we|i|(?:investors|readers|subscribers|holders|shareholders|everyone) should|you should) (?:would )?"
+    r"(?:buy|sell|short|accumulate|own|dump)|(?:investors|readers|subscribers|shareholders) should (?:consider )?"
+    r"(?:buying|selling|owning)|"
     r"(?:buy|sell|short|accumulate) (?:the )?(?:stock|shares|name)|(?:buy|sell|hold) (?:rating|recommendation)|"
     r"rated? (?:a )?(?:buy|sell)|strong buy|price target|target price|overweight|underweight|"
     r"outperform|underperform|you should|we recommend|undervalued|overvalued)\b",
@@ -132,12 +134,36 @@ def deterministic_check(claim: dict, corpus: str, computed: list[float]) -> str 
         return "quote too short to verify"
     if normalize(quote) not in normalize(corpus):
         return "quote not found verbatim in cited document"
+    if quote_is_tainted(corpus, quote):
+        return "quote comes from text flagged as possible prompt injection"
     missing = numbers_supported(claim["text"], corpus, computed)
     if missing:
         return f"numbers not in cited document: {', '.join(missing[:4])}"
     if RECOMMENDATION.search(claim["text"]):
         return "recommendation language (impersonal research only)"
     return None
+
+
+def quote_is_tainted(corpus: str, quote: str) -> bool:
+    """Taint tracking: a quote taken from (or right next to) an instruction-like span can't support a claim, even
+    though it is verbatim. Checks the quote and the line around it (agenda packets put a payload on its own line)."""
+    from localledger.safety import scan
+
+    if scan(quote):
+        return True
+    text = corpus.translate(_QUOTES)
+    words = quote.translate(_QUOTES).split()
+    if not words:
+        return False
+    # Match across any whitespace (a quote may wrap a line) while keeping the document's own line breaks.
+    m = re.search(r"\s+".join(re.escape(w) for w in words), text, re.IGNORECASE)
+    if m is None:
+        return False
+    first_line = text.rfind("\n", 0, m.start())
+    last_line = text.find("\n", m.end())
+    start = max(first_line, m.start() - 240, 0)
+    end = min(last_line if last_line != -1 else len(text), m.end() + 240)
+    return bool(scan(text[start:end]))
 
 
 def quote_context(corpus: str, quote: str, window: int = 700) -> str:

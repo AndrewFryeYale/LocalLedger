@@ -229,6 +229,24 @@ class LlmCall(SQLModel, table=True):
     output_tokens: int = 0
     est_cost_usd: float = 0.0
     cached: bool = False
+    cached_input_tokens: int = 0  # provider prompt-cache reads
+    reasoning_tokens: int = 0  # included in output_tokens
+    latency_ms: int = 0
+    saved_input_tokens: int = 0  # disk-cache hit: the tokens a live call would have used
+    saved_output_tokens: int = 0
+    created_at: datetime = Field(default_factory=utcnow)
+
+
+class SafetyEvent(SQLModel, table=True):
+    """Defenses that fired: injection filtered, war-room loop guard, budget cap, rejected model update, ..."""
+
+    __tablename__ = "safety_events"
+
+    id: int | None = Field(default=None, primary_key=True)
+    kind: str = Field(index=True)
+    ticker: str | None = None
+    document_id: int | None = None
+    detail_json: str = "{}"
     created_at: datetime = Field(default_factory=utcnow)
 
 

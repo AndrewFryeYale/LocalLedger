@@ -1,13 +1,25 @@
 {% extends "base.html" %}
 {% block title %}{{ company.ticker }} · {{ brand() }}{% endblock %}
 {% block content %}
-<div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-  <h1 class="text-2xl font-semibold"><span class="font-mono text-ledger-700">{{ company.ticker }}</span> {{ company.name }}</h1>
-  <span class="text-sm text-slate-500">{{ company.archetype }} · {{ company.size_band }} · ${{ '%.0f'|format(company.mkt_cap_musd or 0) }}M · coverage {{ company.analyst_coverage }} · priority <span class="num">{{ company.priority|num(1) }}</span>{% if company.state %} · {{ company.state }}{% endif %}</span>
-  {% if user %}<a href="/warroom/new?ticker={{ company.ticker }}" class="ml-auto text-sm border border-ledger-700 text-ledger-700 rounded px-3 py-1">Open earnings war room</a>{% endif %}
+<div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+  <div>
+    <p class="kicker">{{ company.archetype }}{% if company.state %} · {{ company.state }}{% endif %}</p>
+    <h1 class="text-3xl font-semibold tracking-tight mt-0.5"><span class="font-mono text-ledger-700">{{ company.ticker }}</span> {{ company.name }}</h1>
+  </div>
+  {% if user %}<a href="/warroom/new?ticker={{ company.ticker }}" class="ml-auto text-sm bg-ledger-700 hover:bg-ledger-800 text-white rounded-md px-4 py-2 font-medium">Open earnings war room →</a>{% endif %}
+</div>
+{% set nxt = (model.visible_quarters()|selectattr('status', 'equalto', 'current')|list|first) if model and model.status in ('modeled', 'trust') else none %}
+{% set v = model.valuation if model else {} %}
+<div class="mt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+  <div class="board-card px-4 py-3"><p class="kicker">Market cap</p><p class="stat">${{ '%.0f'|format(company.mkt_cap_musd or 0) }}M</p><p class="text-xs text-slate-500">{{ company.size_band }}</p></div>
+  <div class="board-card px-4 py-3"><p class="kicker">Analyst coverage</p><p class="stat">{{ company.analyst_coverage if company.analyst_coverage is not none else '-' }}</p><p class="text-xs text-slate-500">consensus estimates</p></div>
+  <div class="board-card px-4 py-3"><p class="kicker">Current-quarter revenue</p><p class="stat">{{ nxt.p50|money if nxt else '-' }}</p><p class="text-xs text-slate-500">{{ 'P50 · ' ~ nxt.label.replace('Q ending ', 'Q/E ') if nxt else 'no revenue model' }}</p></div>
+  <div class="board-card px-4 py-3"><p class="kicker">P(up y/y)</p><p class="stat">{{ '%.0f%%'|format(nxt.p_yoy * 100) if nxt and nxt.p_yoy is not none else '-' }}</p><p class="text-xs text-slate-500">current quarter</p></div>
+  <div class="board-card px-4 py-3"><p class="kicker">Model value / share</p><p class="stat">{{ '$%.2f'|format(v.per_share.base) if v and v.per_share else '-' }}</p><p class="text-xs text-slate-500">{% if v and v.per_share and v.price %}price ${{ '%.2f'|format(v.price) }} · {{ v.method|replace('_', ' ') }}{% else %}{{ (v.method|replace('_', ' ')) if v and v.method else 'not valued' }}{% endif %}</p></div>
+  <div class="board-card px-4 py-3"><p class="kicker">Signals</p><p class="stat">{{ signals|length }}</p><p class="text-xs text-slate-500">{{ moved|length }} moved the model</p></div>
 </div>
 
-<div class="mt-5 grid gap-5 lg:grid-cols-3">
+<div class="mt-6 grid gap-6 lg:grid-cols-3">
   <section class="lg:col-span-2 space-y-5">
     <div class="board-card p-4">
       <h2 class="font-semibold text-sm uppercase tracking-wide text-slate-600">Drivers</h2>
@@ -27,7 +39,7 @@
         {% for s in signals %}
         <tr class="border-b border-slate-100 align-top">
           <td class="py-1.5 pr-2 num whitespace-nowrap">{{ s.as_of }}</td>
-          <td class="pr-2 text-xs font-mono text-slate-500">{{ s.source_id }}</td>
+          <td class="pr-2"><span class="src src-{{ s.source_id }}">{{ s.source_id }}</span></td>
           <td class="pr-2">{{ s.summary }}{% set i = impacts.get(s.id) %}{% if i and i.changed %}<div class="text-[11px] text-sky-800 mt-0.5">Model: {{ i.summary_app }}</div>{% endif %}</td>
           <td class="pr-2 text-right num">{{ '%.2f'|format(s.significance) }}</td>
           <td><a class="text-ledger-700 underline whitespace-nowrap" href="{{ s.citation_url }}" target="_blank" rel="noopener">doc ↗</a></td>

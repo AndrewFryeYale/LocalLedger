@@ -26,9 +26,11 @@ make serve     # web app at http://127.0.0.1:8000
 
 ### LLM access and cost controls
 
-- LLM calls go through the **Portkey gateway** with the OpenAI SDK (`LLM_BASE_URL=https://api.portkey.ai/v1`). Set `PORTKEY_API_KEY` in your shell or `.env`; the key is never printed or logged.
-- Models come from env: `LLM_MODEL_HEAVY` (war-room Moderator and Note writer) and `LLM_MODEL_FAST` (everything else). Both default to `gpt-5.6-luna`.
-- **Budget cap:** `LLM_BUDGET_USD` (default `10`). Every call is recorded in the `llm_calls` ledger. Before a live call, its estimated cost is reserved against the cap; past the cap, LLM steps fall back to a deterministic, extractive mock instead of failing. Prices for the estimate are `LLM_PRICE_IN_PER_MTOK` / `LLM_PRICE_OUT_PER_MTOK` (conservative defaults; set them to your Portkey pricing).
+- LLM calls go through the **Portkey gateway** with the OpenAI SDK (`LLM_BASE_URL=https://api.portkey.ai/v1`). Set `PORTKEY_API_KEY` in your shell or a `.env` file; the key is never printed or logged.
+- **`.env` lookup:** the app reads `.env` in the repo folder first, then `../.env` (the folder above the repo). Shell variables win over both. `.env.example` lists every key, with no real values.
+- Models come from env: `LLM_MODEL_HEAVY` (war-room Moderator and Note writer) and `LLM_MODEL_FAST` (everything else). Both default to `gpt-6-luna` (the only model allowed on the course key).
+- **Reasoning effort** is set per prompt in each file's front matter (`reasoning_effort: low|none`), chosen from `ll bench` runs; `LLM_REASONING_EFFORT` overrides every prompt. A call that runs out of output tokens retries once with less reasoning.
+- **Budget cap:** `LLM_BUDGET_USD` (default `10`). Every call is recorded in the `llm_calls` ledger (input, cached input, output and reasoning tokens, latency, cost). Before a live call, its estimated cost is reserved against the cap; past the cap, LLM steps fall back to a deterministic, extractive mock instead of failing. Prices: `LLM_PRICE_IN_PER_MTOK` / `LLM_PRICE_CACHED_IN_PER_MTOK` / `LLM_PRICE_OUT_PER_MTOK` (gpt-6-luna list prices by default).
 - Every prompt lives in `prompts/*.md`. Calls are cached on disk (`.cache/llm/`) by prompt name, prompt text, model and rendered inputs, so reruns cost nothing.
 - Every command prints its token count and estimated cost. `ll costs` shows the ledger against the cap.
 - No key at all? Everything still runs on the mock (`LLM_PROVIDER=mock` forces it).
@@ -54,8 +56,15 @@ All commands are `ll <command>` (the console script lives at `venv/bin/ll`; `pyt
 | `ll check-citations [--limit N]` | HTTP-check every signal citation URL -> `out/citation_check.csv` |
 | `ll stats` | Companies, documents, notes, and real signals by connector |
 | `ll costs` | LLM spend vs `LLM_BUDGET_USD` |
+| `ll bench --label NAME [--effort prompt\|low\|none\|default]` | Token benchmark: a fixed live workload (8 notes + fact-check, 1 war room, 5 outreach drafts) in a sandbox copy of the DB with a fresh cache -> `out/bench/summary.md` (~$0.01-0.03 per run) |
+| `ll tokenomics` | Unit costs from the bench runs and the ledger, rolled up per user and at 100 / 10,000 users -> `out/tokenomics/` |
+| `ll backfill-agendas [--days 365]` | Re-run the agenda connectors over a year into `out/backtest/agenda_backfill.db` (the live feed is untouched) |
+| `ll backtest [--no-fetch]` | Point-in-time backtest: forecast accuracy, call-report lead time, flagged events and the stock's move afterwards -> `out/backtest/` and `/app/backtest`. No LLM calls |
+| `ll safety-demo` | Red-team demo: a poisoned agenda packet through the live analyst with and without the input filter, plus a simulated compromised model -> `out/safety/demo.md` and `/app/safety` |
 
 Make targets: `setup seed ingest models signals newsletter demo warroom leads outreach pdfs serve test lint check stats costs citations`.
+
+Web pages added for the course write-up: `/how-it-works` (agent diagram, every agent's role and settings, one real war-room run traced step by step), `/app/backtest`, `/app/costs` (tokenomics) and `/app/safety` (defenses, red-team results, safety event log). `python scripts/screenshots.py out/screenshots` captures every page from a running `make serve` (needs `pip install playwright` and Google Chrome).
 
 ## Connectors
 

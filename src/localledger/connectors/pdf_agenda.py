@@ -157,9 +157,11 @@ class PdfAgendaConnector(Connector):
         watchlists: dict[str, Watchlist] | None = None,
         today: date | None = None,
         lookback_days: int | None = None,
+        max_docs: int | None = None,
         **kwargs: Any,
     ) -> None:
         super().__init__(*args, **kwargs)
+        self.max_docs_override = max_docs
         self.towns = towns if towns is not None else load_towns(self.settings.config_dir / "agenda_sources.yaml")
         self._by_id = {t["id"]: t for t in self.towns}
         self._watchlists = watchlists
@@ -191,7 +193,8 @@ class PdfAgendaConnector(Connector):
     def fetch(self, target: str) -> list[Document]:
         town = self._by_id[target]
         links = self._links(town)
-        chosen = select_recent(links, self.today, self._lookback(town), int(town.get("max_docs", MAX_DOCS)))
+        max_docs = self.max_docs_override or int(town.get("max_docs", MAX_DOCS))
+        chosen = select_recent(links, self.today, self._lookback(town), max_docs)
         docs: list[Document] = []
         failed = 0
         for link in chosen:

@@ -3,7 +3,7 @@
   <td class="py-1.5 pr-2 text-right num text-slate-500">{{ '%.2f'|format(s.rank_score) }}</td>
   <td class="pr-2 num whitespace-nowrap">{{ s.as_of }}</td>
   <td class="pr-2 font-mono"><a class="text-ledger-700 underline" href="/app/company/{{ s.ticker }}">{{ s.ticker }}</a></td>
-  <td class="pr-2 text-xs font-mono text-slate-500">{{ s.source_id }}</td>
+  <td class="pr-2"><span class="src src-{{ s.source_id }}">{{ s.source_id }}</span></td>
   <td class="pr-2">{{ s.summary }}<div class="text-xs text-slate-500">{{ c.name }} · {{ c.archetype }}</div></td>
   <td class="pr-2 text-right num">{{ '%.2f'|format(s.significance) }}</td>
   <td class="pr-2 text-xs num whitespace-nowrap">{% set i = impacts.get(s.id) %}{% if i and i.changed %}<span title="{{ i.summary }}">{% if i.pct is not none %}<span class="{{ 'text-ledger-700' if i.pct > 0 else 'text-red-700' }}">{{ '%+.1f%%'|format(i.pct * 100) }}</span> {{ i.quarter }}{% endif %}{% if i.per_share is not none %}<div class="text-slate-500">{{ '%+.2f'|format(i.per_share) }}/sh</div>{% endif %}{% if i.risk_bp %}<div class="text-amber-700">{{ '%+d'|format(i.risk_bp) }} bp risk</div>{% endif %}</span>{% endif %}</td>

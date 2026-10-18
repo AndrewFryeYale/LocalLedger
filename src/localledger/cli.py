@@ -392,5 +392,98 @@ def costs() -> None:
     typer.echo(f"Spent ${spent_usd():.4f} of ${settings.budget_usd:.2f} budget (LLM_BUDGET_USD).")
 
 
+@app.command()
+def bench(
+    label: Annotated[str, typer.Option(help="Name for this run (out/bench/LABEL)")] = "current",
+    effort: Annotated[str, typer.Option(help="LLM_REASONING_EFFORT for the run")] = "prompt",
+) -> None:
+    """Token benchmark: a fixed live workload in a sandbox DB with a fresh cache -> out/bench/summary.md."""
+    from localledger.bench import run_bench
+
+    r = run_bench(label, effort)
+    t, q = r["totals"], r["quality"]
+    typer.echo(
+        f"{label}: {int(t.get('calls', 0))} calls, in={int(t.get('input_tokens', 0)):,} "
+        f"out={int(t.get('output_tokens', 0)):,} (reasoning {int(t.get('reasoning_tokens', 0)):,}), "
+        f"${t.get('cost_usd', 0):.4f}; notes passed {q['notes_passed']}/{q['notes']}, "
+        f"claims kept {q['claims_kept']}/{q['claims_written']}; {r['wall_seconds']}s"
+    )
+    typer.echo(f"Summary: {get_settings().out_dir / 'bench' / 'summary.md'}")
+
+
+@app.command("bench-worker", hidden=True)
+def bench_worker(label: Annotated[str, typer.Option()] = "current") -> None:
+    from localledger.bench import worker
+
+    worker(label)
+
+
+@app.command()
+def backtest(
+    no_fetch: Annotated[bool, typer.Option(help="Use stored data only (no FFIEC or price downloads)")] = False,
+) -> None:
+    """12-month point-in-time backtest: forecast accuracy, call-report lead time, flagged events -> out/backtest."""
+    from localledger.backtest import out_dir, run_backtest
+
+    with session_scope() as s:
+        r = run_backtest(s, fetch=not no_fetch)
+    f, b = r["forecast"]["summary"], r["banks"]["summary"]
+    typer.echo(
+        f"Forecasts: {f['company_quarters']} company-quarters, median error {f['median_ape_model']:.1%} "
+        f"(naive {f['median_ape_seasonal_naive']:.1%}), P10-P90 coverage {f['p10_p90_coverage']:.0%}"
+    )
+    typer.echo(f"Banks: {b['bank_quarters']} bank-quarters, median lead vs 10-Q {b['median_lead_days_vs_10q']} days")
+    typer.echo(f"Events: {len(r['events']['events'])} flagged in 12 months")
+    typer.echo(f"Details: {out_dir() / 'summary.md'}")
+
+
+@app.command()
+def tokenomics() -> None:
+    """Unit costs from `ll bench` runs + the ledger, rolled up to per-user and 100/10,000-user scale."""
+    from localledger.tokenomics import write
+
+    with session_scope() as s:
+        path = write(s)
+    typer.echo(path.read_text())
+
+
+@app.command("backfill-agendas")
+def backfill_agendas(days: Annotated[int, typer.Option(help="Days of agenda history")] = 365) -> None:
+    """Backfill agenda matches for the backtest into out/backtest/agenda_backfill.db (live feed untouched)."""
+    from localledger.backtest import backfill_agendas as run
+
+    typer.echo(f"Backfill database: {run(days)}")
+
+
+@app.command("backfill-worker", hidden=True)
+def backfill_worker(days: Annotated[int, typer.Option()] = 365) -> None:
+    from localledger.backtest import backfill_worker as run
+
+    run(days)
+
+
+@app.command("safety-demo")
+def safety_demo() -> None:
+    """Red-team demo: a poisoned agenda packet through the live analyst, with and without the input filter."""
+    from localledger.research.factcheck import RECOMMENDATION
+    from localledger.safety_demo import run_demo
+
+    results = run_demo()
+    for variant, r in results.items():
+        leaked = [c for c in r["kept"] if RECOMMENDATION.search(c["text"]) or "90 million" in c["text"]]
+        typer.echo(
+            f"{variant}: {len(r['filter_findings'])} filter findings, {len(r['model_claims'])} claims written, "
+            f"{len(r['rejected'])} rejected, {len(r['kept'])} published, injected claims published: {len(leaked)}"
+        )
+    typer.echo(f"Details: {get_settings().out_dir / 'safety' / 'demo.md'}")
+
+
+@app.command("safety-worker", hidden=True)
+def safety_worker(variant: Annotated[str, typer.Option()] = "A") -> None:
+    from localledger.safety_demo import worker
+
+    worker(variant)
+
+
 if __name__ == "__main__":
     app()

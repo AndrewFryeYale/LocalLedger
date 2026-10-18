@@ -1,7 +1,7 @@
 {# expects: sig, company (optional), note (optional) #}
 <article class="border border-slate-200 rounded-md p-4 bg-white">
   <div class="flex items-baseline justify-between gap-3 text-xs text-slate-500">
-    <span class="font-mono">{{ sig.source_id }} · {{ sig.metric }}</span>
+    <span><span class="src src-{{ sig.source_id }}">{{ sig.source_id }}</span> <span class="font-mono">{{ sig.metric }}</span></span>
     <span class="num">as of {{ sig.as_of }}</span>
   </div>
   <h3 class="mt-1 font-semibold">

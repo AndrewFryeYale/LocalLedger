@@ -3,6 +3,7 @@
 ---
 tier: fast            # fast | heavy
 max_tokens: 2000
+reasoning_effort: low # none | low | medium | high | xhigh | default (omit the parameter)
 ---
 ## system
 ...
@@ -31,6 +32,7 @@ class Prompt:
     system: str
     user: str
     raw: str
+    reasoning_effort: str = "default"
 
     def render(self, variables: dict) -> tuple[str, str]:
         return _env.from_string(self.system).render(**variables), _env.from_string(self.user).render(**variables)
@@ -63,4 +65,5 @@ def load_prompt(name: str) -> Prompt:
         system="\n".join(sections["system"]).strip(),
         user="\n".join(sections["user"]).strip(),
         raw=raw,
+        reasoning_effort=str(meta.get("reasoning_effort", "default")),
     )

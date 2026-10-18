@@ -8,9 +8,11 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import os
 import threading
 from collections import defaultdict
 from collections.abc import Callable
+from datetime import timedelta
 
 import yaml
 from sqlmodel import select
@@ -28,6 +30,27 @@ from localledger.warroom.inputs import WarroomInputs, gather_inputs
 
 log = logging.getLogger(__name__)
 _session_locks: dict[int, threading.Lock] = defaultdict(threading.Lock)
+_queued: dict[int, set[str]] = {}  # session -> agents of the rerun waiting for the lock
+_queued_lock = threading.Lock()
+MAX_RUNS_PER_HOUR = int(os.environ.get("WARROOM_MAX_RUNS_PER_HOUR", "12"))
+
+
+class RerunLimited(Exception):
+    """Loop guard: a room can't be rerun more than MAX_RUNS_PER_HOUR times (people or agents ping-ponging)."""
+
+
+def runs_last_hour(session_id: int) -> int:
+    since = utcnow() - timedelta(hours=1)
+    with session_scope() as s:
+        events = s.exec(
+            select(WarroomEvent).where(
+                WarroomEvent.session_id == session_id,
+                WarroomEvent.type == "status",
+                WarroomEvent.agent == None,  # noqa: E711
+                WarroomEvent.created_at >= since,
+            )
+        ).all()
+    return sum(1 for e in events if json.loads(e.payload_json or "{}").get("status") == "running")
 
 
 class Crew:
@@ -229,13 +252,47 @@ def run_sync(
         return asyncio.run(crew.run(agents, actor))
 
 
-def run_in_background(session_id: int, agents: list[str] | None = None, actor: str = "system") -> threading.Thread:
+def run_in_background(
+    session_id: int, agents: list[str] | None = None, actor: str = "system"
+) -> threading.Thread | None:
+    """Start a rerun. Coalesces: if one is already waiting, the waiting run picks up every redirect posted before it
+    starts (instructions are read when it begins), so no second run is queued. Raises RerunLimited past the cap."""
+    from localledger.safety import record_event
+
+    runs = runs_last_hour(session_id)
+    if runs >= MAX_RUNS_PER_HOUR:
+        record_event("loop_guard", session_id=session_id, actor=actor, runs_last_hour=runs)
+        board.emit(
+            session_id,
+            "error",
+            None,
+            "system",
+            error=f"Loop guard: this room has run {runs} times in the last hour (limit {MAX_RUNS_PER_HOUR}). "
+            "Redirects are saved and apply to the next run.",
+        )
+        raise RerunLimited(f"{runs} runs in the last hour (limit {MAX_RUNS_PER_HOUR})")
+    wanted = set(agents or board.AGENTS)
+    with _queued_lock:
+        if session_id in _queued:
+            _queued[session_id] |= wanted
+            board.emit(session_id, "status", None, actor, status="queued", note="merged into the pending rerun")
+            return None
+        _queued[session_id] = wanted
+
     def target() -> None:
         try:
-            run_sync(session_id, agents, actor)
+            with _session_locks[session_id]:
+                with _queued_lock:
+                    todo = _queued.pop(session_id, wanted)
+                crew = Crew(session_id)
+                asyncio.run(crew.run([a for a in board.AGENTS if a in todo], actor))
         except Exception as exc:  # surface on the board instead of dying silently
             log.exception("war room run failed")
             board.emit(session_id, "error", None, "system", error=f"{type(exc).__name__}: {exc}"[:300])
+        finally:
+            with _queued_lock:
+                if _queued.get(session_id) is wanted:
+                    _queued.pop(session_id, None)
 
     t = threading.Thread(target=target, daemon=True, name=f"warroom-{session_id}")
     t.start()

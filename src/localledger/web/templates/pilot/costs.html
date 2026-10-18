@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Costs · {{ brand() }}{% endblock %}
+{% macro usd(x) -%}{% if x is none %}-{% elif x < 1 %}${{ '%.4f'|format(x) }}{% else %}${{ '{:,.2f}'.format(x) }}{% endif %}{%- endmacro %}
+{% block content %}
+<p class="kicker text-ledger-700">Tokenomics</p>
+<h1 class="mt-1 text-3xl font-semibold tracking-tight">What the agents cost, measured</h1>
+<p class="mt-2 text-slate-600 max-w-3xl">Spent so far: <span class="num font-medium">{{ usd(spent) }}</span> of the <span class="num">${{ '%.2f'|format(budget) }}</span> project cap (LLM_BUDGET_USD). Numbers below come from <code>ll bench</code>: one fixed workload (8 analyst notes with fact-check, a full war room, 5 outreach drafts) run live with a fresh cache, then rolled up by <code>ll tokenomics</code>.</p>
+{% if not t %}<p class="mt-4 text-slate-600">Run <code>ll bench</code> and <code>ll tokenomics</code>.</p>{% else %}
+{% set b, tu, st = t.baseline, t.tuned, t.scenarios_tuned %}
+<div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+  <div class="board-card p-4"><p class="kicker">Benchmark workload</p><p class="stat">{{ usd(tu.workload_total) }}</p><p class="text-sm text-slate-600">down {{ '%.0f%%'|format(t.savings.workload_total * 100) }} from {{ usd(b.workload_total) }} before tuning</p></div>
+  <div class="board-card p-4"><p class="kicker">One war room</p><p class="stat">{{ usd(tu.warroom_full_run) }}</p><p class="text-sm text-slate-600">8 agents + fact-check; a redirect reruns part of it for {{ usd(tu.warroom_redirect) }}</p></div>
+  <div class="board-card p-4"><p class="kicker">Weekly research run</p><p class="stat">{{ usd(st.pipeline_per_week) }}</p><p class="text-sm text-slate-600">notes, fact-checks, model updates and the deep note, shared by every reader</p></div>
+  <div class="board-card p-4"><p class="kicker">At 10,000 users</p><p class="stat">{{ usd(st.users_10000.llm_cost_per_month) }}</p><p class="text-sm text-slate-600">per month, {{ usd(st.users_10000.llm_cost_per_user_per_month) }} per user</p></div>
+</div>
+
+<section class="mt-8 grid gap-6 lg:grid-cols-2">
+  <div class="board-card p-5">
+    <h2 class="font-semibold">Where the tokens went, and what changed</h2>
+    <p class="text-sm text-slate-600 mt-1">Before tuning, {{ '%.0f%%'|format(b.tokens_reasoning / b.tokens_out * 100) }} of output tokens were hidden reasoning, and output is billed at {{ '%.0f'|format(t.prices_per_mtok.output / t.prices_per_mtok.input) }}x the input price.</p>
+    <div class="mt-4">{{ compare_bars([('Output tokens per workload', [('baseline', b.tokens_out), ('tuned', tu.tokens_out)]), ('...of which reasoning', [('baseline', b.tokens_reasoning), ('tuned', tu.tokens_reasoning)]), ('Input tokens per workload', [('baseline', b.tokens_in), ('tuned', tu.tokens_in)])], fmt='{:,.0f}') }}</div>
+    <table class="data w-full text-sm mt-4">
+      <thead><tr class="text-left border-b border-slate-200"><th class="py-1.5">Unit</th><th class="text-right">Baseline</th><th class="text-right">Tuned</th><th class="text-right">Saving</th></tr></thead>
+      <tbody>
+        {% for k, label in [('analyst_note_with_factcheck', 'Analyst note + fact-check'), ('warroom_full_run', 'War room, full run'), ('outreach_draft', 'Outreach draft'), ('workload_total', 'Whole workload')] %}
+        <tr class="border-b border-slate-100"><td class="py-1.5">{{ label }}</td><td class="text-right num">{{ usd(b[k]) }}</td><td class="text-right num font-medium">{{ usd(tu[k]) }}</td><td class="text-right num text-ledger-700">{{ '%.0f%%'|format(t.savings[k] * 100) }}</td></tr>
+        {% endfor %}
+        <tr><td class="py-1.5">Wall time per workload</td><td class="text-right num">{{ '%.0f'|format(b.wall_seconds) }}s</td><td class="text-right num font-medium">{{ '%.0f'|format(tu.wall_seconds) }}s</td><td class="text-right num text-ledger-700">{{ '%.0f%%'|format((1 - tu.wall_seconds / b.wall_seconds) * 100) }}</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="board-card p-5">
+    <h2 class="font-semibold">Efficiencies, with the evidence</h2>
+    <ol class="mt-2 space-y-3 text-sm list-decimal pl-5">
+      <li><span class="font-medium">Reasoning effort per agent.</span> Same prompts, same model: <span class="num">{{ '{:,.0f}'.format(b.tokens_reasoning) }}</span> → <span class="num">{{ '{:,.0f}'.format(tu.tokens_reasoning) }}</span> reasoning tokens per workload. "none" everywhere was cheaper still but dropped 2 of 8 notes at fact-check, so writing and checking agents keep "low".</li>
+      <li><span class="font-medium">Retry with less reasoning, not the same request.</span> In the baseline the war-room Note writer spent its entire 5,000-token budget on reasoning twice, returned nothing and fell back to the mock. A truncated call now retries one effort level lower.</li>
+      <li><span class="font-medium">Code before models.</span> {{ '%.1f%%'|format(t.ledger.model_impacts_without_llm_share * 100) }} of {{ '{:,}'.format(t.ledger.model_impacts) }} replayed signals updated the company models through deterministic rules; the LLM updater ran {{ t.ledger.model_impacts_by_llm }} times. Signal scoring, valuation and the whole backtest use no LLM.</li>
+      <li><span class="font-medium">One note per source document.</span> A bank's call-report extract yields up to four signals; they now share one note (253 → 234 notes for the current feed, -8%).</li>
+      <li><span class="font-medium">Compute once, serve everyone.</span> Research is written once a week and read by every subscriber, so the analyst tier has no per-user model calls. Only fund war rooms scale with users.</li>
+      <li><span class="font-medium">Exact-match disk cache.</span> Reruns of unchanged inputs cost $0 ({{ '%.0f%%'|format(t.ledger.disk_cache_hit_rate * 100) }} of all calls so far were cache hits). Provider prompt caching was tested and only hit on near-identical prompts, which the disk cache already makes free, so prompts weren't restructured for it.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="mt-6 board-card p-5">
+  <h2 class="font-semibold">At scale</h2>
+  <p class="text-sm text-slate-600 mt-1">Assumptions (change them in <code>src/localledger/tokenomics.py</code>): {{ '%.0f'|format(t.usage_assumptions.mix.free * 100) }}% free readers, {{ '%.0f'|format(t.usage_assumptions.mix.analyst * 100) }}% analyst tier, {{ '%.0f'|format(t.usage_assumptions.mix.fund * 100) }}% fund pilots; {{ t.usage_assumptions.notes_per_week }} notes and {{ t.usage_assumptions.model_llm_updates_per_week }} LLM model updates a week; each fund opens {{ t.usage_assumptions.warrooms_per_fund_per_month }} war rooms a month with {{ t.usage_assumptions.redirects_per_warroom }} redirects each. Model {{ t.model }} at ${{ t.prices_per_mtok.input }} / ${{ t.prices_per_mtok.cached_input }} / ${{ t.prices_per_mtok.output }} per million input / cached / output tokens.</p>
+  <table class="data w-full text-sm mt-3">
+    <thead><tr class="text-left border-b border-slate-200"><th class="py-1.5">Users</th><th class="text-right">Fund pilots</th><th class="text-right">LLM cost / month (baseline)</th><th class="text-right">LLM cost / month (tuned)</th><th class="text-right">Per user / month (tuned)</th></tr></thead>
+    <tbody>
+    {% for n in [1, 100, 10000] %}{% set k = 'users_' ~ n %}
+    <tr class="border-b border-slate-100"><td class="py-1.5 num">{{ '{:,}'.format(n) }}</td><td class="text-right num">{{ '%.0f'|format(st[k].funds) }}</td><td class="text-right num">{{ usd(t.scenarios_baseline[k].llm_cost_per_month) }}</td><td class="text-right num font-medium">{{ usd(st[k].llm_cost_per_month) }}</td><td class="text-right num">{{ usd(st[k].llm_cost_per_user_per_month) }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <p class="text-sm text-slate-600 mt-3">Per user per month: a free reader costs $0 in model calls, an analyst-tier subscriber ($99/month) $0, and a fund pilot {{ usd(st.per_user_month.fund_pilot) }}. At this model's prices the LLM is a rounding error next to hosting and data licensing; the reason to keep tuning is latency ({{ '%.0f'|format(b.wall_seconds) }}s → {{ '%.0f'|format(tu.wall_seconds) }}s per workload) and headroom to move to a larger model.</p>
+</section>
+
+<section class="mt-6 board-card p-5">
+  <h2 class="font-semibold">Every benchmark run</h2>
+  <div class="overflow-x-auto"><table class="data w-full text-sm mt-3">
+    <thead><tr class="text-left border-b border-slate-200"><th class="py-1.5">Run</th><th>Effort</th><th class="text-right">Calls</th><th class="text-right">Input</th><th class="text-right">Cached in</th><th class="text-right">Output</th><th class="text-right">Reasoning</th><th class="text-right">Cost</th><th class="text-right">Wall</th><th class="text-right">Notes passed</th><th class="text-right">Claims kept</th></tr></thead>
+    <tbody>
+    {% for label, r in t.bench_runs.items() %}{% set x = r.totals %}
+    <tr class="border-b border-slate-100"><td class="py-1.5 font-mono text-xs">{{ label }}</td><td>{{ r.effort }}</td><td class="text-right num">{{ x.calls|int }}</td><td class="text-right num">{{ '{:,}'.format(x.input_tokens|int) }}</td><td class="text-right num">{{ '{:,}'.format(x.cached_input_tokens|int) }}</td><td class="text-right num">{{ '{:,}'.format(x.output_tokens|int) }}</td><td class="text-right num">{{ '{:,}'.format(x.reasoning_tokens|int) }}</td><td class="text-right num">{{ usd(x.cost_usd) }}</td><td class="text-right num">{{ r.wall_seconds }}s</td><td class="text-right num">{{ r.quality.notes_passed }}/{{ r.quality.notes }}</td><td class="text-right num">{{ r.quality.claims_kept }}/{{ r.quality.claims_written }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  <p class="text-xs text-slate-500 mt-2">Cached input appears only on runs that repeated an earlier run's exact prompts (the provider's cache needs near-identical requests).</p>
+</section>
+{% endif %}
+{% endblock %}

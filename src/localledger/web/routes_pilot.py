@@ -230,3 +230,36 @@ def note_page(
         dropped=json.loads(note.factcheck_log or "[]"),
         claims=json.loads(note.claims_json or "[]"),
     )
+
+
+def _out_json(*parts: str) -> dict | None:
+    path = get_settings().out_dir.joinpath(*parts)
+    return json.loads(path.read_text()) if path.exists() else None
+
+
+@router.get("/backtest")
+def backtest_page(request: Request, user: dict = Depends(require_pilot)):
+    r = _out_json("backtest", "results.json")
+    highlights = []
+    if r:
+        risk = [e for e in r["events"]["events"] if e["source"] == "edgar" and "ar20" in e]
+        highlights = sorted(risk, key=lambda e: e["ar20"])[:8]
+    return render(request, "pilot/backtest.html", r=r, highlights=highlights)
+
+
+@router.get("/costs")
+def costs_page(request: Request, user: dict = Depends(require_pilot), session: Session = Depends(get_session)):
+    from localledger.llm.client import spent_usd
+
+    t = _out_json("tokenomics", "tokenomics.json")
+    return render(request, "pilot/costs.html", t=t, spent=spent_usd(), budget=get_settings().budget_usd)
+
+
+@router.get("/safety")
+def safety_page(request: Request, user: dict = Depends(require_pilot), session: Session = Depends(get_session)):
+    from localledger.models import SafetyEvent
+
+    events = session.exec(select(SafetyEvent).order_by(SafetyEvent.id.desc()).limit(100)).all()
+    counts = Counter(e.kind for e in session.exec(select(SafetyEvent)).all())
+    demo = _out_json("safety", "demo.json")
+    return render(request, "pilot/safety.html", events=events, counts=counts, demo=demo)

@@ -64,7 +64,16 @@ def test_web_pages_and_forms(ingested):
     r = client.post("/login", data={"passcode": "wrong", "name": "x"})
     assert "Wrong passcode" in r.text
     client.post("/login", data={"passcode": "ledger-admin", "name": "Andrew"})
-    for path in ("/app/signals", "/app/universe", "/app/company/PCYO", "/admin"):
+    for path in (
+        "/app/signals",
+        "/app/universe",
+        "/app/company/PCYO",
+        "/admin",
+        "/app/backtest",
+        "/app/costs",
+        "/app/safety",
+        "/how-it-works",
+    ):
         assert client.get(path).status_code == 200, path
     csv_text = client.get("/admin/export/waitlist.csv").text
     assert "pm@fund.com" in csv_text

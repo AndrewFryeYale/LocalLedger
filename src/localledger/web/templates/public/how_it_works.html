@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}How it works · {{ brand() }}{% endblock %}
+{% block content %}
+<p class="kicker text-ledger-700">How it works</p>
+<h1 class="mt-1 text-3xl font-semibold tracking-tight max-w-3xl">Code does the counting. Agents do the reading. Nothing reaches a reader without a verbatim source.</h1>
+<p class="mt-3 text-slate-600 max-w-3xl">Deterministic code ingests the records, scores the signals and builds every company's model. Language-model agents are used only where reading is needed: writing what changed, updating a model when a rule can't, and debating a print in the war room. Every agent's output passes through checks that don't trust the model.</p>
+
+<section class="board-card p-5 mt-6">{% include "public/_agent_diagram.html" %}</section>
+
+<section class="mt-8">
+  <h2 class="text-lg font-semibold">The agents</h2>
+  <p class="text-sm text-slate-600 mt-1">Loaded from <code>prompts/*.md</code>. Every agent uses {{ model_fast }} through the Portkey gateway; reasoning effort is set per agent from benchmark runs (see <a class="underline text-ledger-700" href="/app/costs">Costs</a>), low where accuracy needs it and none where it doesn't.</p>
+  <div class="board-card mt-3 overflow-x-auto">
+  <table class="data w-full text-sm">
+    <thead><tr class="text-left border-b border-slate-200"><th class="py-2 px-4">Agent</th><th class="px-2">Role</th><th class="px-2">Reasoning</th><th class="px-2 text-right pr-4">Max output</th></tr></thead>
+    <tbody>
+    {% for a in agents %}
+    <tr class="border-b border-slate-100 align-top"><td class="py-2 px-4 font-medium whitespace-nowrap">{{ a.label }}<div class="font-mono text-[11px] text-slate-400 font-normal">{{ a.name }}</div></td><td class="px-2 py-2 text-slate-700">{{ a.role }}</td><td class="px-2 py-2"><span class="pill {{ 'bg-ledger-50 text-ledger-800' if a.effort == 'low' else 'bg-slate-100 text-slate-600' }}">{{ a.effort }}</span></td><td class="px-2 py-2 text-right pr-4 num text-slate-600">{{ '{:,}'.format(a.max_tokens) }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</section>
+
+{% if trace %}
+<section class="mt-8">
+  <h2 class="text-lg font-semibold">One real run, step by step</h2>
+  <p class="text-sm text-slate-600 mt-1">War room #{{ trace.room.id }}: {{ trace.room.title }} ({{ trace.room.created_at.strftime('%Y-%m-%d') }}). {{ trace.calls }} model calls, {{ '{:,}'.format(trace.tokens_in) }} input and {{ '{:,}'.format(trace.tokens_out) }} output tokens, <span class="num">${{ '%.4f'|format(trace.cost) }}</span>, {{ '%.0f'|format(trace.seconds) }} seconds end to end. Agents on the same level run concurrently.</p>
+  <div class="board-card mt-3 p-4">
+    {% set total = trace.seconds or 1 %}
+    <ol class="space-y-3">
+    {% for s in trace.steps %}
+      <li class="grid grid-cols-12 gap-3 items-start">
+        <div class="col-span-12 sm:col-span-2 font-medium text-sm">{{ s.label }}
+          {% if s.call %}<div class="text-[11px] text-slate-500 num font-normal">{{ '{:,}'.format(s.call.input_tokens) }} in · {{ '{:,}'.format(s.call.output_tokens) }} out · ${{ '%.4f'|format(s.call.est_cost_usd) }}</div>{% endif %}
+        </div>
+        <div class="col-span-12 sm:col-span-3">
+          <div class="relative h-3 bg-slate-100 rounded-full mt-1.5">
+            {% if s.start_s is not none and s.end_s is not none %}<div class="absolute h-3 rounded-full bg-ledger-600" style="left: {{ (s.start_s / total * 100)|round(1) }}%; width: {{ ((s.end_s - s.start_s) / total * 100)|round(1) if s.end_s > s.start_s else 1 }}%"></div>{% endif %}
+          </div>
+          <div class="text-[11px] text-slate-500 num mt-1">{{ '%.1f'|format(s.start_s or 0) }}s → {{ '%.1f'|format(s.end_s or 0) }}s</div>
+        </div>
+        <p class="col-span-12 sm:col-span-7 text-sm text-slate-700">{{ s.excerpt|truncate(330) }}</p>
+      </li>
+    {% endfor %}
+    </ol>
+    {% if trace.note %}
+    <div class="mt-4 border-t border-slate-200 pt-3 text-sm">
+      <span class="font-medium">Fact-check:</span> {{ trace.note.kept }} claims kept, {{ trace.note.dropped }} rejected{% if trace.factcheck %} ({{ '{:,}'.format(trace.factcheck.input_tokens) }} in · {{ '{:,}'.format(trace.factcheck.output_tokens) }} out){% endif %}. Rejections:
+      <ul class="list-disc pl-5 text-slate-600 mt-1">{% for r in trace.note.dropped_reasons %}<li>{{ r }}</li>{% endfor %}</ul>
+      {% if user %}<a class="underline text-ledger-700 mt-2 inline-block" href="/warroom/{{ trace.room.id }}">Open this room →</a>{% endif %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+
+<section class="mt-8 grid gap-4 md:grid-cols-3 text-sm">
+  <div class="board-card p-4"><p class="kicker">Untrusted input</p><p class="mt-1 font-medium">Documents are data, never instructions.</p><p class="text-slate-600 mt-1">An input filter strips instruction-like text, hidden characters and forged document headers before any prompt; every prompt says document text must not be obeyed.</p></div>
+  <div class="board-card p-4"><p class="kicker">Invented facts</p><p class="mt-1 font-medium">No verbatim source, no claim.</p><p class="text-slate-600 mt-1">Quotes must match the stored document; numbers must appear in it; quotes from text flagged as injection are refused; an LLM verifier rereads the rest.</p></div>
+  <div class="board-card p-4"><p class="kicker">Runaway cost</p><p class="mt-1 font-medium">Hard budget, loop guard, cache.</p><p class="text-slate-600 mt-1">Each call reserves its cost against LLM_BUDGET_USD and falls back to a deterministic mock at the cap; war rooms are capped per hour; reruns of unchanged inputs are free.</p></div>
+</section>
+{% endblock %}

@@ -17,6 +17,7 @@ from sqlmodel import Session
 from localledger.compliance import disclosures
 from localledger.config import get_settings
 from localledger.db import get_engine
+from localledger.web import charts
 
 TEMPLATES = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
 
@@ -51,6 +52,9 @@ def _fromjson(value: str | None):
 
 TEMPLATES.env.filters.update(md=_md, money=_money, num=_num, fromjson=_fromjson)
 TEMPLATES.env.globals.update(
+    revenue_chart=charts.revenue_chart,
+    hbar_chart=charts.hbar_chart,
+    compare_bars=charts.compare_bars,
     brand=lambda: get_settings().brand,
     disclosures=disclosures,
     contact_email=lambda: get_settings().contact_email,

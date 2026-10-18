@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}Backtest · {{ brand() }}{% endblock %}
+{% macro pct(x, d=1, sign=False) -%}{% if x is none %}n/a{% else %}{{ ('%+.' ~ d ~ 'f%%' if sign else '%.' ~ d ~ 'f%%')|format(x * 100) }}{% endif %}{%- endmacro %}
+{% block content %}
+<p class="kicker text-ledger-700">Backtest</p>
+<h1 class="mt-1 text-3xl font-semibold tracking-tight">What Local Ledger would have caught in the last 12 months</h1>
+{% if not r %}
+<p class="mt-4 text-slate-600">No backtest yet. Run <code>ll backtest</code>.</p>
+{% else %}
+{% set f = r.forecast.summary %}{% set b = r.banks.summary %}{% set ev = r.events.summary %}{% set risk = ev._all_risk %}{% set lead = ev._agenda_lead or {} %}
+<p class="mt-2 text-slate-600 max-w-3xl">Point in time, as of {{ r.as_of }}: every model is rebuilt from the filings that were public on the day of the forecast, every event is dated by when it was filed or posted, and price moves are measured from the close before the news against the Russell 2000 (IWM). No language model is used, so the backtest costs nothing in tokens.</p>
+
+<div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+  <div class="board-card p-4"><p class="kicker">Risk filings flagged</p><p class="stat">{{ risk.n }}</p><p class="text-sm text-slate-600">delisting notices, late filings, restatements, auditor changes and more, across {{ risk.tickers }} companies, each flagged the day it was filed</p></div>
+  <div class="board-card p-4"><p class="kicker">What followed</p><p class="stat text-red-700">{{ pct(risk.median_ar20, 1, True) }}</p><p class="text-sm text-slate-600">median move vs IWM over the next 20 trading days; {{ pct(risk.share_down_ar20, 0) }} of names fell (n={{ risk.n_ar20 }})</p></div>
+  <div class="board-card p-4"><p class="kicker">Revenue forecasts</p><p class="stat">{{ pct(f.median_ape_model) }}</p><p class="text-sm text-slate-600">median error on {{ f.company_quarters }} company-quarters vs {{ pct(f.median_ape_seasonal_naive) }} for "same quarter last year"; {{ pct(f.p10_p90_coverage, 0) }} inside our P10-P90 range</p></div>
+  <div class="board-card p-4"><p class="kicker">Local agenda items</p><p class="stat">{{ lead.n or 0 }}</p><p class="text-sm text-slate-600">{% if lead.median_days_before_sec_mention is not none %}matched to {{ lead.tickers }} companies; the company's next SEC filing named the project a median {{ lead.median_days_before_sec_mention|round|int }} days later{% else %}matched to {{ lead.tickers or 0 }} companies{% endif %}</p></div>
+</div>
+
+<section class="mt-8 grid gap-6 lg:grid-cols-5">
+  <div class="lg:col-span-3 board-card p-5">
+    <h2 class="font-semibold">1 · Events and the stock's move afterwards</h2>
+    <p class="text-sm text-slate-600 mt-1">Median abnormal return 20 trading days after the filing (stock minus IWM). Smaller categories are noisy; n is shown.</p>
+    {% set bars = [] %}{% for kind, row in ev.items() if not kind.startswith('_') and row.median_ar20 is not none and row.n_ar20 >= 3 %}{% set _ = bars.append((kind, row.median_ar20, 'n=' ~ row.n_ar20)) %}{% endfor %}
+    <div class="mt-4">{{ hbar_chart(bars|sort(attribute='1')) }}</div>
+    <table class="data w-full text-sm mt-5">
+      <thead><tr class="text-left border-b border-slate-200"><th class="py-1.5">Event</th><th class="text-right">n</th><th class="text-right">5 days</th><th class="text-right">20 days</th><th class="text-right">60 days</th><th class="text-right">Share down (20d)</th></tr></thead>
+      <tbody>
+      {% for kind, row in ev.items() if not kind.startswith('_') %}
+      <tr class="border-b border-slate-100"><td class="py-1.5">{{ kind }}</td><td class="text-right num">{{ row.n }}</td><td class="text-right num">{{ pct(row.median_ar5, 1, True) }}</td><td class="text-right num font-medium {{ 'text-red-700' if row.median_ar20 is not none and row.median_ar20 < 0 }}">{{ pct(row.median_ar20, 1, True) }}</td><td class="text-right num">{{ pct(row.median_ar60, 1, True) }}</td><td class="text-right num">{{ pct(row.share_down_ar20, 0) }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="lg:col-span-2 board-card p-5">
+    <h2 class="font-semibold">Biggest moves after a flag</h2>
+    <p class="text-sm text-slate-600 mt-1">Flagged by the EDGAR connector the day each was filed.</p>
+    <ul class="mt-3 divide-y divide-slate-100">
+    {% for e in highlights %}
+      <li class="py-2 text-sm flex items-start gap-3">
+        <span class="font-mono text-ledger-700 w-14 shrink-0"><a class="underline" href="/app/company/{{ e.ticker }}">{{ e.ticker }}</a></span>
+        <span class="flex-1"><a class="hover:underline" href="{{ e.url }}" target="_blank" rel="noopener">{{ e.kind }}</a><span class="block text-xs text-slate-500 num">{{ e.date }} · {{ e.form }}</span></span>
+        <span class="num text-red-700 font-medium">{{ pct(e.ar20, 0, True) }}</span>
+      </li>
+    {% endfor %}
+    </ul>
+  </div>
+</section>
+
+<section class="mt-6 grid gap-6 lg:grid-cols-2">
+  <div class="board-card p-5">
+    <h2 class="font-semibold">2 · Revenue forecasts, point in time</h2>
+    <p class="text-sm text-slate-600 mt-1">{{ f.company_quarters }} company-quarters, {{ f.companies }} companies, the last 4 reported quarters. Each forecast is made on the first day of the quarter.</p>
+    <div class="mt-4">{{ compare_bars([('Median absolute error', [('Local Ledger model', f.median_ape_model), ('last reported quarter', f.median_ape_last_quarter), ('same quarter last year', f.median_ape_seasonal_naive)])]) }}</div>
+    <dl class="mt-4 grid grid-cols-2 gap-3 text-sm">
+      <div><dt class="text-slate-500">Inside P10-P90 (target 80%)</dt><dd class="text-xl font-semibold num">{{ pct(f.p10_p90_coverage, 0) }}</dd></div>
+      <div><dt class="text-slate-500">Brier score, P(up y/y)</dt><dd class="text-xl font-semibold num">{{ '%.3f'|format(f.brier_p_up_yoy) }} <span class="text-sm font-normal text-slate-500">vs {{ '%.3f'|format(f.brier_base_rate) }} base rate</span></dd></div>
+    </dl>
+    <table class="data w-full text-sm mt-4">
+      <thead><tr class="text-left border-b border-slate-200"><th class="py-1.5">Archetype</th><th class="text-right">n</th><th class="text-right">Median error</th><th class="text-right">In range</th></tr></thead>
+      <tbody>{% for a, row in f.by_archetype.items() %}<tr class="border-b border-slate-100"><td class="py-1">{{ a }}</td><td class="text-right num">{{ row.n }}</td><td class="text-right num">{{ pct(row.median_ape_model) }}</td><td class="text-right num">{{ pct(row.coverage, 0) }}</td></tr>{% endfor %}</tbody>
+    </table>
+  </div>
+  <div class="board-card p-5">
+    <h2 class="font-semibold">3 · Banks: the call report vs the 10-Q</h2>
+    <p class="text-sm text-slate-600 mt-1">{{ b.bank_quarters }} bank-quarters, {{ b.banks }} banks. The FFIEC Call Report carries the bank's quarterly interest income, loans, deposits and credit quality; it is due 30 days after quarter end and appears in the public database a few weeks later.</p>
+    <div class="mt-4">{{ compare_bars([('Median error, quarterly revenue', [('call-report nowcast', b.median_ape_nowcast), ('statistical model', b.median_ape_model)])]) }}</div>
+    <dl class="mt-4 grid grid-cols-2 gap-3 text-sm">
+      <div><dt class="text-slate-500">Nowcast beats the model</dt><dd class="text-xl font-semibold num">{{ pct(b.nowcast_better_share, 0) }}</dd></div>
+      <div><dt class="text-slate-500">Quarter-over-quarter direction right</dt><dd class="text-xl font-semibold num">{{ pct(b.direction_hit_rate, 0) }}</dd></div>
+      <div><dt class="text-slate-500">Days ahead of the 10-Q (due date / +45 days)</dt><dd class="text-xl font-semibold num">{{ b.median_lead_days_vs_10q }} / {{ b.median_lead_days_vs_10q_conservative }}</dd></div>
+      <div><dt class="text-slate-500">First public revenue number (due date / +45 days)</dt><dd class="text-xl font-semibold num">{{ pct(b.call_report_first_share, 0) }} / {{ pct(b.call_report_first_conservative_share, 0) }}</dd></div>
+    </dl>
+    <p class="text-sm text-slate-600 mt-3">Read honestly: most of these banks publish an earnings release before the call report, so the call report is rarely first with the headline number. Its value is the detail releases leave out (loan growth, deposit mix, CRE concentration, non-current loans), which drives the bank signals and model updates, and the banks that never issue a release.</p>
+  </div>
+</section>
+
+{% set agendas = r.events.events|selectattr('source', 'ne', 'edgar')|list %}
+{% if agendas %}
+<section class="mt-6 board-card p-5">
+  <h2 class="font-semibold">4 · Local agenda items before the company said anything</h2>
+  <p class="text-sm text-slate-600 mt-1">Municipal agenda matches (Legistar and PDF agendas, backfilled 12 months) and the company's next SEC filing that named the same project.</p>
+  <div class="overflow-x-auto"><table class="data w-full text-sm mt-3">
+    <thead><tr class="text-left border-b border-slate-200"><th class="py-1.5">Meeting</th><th>Ticker</th><th>Agenda item</th><th>First SEC mention after</th><th class="text-right">Days</th><th class="text-right">20d vs IWM</th></tr></thead>
+    <tbody>
+    {% for e in agendas|sort(attribute='date', reverse=True) %}
+    <tr class="border-b border-slate-100 align-top"><td class="py-1.5 num whitespace-nowrap">{{ e.date[:10] }}</td><td class="font-mono"><a class="underline text-ledger-700" href="/app/company/{{ e.ticker }}">{{ e.ticker }}</a></td><td class="pr-3"><a class="hover:underline" href="{{ e.url }}" target="_blank" rel="noopener">{{ (e.summary or e.kind)|truncate(140) }}</a></td><td class="whitespace-nowrap">{% if e.sec_mention_date %}{{ e.sec_mention_form }} {{ e.sec_mention_date }}<div class="text-xs text-slate-500">“{{ e.sec_mention_keyword }}”</div>{% else %}<span class="text-slate-400">none yet</span>{% endif %}</td><td class="text-right num">{{ e.sec_mention_lag_days if e.sec_mention_lag_days is defined else '' }}</td><td class="text-right num">{{ pct(e.ar20, 1, True) if e.ar20 is defined else '' }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+</section>
+{% endif %}
+
+{% if r.workload %}{% set w = r.workload %}
+<section class="mt-6 board-card p-5">
+  <h2 class="font-semibold">5 · The reading it replaces</h2>
+  <div class="mt-3 grid gap-6 md:grid-cols-3 items-center">
+    <div><p class="stat">{{ '{:,}'.format(w.documents_total) }}</p><p class="text-sm text-slate-600">documents in 12 months for the 237 names: {% for k, v in w.documents.items() %}{{ '{:,}'.format(v) }} {{ k|replace('_', ' ') }}{{ 's' if v != 1 }}{{ ', ' if not loop.last }}{% endfor %}</p></div>
+    <div><p class="stat">~{{ '{:,.0f}'.format(w.reading_hours) }} hours</p><p class="text-sm text-slate-600">to read them, at {% for k, v in w.minutes_per_document.items() %}{{ v }} min per {{ k|replace('_', ' ') }}{{ ', ' if not loop.last }}{% endfor %} (our assumptions): about half an analyst-year</p></div>
+    <div><p class="stat">{{ w.flagged }}</p><p class="text-sm text-slate-600">events surfaced ({{ '%.1f%%'|format(w.flag_rate * 100) }} of documents), each with its source linked</p></div>
+  </div>
+</section>
+{% endif %}
+
+<section class="mt-6 board-card p-5 text-sm text-slate-600">
+  <h2 class="font-semibold text-slate-900">Method and limits</h2>
+  <ul class="list-disc pl-5 mt-2 space-y-1">
+    <li>Forecasts use only quarters public before the forecast date (the filing date, or at the latest 95 days after quarter end for values that reached XBRL through a later filing). Curated event overlays are excluded because they were written after the fact.</li>
+    <li>Event returns start from the close before the filing date, so they include the first-day reaction; a reader acting on the flag the next morning would see the remaining move. Microcap prices are noisy and these are medians of small samples; this is not a trading strategy.</li>
+    <li>Prices: Yahoo Finance via yfinance, for internal research only (see LEGAL_REVIEW.md, question 26).</li>
+    <li>Reproduce with <code>ll backfill-agendas</code> then <code>ll backtest</code>; results in <code>out/backtest/</code>.</li>
+  </ul>
+</section>
+{% endif %}
+{% endblock %}
