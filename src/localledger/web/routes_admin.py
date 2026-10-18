@@ -6,7 +6,7 @@ import csv
 import io
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from fastapi.responses import StreamingResponse
+from fastapi.responses import HTMLResponse, StreamingResponse
 from sqlmodel import Session, func, select
 
 from localledger.compliance import blackout_reminders, load_holdings
@@ -65,6 +65,17 @@ def toggle_lead(
     session.add(lead)
     session.commit()
     return render(request, "admin/_lead_row.html", lead=lead)
+
+
+@router.get("/deck", response_class=HTMLResponse)
+def pitch_deck(cik: str | None = None, user: dict = Depends(require_admin), session: Session = Depends(get_session)):
+    """The pitch deck, generic or for one lead, rendered live (same generator as `ll deck`)."""
+    from localledger.gtm.deck import find_lead, render_deck
+
+    lead = find_lead(session, cik) if cik else None
+    if cik and not lead:
+        raise HTTPException(404, "no such lead")
+    return HTMLResponse(render_deck(session, lead))
 
 
 def _csv_response(name: str, header: list[str], rows: list[list]) -> StreamingResponse:

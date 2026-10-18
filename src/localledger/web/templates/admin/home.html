@@ -11,7 +11,7 @@
 
 <div class="mt-6 grid gap-6 lg:grid-cols-3">
   <section class="lg:col-span-2">
-    <h2 class="font-semibold text-sm uppercase tracking-wide text-slate-600">Fund leads (13F)</h2>
+    <div class="flex items-baseline justify-between"><h2 class="font-semibold text-sm uppercase tracking-wide text-slate-600">Fund leads (13F)</h2><a class="text-xs underline text-ledger-700" href="/admin/deck" target="_blank">Generic pitch deck</a></div>
     <div class="mt-2 overflow-x-auto"><table class="w-full text-sm border-collapse">
       <thead><tr class="text-left border-b border-slate-300 text-xs text-slate-500"><th class="py-1.5 pr-2 text-right">#</th><th class="pr-2">Fund</th><th class="pr-2 text-right">Overlap</th><th class="pr-2 text-right">Value</th><th class="pr-2">Names</th><th>Status</th></tr></thead>
       <tbody>{% for lead in leads %}{% include "admin/_lead_row.html" %}{% else %}<tr><td colspan="6" class="py-3 text-slate-500">Run <code>ll leads</code>.</td></tr>{% endfor %}</tbody>

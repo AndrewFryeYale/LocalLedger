@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ brand() }}{% if lead %} for {{ lead.fund_name }}{% endif %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+{% if reveal %}<style>{{ reveal['reveal.min.css']|safe }}</style>{% else %}<link rel="stylesheet" href="{{ reveal_cdn }}/reveal.min.css">{% endif %}
+<style>
+  :root { --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --accent:#1f6f54; --accent-dark:#0d3326; --soft:#ecf5f0; --paper:#fbfaf7; --red:#b42318; }
+  html, body { background: var(--paper); }
+  .reveal { font-family: Inter, ui-sans-serif, system-ui, sans-serif; color: var(--ink); font-size: 30px; }
+  .reveal .slides { text-align: left; }
+  .reveal .slides section { height: 100%; padding: 0 8px; box-sizing: border-box; }
+  .reveal h1, .reveal h2, .reveal h3 { font-family: inherit; color: var(--accent-dark); letter-spacing: -0.02em; margin: 0 0 18px; text-transform: none; }
+  .reveal h1 { font-size: 2.3em; line-height: 1.05; font-weight: 700; }
+  .reveal h2 { font-size: 1.45em; font-weight: 700; }
+  .reveal p, .reveal li { line-height: 1.35; }
+  .reveal a { color: var(--accent); }
+  .kicker { font-size: 0.5em; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+  .lede { font-size: 0.82em; color: #334155; max-width: 30em; }
+  .muted { color: var(--muted); }
+  .small { font-size: 0.64em; }
+  .xs { font-size: 0.52em; }
+  .label { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
+  .grid { display: grid; gap: 22px; }
+  .g2 { grid-template-columns: 1fr 1fr; } .g3 { grid-template-columns: repeat(3, 1fr); } .g4 { grid-template-columns: repeat(4, 1fr); }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 18px 22px; box-shadow: 0 1px 2px rgba(15,23,42,.04); }
+  .stat { font-size: 1.9em; font-weight: 700; color: var(--accent-dark); line-height: 1; font-variant-numeric: tabular-nums; }
+  .stat.red { color: var(--red); }
+  .stat-label { font-size: 0.58em; color: var(--muted); margin-top: 8px; line-height: 1.3; }
+  table.t { width: 100%; border-collapse: collapse; font-size: 0.6em; }
+  table.t th { text-align: left; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--line); padding: 6px 8px; text-transform: uppercase; letter-spacing: .05em; font-size: .85em; }
+  table.t td { border-bottom: 1px solid var(--line); padding: 10px 8px; vertical-align: top; }
+  table.t td.date { white-space: nowrap; }
+  table.t td.num, table.t th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+  .tick { font-family: "JetBrains Mono", ui-monospace, monospace; font-weight: 600; color: var(--accent-dark); }
+  .pill { display: inline-block; font-size: .8em; padding: 1px 8px; border-radius: 999px; background: var(--soft); color: var(--accent-dark); }
+  .pill.red { background: #fdecea; color: var(--red); }
+  .note { font-size: 0.62em; line-height: 1.45; }
+  .note p { margin: 0 0 10px; }
+  .note ol, .note ul { margin: 0; }
+  .foot { position: absolute; left: 8px; right: 8px; bottom: -6px; display: flex; justify-content: space-between; font-size: 0.36em; color: var(--muted); border-top: 1px solid var(--line); padding-top: 6px; }
+  .title-slide { display: flex; flex-direction: column; justify-content: center; }
+  .brandmark { display: flex; align-items: center; gap: 12px; font-weight: 700; color: var(--accent-dark); font-size: .7em; margin-bottom: 40px; }
+  .brandmark svg { width: 34px; height: 34px; }
+  .reveal .progress { color: var(--accent); }
+  .reveal .controls { color: var(--accent); }
+  .disc p { font-size: 0.4em; color: var(--muted); margin: 0 0 6px; line-height: 1.4; }
+  svg { max-width: 100%; }
+  .card svg { width: 100%; height: auto; }
+  .diagram svg { max-height: 500px; }
+  @media print { .reveal .slides section { overflow: hidden; } }
+</style>
+</head>
+<body>
+{% macro foot(n) -%}<div class="foot"><span>{{ brand() }} · {{ disclosure_marker }} Impersonal research, not investment advice.</span><span>{{ n }}</span></div>{%- endmacro %}
+<div class="reveal"><div class="slides">
+
+<section class="title-slide">
+  <div class="brandmark"><svg viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#1f6f54"/><path d="M9 8v16h14" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M14 19l3-4 3 2 3-5" stroke="#cfe5da" stroke-width="2" fill="none" stroke-linecap="round"/></svg>{{ brand() }}</div>
+  <div class="kicker">{% if lead %}Prepared for {{ lead.fund_name }}{% else %}For funds that own microcaps{% endif %}</div>
+  <h1>The public records that move<br>under-covered microcaps,<br>read for you every week.</h1>
+  <p class="lede">Building permits, council agendas, bank call reports, state production and gaming data, and SEC filings, mapped to {{ stats.companies }} US microcaps. Every claim cited and fact-checked.</p>
+  <p class="small muted">{{ today.strftime('%B %-d, %Y') }} · {{ contact_email() }}</p>
+  {{ foot(1) }}
+</section>
+
+<section>
+  <div class="kicker">The problem</div>
+  <h2>Nobody is reading the documents that move these stocks</h2>
+  <div class="grid g3" style="margin-top:30px">
+    <div class="card"><div class="stat">{{ stats.uncovered }}<span class="muted" style="font-size:.45em"> / {{ stats.companies }}</span></div><div class="stat-label">names in our universe with zero consensus analyst coverage</div></div>
+    {% if bt %}<div class="card"><div class="stat">{{ '{:,}'.format(bt.workload.documents_total) }}</div><div class="stat-label">relevant public documents filed in the last 12 months (8-K, 10-Q, 10-K, agendas, call reports)</div></div>
+    <div class="card"><div class="stat">{{ '{:,.0f}'.format(bt.workload.reading_hours) }} h</div><div class="stat-label">to read them all at normal analyst pace: about half an analyst-year</div></div>{% endif %}
+  </div>
+  <p class="small" style="margin-top:34px;max-width:36em">For a {{ archetypes[0][0]|lower }}, a land developer or a royalty trust, the news often shows up first at a <b>town planning board</b>, a <b>state agency</b> or a <b>regulator's database</b>, weeks before it reaches an SEC filing.</p>
+  {{ foot(2) }}
+</section>
+
+<section>
+  <div class="kicker">What we read</div>
+  <h2>{{ stats.sources }} public-record sources, one citation trail</h2>
+  <table class="t"><thead><tr><th>Source</th><th>Type</th><th class="num">Documents stored</th><th class="num">Cited signals</th></tr></thead><tbody>
+  {% for s in sources|sort(attribute="signals", reverse=True) %}<tr><td>{{ s.name }}</td><td class="muted">{{ s.type.replace("_", " ")|capitalize }}</td><td class="num">{{ '{:,}'.format(s.documents) }}</td><td class="num">{{ '{:,}'.format(s.signals) }}</td></tr>{% endfor %}
+  </tbody></table>
+  <p class="xs muted" style="margin-top:14px">Every document is stored with its URL and sha256. A signal without a citation can't be written. robots.txt is honored, and blocked sources are skipped, not worked around.</p>
+  {{ foot(3) }}
+</section>
+
+<section>
+{% if lead %}
+  <div class="kicker">Your book</div>
+  <h2>{{ lead.overlap_count }} of your 13F names are in our universe</h2>
+  <p class="xs muted" style="margin:-8px 0 14px">From your {{ lead.report_period or 'latest' }} 13F: {{ lead.overlap_value_usd|money }} across these names. Latest signal on each (top {{ holdings|length }} shown).</p>
+  <table class="t"><thead><tr><th>Name</th><th>Latest signal</th><th>Source</th><th class="num">As of</th></tr></thead><tbody>
+  {% for h in holdings %}<tr>
+    <td><span class="tick">{{ h.company.ticker }}</span><div class="muted" style="font-size:.85em">{{ h.company.archetype }}</div></td>
+    <td>{% if h.signal %}{{ h.signal.summary|truncate(150) }}{% if h.impact %}<div class="muted" style="font-size:.9em;margin-top:2px">{{ h.impact|truncate(110) }}</div>{% endif %}{% else %}<span class="muted">No signal yet: on the watchlist.</span>{% endif %}</td>
+    <td>{% if h.signal %}<a href="{{ h.signal.citation_url }}">{{ h.source }}</a>{% endif %}</td>
+    <td class="num date">{{ h.signal.as_of if h.signal else '' }}</td></tr>{% endfor %}
+  </tbody></table>
+{% else %}
+  <div class="kicker">This week</div>
+  <h2>Ranked signals, each linked to its source</h2>
+  <table class="t"><thead><tr><th>Name</th><th>Signal</th><th class="num">As of</th></tr></thead><tbody>
+  {% for s, c in top_signals %}<tr><td><span class="tick">{{ s.ticker }}</span><div class="muted" style="font-size:.85em">{{ c.archetype }}</div></td><td>{{ s.summary|truncate(170) }} <a href="{{ s.citation_url }}">source</a></td><td class="num date">{{ s.as_of }}</td></tr>{% endfor %}
+  </tbody></table>
+{% endif %}
+  {{ foot(4) }}
+</section>
+
+{% if showcase %}{% set n, sg, co = showcase %}
+<section>
+  <div class="kicker">One signal, start to finish</div>
+  <h2><span class="tick">{{ co.ticker }}</span> · {{ co.name }}</h2>
+  <div class="grid g2" style="grid-template-columns: 1fr 1.5fr; align-items:start">
+    <div class="card small"><div class="label">The record</div><p style="margin:8px 0">{{ sg.summary|truncate(220) }}</p><a style="font-size:.7em" href="{{ sg.citation_url }}">{{ sg.citation_url|truncate(60) }}</a>
+      <div class="label" style="margin-top:18px">Then</div>
+      <p style="margin:6px 0 0;font-size:.85em">Mapped to the ticker → scored → analyst agent drafts with a 10-K/10-Q passage → fact-check drops any claim whose quote or number isn't in the source.</p></div>
+    <div class="card note"><div class="label" style="margin-bottom:8px">The published note <span class="pill">fact-check passed</span></div>{{ n.body_md|md }}</div>
+  </div>
+  {{ foot(5) }}
+</section>
+{% endif %}
+
+{% if bt %}{% set ev = bt.events.summary %}
+<section>
+  <div class="kicker">Backtest · last 12 months · point in time</div>
+  <h2>Early warnings that came before the price moved</h2>
+  <div class="grid g2" style="grid-template-columns: 1.35fr 1fr; align-items:start">
+    <div class="card"><div class="xs muted" style="margin-bottom:8px">Median 20-trading-day return vs IWM after each filing type</div>{{ hbar_chart(events, width=620) }}</div>
+    <div class="grid" style="gap:16px">
+      <div class="card"><div class="stat red">{{ '{:+.1%}'.format(ev._all_risk.median_ar20) }}</div><div class="stat-label">median 20-day abnormal return after {{ ev._all_risk.n }} risk filings across {{ ev._all_risk.tickers }} names; {{ '{:.0%}'.format(ev._all_risk.share_down_ar20) }} fell</div></div>
+      <div class="card"><div class="stat">{{ ev._agenda_lead.median_days_before_sec_mention }} days</div><div class="stat-label">median lead from a town agenda item to the first SEC filing that mentions the project ({{ ev._agenda_lead.with_later_sec_mention }} of {{ ev._agenda_lead.n }} items; up to {{ ev._agenda_lead.max_days_before_sec_mention }} days)</div></div>
+    </div>
+  </div>
+  <p class="xs muted" style="margin-top:12px">Returns measured from the close before the filing, so this is what a reader flagged that day would have seen. Past results do not predict future returns.</p>
+  {{ foot(6) }}
+</section>
+
+<section>{% set f = bt.forecast.summary %}{% set b = bt.banks.summary %}
+  <div class="kicker">Backtest · forecasts</div>
+  <h2>Lower forecast error than the naive baselines</h2>
+  <div class="grid g2" style="align-items:start">
+    <div class="card"><div class="xs muted" style="margin-bottom:8px">Median absolute % error, next-quarter revenue · {{ f.company_quarters }} company-quarters, {{ f.companies }} names</div>
+      {{ compare_bars([('Company revenue', [('Local Ledger model', f.median_ape_model), ('Last quarter', f.median_ape_last_quarter), ('Same quarter last year', f.median_ape_seasonal_naive)]), ('Community banks', [('Call-report nowcast', b.median_ape_nowcast), ('Model before call report', b.median_ape_model)])], width=560) }}</div>
+    <div class="grid g2" style="gap:16px">
+      <div class="card"><div class="stat">{{ '{:.0%}'.format(f.p10_p90_coverage) }}</div><div class="stat-label">of actuals landed inside our P10–P90 range</div></div>
+      <div class="card"><div class="stat">{{ '{:.0%}'.format(b.direction_hit_rate) }}</div><div class="stat-label">bank revenue direction called from the FFIEC call report</div></div>
+      <div class="card"><div class="stat">{{ '%.3f'|format(f.brier_p_up_yoy) }}</div><div class="stat-label">Brier score on P(revenue up y/y), vs {{ '%.3f'|format(f.brier_base_rate) }} for the base rate</div></div>
+      <div class="card"><div class="stat">{{ '{:.0%}'.format(b.nowcast_better_share) }}</div><div class="stat-label">of {{ b.bank_quarters }} bank-quarters where the call-report nowcast beat the model ({{ b.banks }} banks)</div></div>
+    </div>
+  </div>
+  {{ foot(7) }}
+</section>
+{% endif %}
+
+<section>
+  <div class="kicker">How it works</div>
+  <h2>Rules first, agents for judgment, people approve</h2>
+  <div class="card diagram" style="padding:12px;text-align:center">{% include "public/_agent_diagram.html" %}</div>
+  {% if tok %}<p class="xs muted" style="margin-top:10px">{{ '{:.1%}'.format(tok.ledger.model_impacts_without_llm_share) }} of {{ '{:,}'.format(tok.ledger.model_impacts) }} replayed signals updated a company model with no LLM call.</p>{% endif %}
+  {{ foot(8) }}
+</section>
+
+<section>
+  <div class="kicker">Why you can trust it</div>
+  <h2>Cited, fact-checked, red-teamed, cheap to run</h2>
+  <div class="grid g2" style="align-items:start">
+    <div class="card">
+      <div class="xs muted" style="margin-bottom:6px">Red team: a council agenda planted with hidden instructions to the AI and a fake $90M figure</div>
+      {% if safety %}<table class="t"><thead><tr><th>Scenario</th><th class="num">Lines filtered</th><th class="num">Claims dropped</th><th>Injected text published?</th></tr></thead><tbody>
+      {% for v in safety.variants %}<tr><td>{{ v.name|capitalize }}</td><td class="num">{{ v.filtered }}</td><td class="num">{{ v.rejected }}</td><td>{% if v.breached %}<span class="pill red">yes</span>{% else %}<span class="pill">no</span>{% endif %}</td></tr>{% endfor %}
+      </tbody></table>{% endif %}
+      <p class="xs" style="margin-top:12px">Every claim must quote its source verbatim, and every number must appear in the quote. Recommendation language is blocked. A person approves before anything is published.</p>
+    </div>
+    {% if tok %}{% set st = tok.scenarios_tuned %}<div class="grid" style="gap:16px">
+      <div class="card"><div class="stat">{{ '{:.0%}'.format(tok.savings.workload_total) }}</div><div class="stat-label">lower LLM cost per run after tuning, with fact-check pass rates checked before and after</div></div>
+      <div class="card"><div class="stat">${{ '%.2f'|format(st.fund_variable_per_month) }}</div><div class="stat-label">LLM cost per fund per month, with {{ tok.usage_assumptions.warrooms_per_fund_per_month }} earnings war rooms and redirects</div></div>
+    </div>{% endif %}
+  </div>
+  {{ foot(9) }}
+</section>
+
+<section>
+  <div class="kicker">{% if lead %}Next step for {{ lead.fund_name }}{% else %}Next step{% endif %}</div>
+  <h2>A four-week fund pilot, at no cost</h2>
+  <div class="grid g3">
+    <div class="card"><b>Free weekly issue</b><p class="small muted" style="margin:8px 0 0">The 5–8 most significant signals and one deeper company note.</p></div>
+    <div class="card"><b>Analyst seat · $99/mo</b><p class="small muted" style="margin:8px 0 0">The full ranked feed across all {{ stats.companies }} names, company models and filings.</p></div>
+    <div class="card" style="border-color:var(--accent)"><b>Fund pilot · 4 weeks</b><p class="small muted" style="margin:8px 0 0">Team access, {% if lead %}a watchlist built from your {{ lead.overlap_count }} overlapping names, {% else %}custom watchlists and towns, {% endif %}and the multiplayer earnings war room.</p></div>
+  </div>
+  <p class="small" style="margin:22px 0">Reply to {{ contact_email() }} to start.</p>
+  <div class="disc">{% for line in disclosures() %}<p>{{ line }}</p>{% endfor %}</div>
+  {{ foot(10) }}
+</section>
+
+</div></div>
+{% if reveal %}<script>{{ reveal['reveal.min.js']|safe }}</script>{% else %}<script src="{{ reveal_cdn }}/reveal.min.js"></script>{% endif %}
+<script>Reveal.initialize({ hash: true, width: 1280, height: 720, margin: 0.06, transition: 'fade', controls: true, progress: true, slideNumber: false });</script>
+</body></html>

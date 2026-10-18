@@ -132,3 +132,55 @@ def test_zip_reader_handles_tsv(mini_13f):
     with zipfile.ZipFile(mini_13f) as zf:
         rows = list(csv.DictReader(io.TextIOWrapper(zf.open("INFOTABLE.tsv")), delimiter="\t"))
     assert len(rows) == 6
+
+
+def _lead(session):
+    lead = Lead(
+        cik="1",
+        fund_name="Small Cap Value Partners LLC",
+        report_period="30-JUN-2026",
+        overlap_count=2,
+        overlap_value_usd=3_500_000,
+        overlap_tickers="PCYO TRC",
+        rank=1,
+    )
+    session.add(lead)
+    session.commit()
+    return lead
+
+
+def test_deck_generic_is_self_describing_and_compliant(seeded):
+    from localledger.compliance import DISCLOSURE_MARKER, lint_impersonal
+    from localledger.gtm.deck import build_deck, deck_text
+
+    [path] = build_deck(seeded)
+    html = path.read_text()
+    assert path.name == "pitch.html"
+    assert DISCLOSURE_MARKER in html and "Reveal.initialize" in html
+    assert html.count("<section") <= 10  # course and pitch limit
+    assert not lint_impersonal(deck_text(html))
+    assert "reveal.min.js" in html  # offline: CDN fallback instead of the inlined copy
+
+
+def test_deck_for_one_fund_and_top_leads(seeded):
+    from localledger.gtm.deck import build_deck, find_lead
+
+    _lead(seeded)
+    assert find_lead(seeded, "1").fund_name == find_lead(seeded, "small cap value").fund_name
+    [path] = build_deck(seeded, fund="small cap value")
+    html = path.read_text()
+    assert path.name == "pitch-small-cap-value-partners-llc.html"
+    assert "Prepared for Small Cap Value Partners LLC" in html
+    assert "PCYO" in html and "TRC" in html and "2 of your 13F names" in html
+    assert [p.name for p in build_deck(seeded, top=5)] == [path.name]
+    with pytest.raises(LookupError):
+        build_deck(seeded, fund="no such fund")
+
+
+def test_deck_blocked_by_recommendation_language(seeded, monkeypatch):
+    from localledger.gtm import deck
+
+    monkeypatch.setattr(deck, "render_deck", lambda s, lead=None: "<section>Readers should buy PCYO.</section>")
+    with pytest.raises(ValueError, match="lint"):
+        deck.build_deck(seeded)
+    assert not (deck.get_settings().out_dir / "deck" / "pitch.html").exists()

@@ -260,6 +260,24 @@ def pdfs() -> None:
 
 
 @app.command()
+def deck(
+    fund: Annotated[str | None, typer.Option(help="Fund name or CIK from `ll leads` (adds a your-book slide)")] = None,
+    top: Annotated[int, typer.Option(help="Write a deck for each of the top N non-index leads")] = 0,
+) -> None:
+    """Pitch deck: self-contained reveal.js HTML from live data -> ./out/deck (no LLM calls; never sent)."""
+    from localledger.gtm.deck import build_deck
+
+    with session_scope() as s:
+        try:
+            paths = build_deck(s, fund=fund, top=top)
+        except LookupError as e:
+            typer.echo(str(e))
+            raise typer.Exit(1) from None
+    for path in paths:
+        typer.echo(f"wrote {path}")
+
+
+@app.command()
 def publish(
     note_id: Annotated[int, typer.Option(help="Note to mark published")],
     disclose: Annotated[bool, typer.Option(help="Note carries the author-holdings disclosure")] = False,

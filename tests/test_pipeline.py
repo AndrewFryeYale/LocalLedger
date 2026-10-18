@@ -75,6 +75,9 @@ def test_web_pages_and_forms(ingested):
         "/how-it-works",
     ):
         assert client.get(path).status_code == 200, path
+    deck = client.get("/admin/deck")
+    assert deck.status_code == 200 and DISCLOSURE_MARKER in deck.text and "Reveal.initialize" in deck.text
+    assert client.get("/admin/deck?cik=999999").status_code == 404
     csv_text = client.get("/admin/export/waitlist.csv").text
     assert "pm@fund.com" in csv_text
     sig = ingested.exec(select(Signal)).first()

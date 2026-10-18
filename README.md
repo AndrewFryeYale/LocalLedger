@@ -51,6 +51,7 @@ All commands are `ll <command>` (the console script lives at `venv/bin/ll`; `pyt
 | `ll warroom --session ID --redirect "..." [--agent bear] [--as NAME]` | Post a redirect into an existing room and rerun the affected agents |
 | `ll leads` | Fund target list from the latest SEC 13F data set -> `out/leads.csv` (CUSIPs verified via OpenFIGI) |
 | `ll outreach [--top 50]` | ~90-word personalized drafts -> `out/outreach/` (drafts only) |
+| `ll deck [--fund NAME\|CIK] [--top N]` | 10-slide pitch deck from live data (backtest, tokenomics, red team, signals) -> `out/deck/*.html`, a single self-contained reveal.js file. `--fund` adds a slide with that fund's 13F holdings in the universe and the latest cited signal on each. No LLM calls; blocked if any slide fails the impersonal-language lint. Also at `/admin/deck` (per lead from the admin leads table) |
 | `ll pdfs` | `out/pdf/fund_one_pager.pdf` and `out/pdf/sample_issue.pdf` |
 | `ll publish --note-id N [--disclose]` | Mark a note published after compliance checks; prints trading-blackout reminders |
 | `ll check-citations [--limit N]` | HTTP-check every signal citation URL -> `out/citation_check.csv` |
