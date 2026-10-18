@@ -1,0 +1,1571 @@
+{
+ "model": "gpt-6-luna",
+ "prices_per_mtok": {
+  "input": 0.1,
+  "cached_input": 0.01,
+  "output": 0.5
+ },
+ "usage_assumptions": {
+  "notes_per_week": 20,
+  "model_llm_updates_per_week": 15,
+  "deep_notes_per_week": 1,
+  "warrooms_per_fund_per_month": 8,
+  "redirects_per_warroom": 2,
+  "outreach_drafts_per_month": 50,
+  "mix": {
+   "free": 0.9,
+   "analyst": 0.09,
+   "fund": 0.01
+  },
+  "weeks_per_month": 4.33
+ },
+ "baseline": {
+  "analyst_note_with_factcheck": 0.0017611237500000001,
+  "warroom_full_run": 0.01230206,
+  "warroom_redirect": 0.0068333000000000005,
+  "outreach_draft": 0.00034481999999999997,
+  "workload_total": 0.028115150000000005,
+  "tokens_in": 80566.0,
+  "tokens_cached_in": 14905.0,
+  "tokens_out": 42800.0,
+  "tokens_reasoning": 31137.5,
+  "wall_seconds": 286.05,
+  "runs": [
+   "a_baseline",
+   "a_baseline_r2"
+  ]
+ },
+ "tuned": {
+  "analyst_note_with_factcheck": 0.0007318281250000001,
+  "warroom_full_run": 0.00601012,
+  "warroom_redirect": 0.0028956,
+  "outreach_draft": 0.00014307,
+  "workload_total": 0.012580095000000001,
+  "tokens_in": 74016.5,
+  "tokens_cached_in": 27364.5,
+  "tokens_out": 15282.5,
+  "tokens_reasoning": 4007.5,
+  "wall_seconds": 117.05000000000001,
+  "runs": [
+   "d_tuned",
+   "d_tuned_r2"
+  ]
+ },
+ "savings": {
+  "workload_total": 0.5525510267595941,
+  "analyst_note_with_factcheck": 0.5844538891716156,
+  "warroom_full_run": 0.511454179218765,
+  "outreach_draft": 0.5850878719331825
+ },
+ "model_update_call": 0.00027748,
+ "ledger": {
+  "calls": 827,
+  "disk_cache_hits": 140,
+  "disk_cache_hit_rate": 0.16928657799274485,
+  "model_impacts": 1070,
+  "model_impacts_by_llm": 8,
+  "model_impacts_without_llm_share": 0.9925233644859813,
+  "methods": {
+   "llm": 8,
+   "note": 602,
+   "rule:agenda": 9,
+   "rule:cre": 110,
+   "rule:credit": 110,
+   "rule:deposits": 110,
+   "rule:distribution": 1,
+   "rule:filing": 9,
+   "rule:gaming": 1,
+   "rule:loans": 106,
+   "rule:production": 4
+  }
+ },
+ "scenarios_baseline": {
+  "pipeline_per_week": 0.043787484375000005,
+  "pipeline_per_month": 0.18959980734375004,
+  "fund_variable_per_month": 0.20774928,
+  "users_1": {
+   "funds": 0.01,
+   "llm_cost_per_month": 0.20891830014375004,
+   "llm_cost_per_user_per_month": 0.20891830014375004
+  },
+  "users_100": {
+   "funds": 1.0,
+   "llm_cost_per_month": 0.4145900873437501,
+   "llm_cost_per_user_per_month": 0.0041459008734375
+  },
+  "users_10000": {
+   "funds": 100.0,
+   "llm_cost_per_month": 20.981768807343748,
+   "llm_cost_per_user_per_month": 0.002098176880734375
+  },
+  "per_user_month": {
+   "free_reader": 0.0,
+   "analyst_99": 0.0,
+   "fund_pilot": 0.20774928
+  }
+ },
+ "scenarios_tuned": {
+  "pipeline_per_week": 0.020628332812500004,
+  "pipeline_per_month": 0.08932068107812502,
+  "fund_variable_per_month": 0.09441056,
+  "users_1": {
+   "funds": 0.01,
+   "llm_cost_per_month": 0.09741828667812502,
+   "llm_cost_per_user_per_month": 0.09741828667812502
+  },
+  "users_100": {
+   "funds": 1.0,
+   "llm_cost_per_month": 0.19088474107812503,
+   "llm_cost_per_user_per_month": 0.0019088474107812504
+  },
+  "users_10000": {
+   "funds": 100.0,
+   "llm_cost_per_month": 9.537530181078123,
+   "llm_cost_per_user_per_month": 0.0009537530181078123
+  },
+  "per_user_month": {
+   "free_reader": 0.0,
+   "analyst_99": 0.0,
+   "fund_pilot": 0.09441056
+  }
+ },
+ "bench_runs": {
+  "a_baseline": {
+   "label": "a_baseline",
+   "model": "gpt-6-luna",
+   "ledger_from_id": 513,
+   "notes": [
+    {
+     "signal_id": 37,
+     "ticker": "ELME",
+     "source": "edgar",
+     "kept": 3,
+     "dropped": 0,
+     "dropped_reasons": [],
+     "passed": true
+    },
+    {
+     "signal_id": 210,
+     "ticker": "EONR",
+     "source": "edgar",
+     "kept": 3,
+     "dropped": 0,
+     "dropped_reasons": [],
+     "passed": true
+    },
+    {
+     "signal_id": 943,
+     "ticker": "PBFS",
+     "source": "ffiec",
+     "kept": 2,
+     "dropped": 2,
+     "dropped_reasons": [
+      "deterministic",
+      "deterministic"
+     ],
+     "passed": true
+    },
+    {
+     "signal_id": 970,
+     "ticker": "PNBK",
+     "source": "ffiec",
+     "kept": 3,
+     "dropped": 1,
+     "dropped_reasons": [
+      "deterministic"
+     ],
+     "passed": true
+    },
+    {
+     "signal_id": 1057,
+     "ticker": "PCYO",
+     "source": "legistar",
+     "kept": 3,
+     "dropped": 0,
+     "dropped_reasons": [],
+     "passed": true
+    },
+    {
+     "signal_id": 1065,
+     "ticker": "MLP",
+     "source": "legistar",
+     "kept": 3,
+     "dropped": 0,
+     "dropped_reasons": [],
+     "passed": true
+    },
+    {
+     "signal_id": 609,
+     "ticker": "EP",
+     "source": "og_state",
+     "kept": 2,
+     "dropped": 2,
+     "dropped_reasons": [
+      "llm",
+      "llm"
+     ],
+     "passed": true
+    },
+    {
+     "signal_id": 1058,
+     "ticker": "GYRO",
+     "source": "pdf_agenda",
+     "kept": 3,
+     "dropped": 0,
+     "dropped_reasons": [],
+     "passed": true
+    }
+   ],
+   "warroom": {
+    "status": "complete",
+    "kept": 6,
+    "dropped": 1,
+    "passed": true
+   },
+   "outreach": {
+    "drafts": 5,
+    "template_fallbacks": 0
+   },
+   "by_prompt": {
+    "analyst_signal_note": {
+     "calls": 8.0,
+     "live": 8.0,
+     "mock": 0.0,
+     "input_tokens": 21212.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 20470.0,
+     "reasoning_tokens": 16704.0,
+     "latency_ms": 145347.0,
+     "cost_usd": 0.012356200000000001
+    },
+    "factcheck_claims": {
+     "calls": 9.0,
+     "live": 9.0,
+     "mock": 0.0,
+     "input_tokens": 14519.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 2347.0,
+     "reasoning_tokens": 1060.0,
+     "latency_ms": 25924.0,
+     "cost_usd": 0.0026254
+    },
+    "outreach_email": {
+     "calls": 5.0,
+     "live": 5.0,
+     "mock": 0.0,
+     "input_tokens": 2481.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 2721.0,
+     "reasoning_tokens": 1762.0,
+     "latency_ms": 22859.0,
+     "cost_usd": 0.0016086
+    },
+    "warroom_bear": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 3225.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 364.0,
+     "reasoning_tokens": 138.0,
+     "latency_ms": 4539.0,
+     "cost_usd": 0.0005045
+    },
+    "warroom_bull": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 3225.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 360.0,
+     "reasoning_tokens": 91.0,
+     "latency_ms": 3635.0,
+     "cost_usd": 0.0005025
+    },
+    "warroom_model": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 2831.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 1611.0,
+     "reasoning_tokens": 837.0,
+     "latency_ms": 13994.0,
+     "cost_usd": 0.0010886
+    },
+    "warroom_moderator": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 2059.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 1558.0,
+     "reasoning_tokens": 756.0,
+     "latency_ms": 12442.0,
+     "cost_usd": 0.0009849
+    },
+    "warroom_note_writer": {
+     "calls": 2.0,
+     "live": 1.0,
+     "mock": 1.0,
+     "input_tokens": 22882.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 10000.0,
+     "reasoning_tokens": 10000.0,
+     "latency_ms": 0.0,
+     "cost_usd": 0.007288200000000001
+    },
+    "warroom_read_across": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 2035.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 859.0,
+     "reasoning_tokens": 489.0,
+     "latency_ms": 8923.0,
+     "cost_usd": 0.000633
+    },
+    "warroom_reader": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 8625.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 3378.0,
+     "reasoning_tokens": 1719.0,
+     "latency_ms": 21578.0,
+     "cost_usd": 0.0025515
+    },
+    "warroom_thesis": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 2085.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 1444.0,
+     "reasoning_tokens": 706.0,
+     "latency_ms": 12766.0,
+     "cost_usd": 0.0009305
+    }
+   },
+   "totals": {
+    "calls": 31.0,
+    "live": 30.0,
+    "mock": 1.0,
+    "input_tokens": 85179.0,
+    "cached_input_tokens": 0.0,
+    "output_tokens": 45112.0,
+    "reasoning_tokens": 34262.0,
+    "latency_ms": 272007.0,
+    "cost_usd": 0.03107390000000001
+   },
+   "quality": {
+    "notes_passed": 8,
+    "notes": 8,
+    "claims_kept": 22,
+    "claims_written": 27
+   },
+   "wall_seconds": 283.8,
+   "effort": "default"
+  },
+  "a_baseline_r2": {
+   "label": "a_baseline_r2",
+   "model": "gpt-6-luna",
+   "ledger_from_id": 663,
+   "notes": [
+    {
+     "signal_id": 37,
+     "ticker": "ELME",
+     "source": "edgar",
+     "kept": 4,
+     "dropped": 0,
+     "dropped_reasons": [],
+     "passed": true
+    },
+    {
+     "signal_id": 210,
+     "ticker": "EONR",
+     "source": "edgar",
+     "kept": 4,
+     "dropped": 1,
+     "dropped_reasons": [
+      "deterministic"
+     ],
+     "passed": true
+    },
+    {
+     "signal_id": 943,
+     "ticker": "PBFS",
+     "source": "ffiec",
+     "kept": 4,
+     "dropped": 0,
+     "dropped_reasons": [],
+     "passed": true
+    },
+    {
+     "signal_id": 970,
+     "ticker": "PNBK",
+     "source": "ffiec",
+     "kept": 2,
+     "dropped": 1,
+     "dropped_reasons": [
+      "deterministic"
+     ],
+     "passed": true
+    },
+    {
+     "signal_id": 1057,
+     "ticker": "PCYO",
+     "source": "legistar",
+     "kept": 3,
+     "dropped": 0,
+     "dropped_reasons": [],
+     "passed": true
+    },
+    {
+     "signal_id": 1065,
+     "ticker": "MLP",
+     "source": "legistar",
+     "kept": 3,
+     "dropped": 0,
+     "dropped_reasons": [],
+     "passed": true
+    },
+    {
+     "signal_id": 609,
+     "ticker": "EP",
+     "source": "og_state",
+     "kept": 2,
+     "dropped": 1,
+     "dropped_reasons": [
+      "llm"
+     ],
+     "passed": true
+    },
+    {
+     "signal_id": 1058,
+     "ticker": "GYRO",
+     "source": "pdf_agenda",
+     "kept": 3,
+     "dropped": 1,
+     "dropped_reasons": [
+      "deterministic"
+     ],
+     "passed": true
+    }
+   ],
+   "warroom": {
+    "status": "complete",
+    "kept": 6,
+    "dropped": 3,
+    "passed": true
+   },
+   "outreach": {
+    "drafts": 5,
+    "template_fallbacks": 0
+   },
+   "by_prompt": {
+    "analyst_signal_note": {
+     "calls": 8.0,
+     "live": 8.0,
+     "mock": 0.0,
+     "input_tokens": 21212.0,
+     "cached_input_tokens": 21188.0,
+     "output_tokens": 19945.0,
+     "reasoning_tokens": 16007.0,
+     "latency_ms": 150670.0,
+     "cost_usd": 0.010186780000000001
+    },
+    "factcheck_claims": {
+     "calls": 9.0,
+     "live": 9.0,
+     "mock": 0.0,
+     "input_tokens": 16401.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 2739.0,
+     "reasoning_tokens": 1320.0,
+     "latency_ms": 28435.0,
+     "cost_usd": 0.0030096000000000003
+    },
+    "outreach_email": {
+     "calls": 5.0,
+     "live": 5.0,
+     "mock": 0.0,
+     "input_tokens": 2481.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 3183.0,
+     "reasoning_tokens": 2221.0,
+     "latency_ms": 23893.0,
+     "cost_usd": 0.0018395999999999998
+    },
+    "warroom_bear": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 3278.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 440.0,
+     "reasoning_tokens": 180.0,
+     "latency_ms": 5774.0,
+     "cost_usd": 0.0005478
+    },
+    "warroom_bull": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 3278.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 386.0,
+     "reasoning_tokens": 143.0,
+     "latency_ms": 3916.0,
+     "cost_usd": 0.0005208
+    },
+    "warroom_model": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 2888.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 1721.0,
+     "reasoning_tokens": 889.0,
+     "latency_ms": 13048.0,
+     "cost_usd": 0.0011493
+    },
+    "warroom_moderator": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 2064.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 1850.0,
+     "reasoning_tokens": 1050.0,
+     "latency_ms": 15380.0,
+     "cost_usd": 0.0011314
+    },
+    "warroom_note_writer": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 11548.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 4110.0,
+     "reasoning_tokens": 2848.0,
+     "latency_ms": 25766.0,
+     "cost_usd": 0.0032098
+    },
+    "warroom_read_across": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 2036.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 679.0,
+     "reasoning_tokens": 378.0,
+     "latency_ms": 6539.0,
+     "cost_usd": 0.0005431
+    },
+    "warroom_reader": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 8625.0,
+     "cached_input_tokens": 8622.0,
+     "output_tokens": 3771.0,
+     "reasoning_tokens": 2047.0,
+     "latency_ms": 22484.0,
+     "cost_usd": 0.00197202
+    },
+    "warroom_thesis": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 2142.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 1664.0,
+     "reasoning_tokens": 930.0,
+     "latency_ms": 14176.0,
+     "cost_usd": 0.0010462
+    }
+   },
+   "totals": {
+    "calls": 30.0,
+    "live": 30.0,
+    "mock": 0.0,
+    "input_tokens": 75953.0,
+    "cached_input_tokens": 29810.0,
+    "output_tokens": 40488.0,
+    "reasoning_tokens": 28013.0,
+    "latency_ms": 310081.0,
+    "cost_usd": 0.0251564
+   },
+   "quality": {
+    "notes_passed": 8,
+    "notes": 8,
+    "claims_kept": 25,
+    "claims_written": 29
+   },
+   "wall_seconds": 288.3,
+   "effort": "default"
+  },
+  "b_low": {
+   "label": "b_low",
+   "model": "gpt-6-luna",
+   "ledger_from_id": 543,
+   "notes": [
+    {
+     "signal_id": 37,
+     "ticker": "ELME",
+     "source": "edgar",
+     "kept": 3,
+     "dropped": 0,
+     "dropped_reasons": [],
+     "passed": true
+    },
+    {
+     "signal_id": 210,
+     "ticker": "EONR",
+     "source": "edgar",
+     "kept": 3,
+     "dropped": 0,
+     "dropped_reasons": [],
+     "passed": true
+    },
+    {
+     "signal_id": 943,
+     "ticker": "PBFS",
+     "source": "ffiec",
+     "kept": 4,
+     "dropped": 0,
+     "dropped_reasons": [],
+     "passed": true
+    },
+    {
+     "signal_id": 970,
+     "ticker": "PNBK",
+     "source": "ffiec",
+     "kept": 3,
+     "dropped": 0,
+     "dropped_reasons": [],
+     "passed": true
+    },
+    {
+     "signal_id": 1057,
+     "ticker": "PCYO",
+     "source": "legistar",
+     "kept": 3,
+     "dropped": 0,
+     "dropped_reasons": [],
+     "passed": true
+    },
+    {
+     "signal_id": 1065,
+     "ticker": "MLP",
+     "source": "legistar",
+     "kept": 3,
+     "dropped": 0,
+     "dropped_reasons": [],
+     "passed": true
+    },
+    {
+     "signal_id": 609,
+     "ticker": "EP",
+     "source": "og_state",
+     "kept": 1,
+     "dropped": 2,
+     "dropped_reasons": [
+      "llm",
+      "llm"
+     ],
+     "passed": false
+    },
+    {
+     "signal_id": 1058,
+     "ticker": "GYRO",
+     "source": "pdf_agenda",
+     "kept": 3,
+     "dropped": 1,
+     "dropped_reasons": [
+      "deterministic"
+     ],
+     "passed": true
+    }
+   ],
+   "warroom": {
+    "status": "complete",
+    "kept": 4,
+    "dropped": 4,
+    "passed": true
+   },
+   "outreach": {
+    "drafts": 5,
+    "template_fallbacks": 0
+   },
+   "by_prompt": {
+    "analyst_signal_note": {
+     "calls": 8.0,
+     "live": 8.0,
+     "mock": 0.0,
+     "input_tokens": 21212.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 6210.0,
+     "reasoning_tokens": 2901.0,
+     "latency_ms": 47849.0,
+     "cost_usd": 0.005226199999999999
+    },
+    "factcheck_claims": {
+     "calls": 9.0,
+     "live": 9.0,
+     "mock": 0.0,
+     "input_tokens": 16144.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 1802.0,
+     "reasoning_tokens": 408.0,
+     "latency_ms": 19757.0,
+     "cost_usd": 0.0025154
+    },
+    "outreach_email": {
+     "calls": 5.0,
+     "live": 5.0,
+     "mock": 0.0,
+     "input_tokens": 2481.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 1747.0,
+     "reasoning_tokens": 797.0,
+     "latency_ms": 16745.0,
+     "cost_usd": 0.0011216
+    },
+    "warroom_bear": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 2920.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 287.0,
+     "reasoning_tokens": 53.0,
+     "latency_ms": 3367.0,
+     "cost_usd": 0.0004355
+    },
+    "warroom_bull": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 2920.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 357.0,
+     "reasoning_tokens": 75.0,
+     "latency_ms": 4633.0,
+     "cost_usd": 0.0004705
+    },
+    "warroom_model": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 2442.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 1109.0,
+     "reasoning_tokens": 310.0,
+     "latency_ms": 7659.0,
+     "cost_usd": 0.0007987000000000001
+    },
+    "warroom_moderator": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 2061.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 1050.0,
+     "reasoning_tokens": 147.0,
+     "latency_ms": 8445.0,
+     "cost_usd": 0.0007311
+    },
+    "warroom_note_writer": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 11068.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 1344.0,
+     "reasoning_tokens": 168.0,
+     "latency_ms": 8196.0,
+     "cost_usd": 0.0017787999999999999
+    },
+    "warroom_read_across": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 2031.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 400.0,
+     "reasoning_tokens": 0.0,
+     "latency_ms": 4252.0,
+     "cost_usd": 0.00040310000000000004
+    },
+    "warroom_reader": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 8625.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 1062.0,
+     "reasoning_tokens": 104.0,
+     "latency_ms": 6194.0,
+     "cost_usd": 0.0013935
+    },
+    "warroom_thesis": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 1696.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 880.0,
+     "reasoning_tokens": 250.0,
+     "latency_ms": 7065.0,
+     "cost_usd": 0.0006096000000000001
+    }
+   },
+   "totals": {
+    "calls": 30.0,
+    "live": 30.0,
+    "mock": 0.0,
+    "input_tokens": 73600.0,
+    "cached_input_tokens": 0.0,
+    "output_tokens": 16248.0,
+    "reasoning_tokens": 5213.0,
+    "latency_ms": 134162.0,
+    "cost_usd": 0.015484000000000001
+   },
+   "quality": {
+    "notes_passed": 7,
+    "notes": 8,
+    "claims_kept": 23,
+    "claims_written": 26
+   },
+   "wall_seconds": 121.2,
+   "effort": "low"
+  },
+  "c_none": {
+   "label": "c_none",
+   "model": "gpt-6-luna",
+   "ledger_from_id": 543,
+   "notes": [
+    {
+     "signal_id": 37,
+     "ticker": "ELME",
+     "source": "edgar",
+     "kept": 2,
+     "dropped": 0,
+     "dropped_reasons": [],
+     "passed": true
+    },
+    {
+     "signal_id": 210,
+     "ticker": "EONR",
+     "source": "edgar",
+     "kept": 3,
+     "dropped": 0,
+     "dropped_reasons": [],
+     "passed": true
+    },
+    {
+     "signal_id": 943,
+     "ticker": "PBFS",
+     "source": "ffiec",
+     "kept": 3,
+     "dropped": 1,
+     "dropped_reasons": [
+      "deterministic"
+     ],
+     "passed": true
+    },
+    {
+     "signal_id": 970,
+     "ticker": "PNBK",
+     "source": "ffiec",
+     "kept": 2,
+     "dropped": 2,
+     "dropped_reasons": [
+      "llm",
+      "llm"
+     ],
+     "passed": true
+    },
+    {
+     "signal_id": 1057,
+     "ticker": "PCYO",
+     "source": "legistar",
+     "kept": 3,
+     "dropped": 0,
+     "dropped_reasons": [],
+     "passed": true
+    },
+    {
+     "signal_id": 1065,
+     "ticker": "MLP",
+     "source": "legistar",
+     "kept": 3,
+     "dropped": 0,
+     "dropped_reasons": [],
+     "passed": true
+    },
+    {
+     "signal_id": 609,
+     "ticker": "EP",
+     "source": "og_state",
+     "kept": 1,
+     "dropped": 2,
+     "dropped_reasons": [
+      "llm",
+      "llm"
+     ],
+     "passed": false
+    },
+    {
+     "signal_id": 1058,
+     "ticker": "GYRO",
+     "source": "pdf_agenda",
+     "kept": 1,
+     "dropped": 1,
+     "dropped_reasons": [
+      "llm"
+     ],
+     "passed": false
+    }
+   ],
+   "warroom": {
+    "status": "complete",
+    "kept": 6,
+    "dropped": 2,
+    "passed": true
+   },
+   "outreach": {
+    "drafts": 5,
+    "template_fallbacks": 0
+   },
+   "by_prompt": {
+    "analyst_signal_note": {
+     "calls": 8.0,
+     "live": 8.0,
+     "mock": 0.0,
+     "input_tokens": 21212.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 3159.0,
+     "reasoning_tokens": 0.0,
+     "latency_ms": 26734.0,
+     "cost_usd": 0.0037006999999999995
+    },
+    "factcheck_claims": {
+     "calls": 9.0,
+     "live": 9.0,
+     "mock": 0.0,
+     "input_tokens": 15870.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 1476.0,
+     "reasoning_tokens": 0.0,
+     "latency_ms": 22071.0,
+     "cost_usd": 0.002325
+    },
+    "outreach_email": {
+     "calls": 5.0,
+     "live": 5.0,
+     "mock": 0.0,
+     "input_tokens": 2481.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 939.0,
+     "reasoning_tokens": 0.0,
+     "latency_ms": 9990.0,
+     "cost_usd": 0.0007176
+    },
+    "warroom_bear": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 3331.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 262.0,
+     "reasoning_tokens": 0.0,
+     "latency_ms": 3447.0,
+     "cost_usd": 0.0004641
+    },
+    "warroom_bull": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 3331.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 247.0,
+     "reasoning_tokens": 0.0,
+     "latency_ms": 2583.0,
+     "cost_usd": 0.00045660000000000004
+    },
+    "warroom_model": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 2934.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 541.0,
+     "reasoning_tokens": 0.0,
+     "latency_ms": 4706.0,
+     "cost_usd": 0.0005639000000000001
+    },
+    "warroom_moderator": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 2067.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 795.0,
+     "reasoning_tokens": 0.0,
+     "latency_ms": 6952.0,
+     "cost_usd": 0.0006042
+    },
+    "warroom_note_writer": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 11554.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 978.0,
+     "reasoning_tokens": 0.0,
+     "latency_ms": 6430.0,
+     "cost_usd": 0.0016444
+    },
+    "warroom_read_across": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 2019.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 312.0,
+     "reasoning_tokens": 0.0,
+     "latency_ms": 3678.0,
+     "cost_usd": 0.00035789999999999997
+    },
+    "warroom_reader": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 8625.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 1757.0,
+     "reasoning_tokens": 0.0,
+     "latency_ms": 10304.0,
+     "cost_usd": 0.001741
+    },
+    "warroom_thesis": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 2188.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 669.0,
+     "reasoning_tokens": 0.0,
+     "latency_ms": 6566.0,
+     "cost_usd": 0.0005533
+    }
+   },
+   "totals": {
+    "calls": 30.0,
+    "live": 30.0,
+    "mock": 0.0,
+    "input_tokens": 75612.0,
+    "cached_input_tokens": 0.0,
+    "output_tokens": 11135.0,
+    "reasoning_tokens": 0.0,
+    "latency_ms": 103461.0,
+    "cost_usd": 0.013128700000000002
+   },
+   "quality": {
+    "notes_passed": 6,
+    "notes": 8,
+    "claims_kept": 18,
+    "claims_written": 24
+   },
+   "wall_seconds": 94.1,
+   "effort": "none"
+  },
+  "d_tuned": {
+   "label": "d_tuned",
+   "model": "gpt-6-luna",
+   "ledger_from_id": 633,
+   "notes": [
+    {
+     "signal_id": 37,
+     "ticker": "ELME",
+     "source": "edgar",
+     "kept": 3,
+     "dropped": 1,
+     "dropped_reasons": [
+      "llm"
+     ],
+     "passed": true
+    },
+    {
+     "signal_id": 210,
+     "ticker": "EONR",
+     "source": "edgar",
+     "kept": 4,
+     "dropped": 0,
+     "dropped_reasons": [],
+     "passed": true
+    },
+    {
+     "signal_id": 943,
+     "ticker": "PBFS",
+     "source": "ffiec",
+     "kept": 3,
+     "dropped": 1,
+     "dropped_reasons": [
+      "deterministic"
+     ],
+     "passed": true
+    },
+    {
+     "signal_id": 970,
+     "ticker": "PNBK",
+     "source": "ffiec",
+     "kept": 2,
+     "dropped": 1,
+     "dropped_reasons": [
+      "llm"
+     ],
+     "passed": true
+    },
+    {
+     "signal_id": 1057,
+     "ticker": "PCYO",
+     "source": "legistar",
+     "kept": 3,
+     "dropped": 0,
+     "dropped_reasons": [],
+     "passed": true
+    },
+    {
+     "signal_id": 1065,
+     "ticker": "MLP",
+     "source": "legistar",
+     "kept": 3,
+     "dropped": 0,
+     "dropped_reasons": [],
+     "passed": true
+    },
+    {
+     "signal_id": 609,
+     "ticker": "EP",
+     "source": "og_state",
+     "kept": 0,
+     "dropped": 3,
+     "dropped_reasons": [
+      "llm",
+      "llm",
+      "llm"
+     ],
+     "passed": false
+    },
+    {
+     "signal_id": 1058,
+     "ticker": "GYRO",
+     "source": "pdf_agenda",
+     "kept": 2,
+     "dropped": 1,
+     "dropped_reasons": [
+      "deterministic"
+     ],
+     "passed": true
+    }
+   ],
+   "warroom": {
+    "status": "complete",
+    "kept": 6,
+    "dropped": 2,
+    "passed": true
+   },
+   "outreach": {
+    "drafts": 5,
+    "template_fallbacks": 0
+   },
+   "by_prompt": {
+    "analyst_signal_note": {
+     "calls": 8.0,
+     "live": 8.0,
+     "mock": 0.0,
+     "input_tokens": 21212.0,
+     "cached_input_tokens": 16297.0,
+     "output_tokens": 5827.0,
+     "reasoning_tokens": 2345.0,
+     "latency_ms": 47982.0,
+     "cost_usd": 0.00356797
+    },
+    "factcheck_claims": {
+     "calls": 9.0,
+     "live": 9.0,
+     "mock": 0.0,
+     "input_tokens": 16157.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 1910.0,
+     "reasoning_tokens": 495.0,
+     "latency_ms": 25065.0,
+     "cost_usd": 0.0025707
+    },
+    "outreach_email": {
+     "calls": 5.0,
+     "live": 5.0,
+     "mock": 0.0,
+     "input_tokens": 2481.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 937.0,
+     "reasoning_tokens": 0.0,
+     "latency_ms": 9682.0,
+     "cost_usd": 0.0007166
+    },
+    "warroom_bear": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 3023.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 246.0,
+     "reasoning_tokens": 0.0,
+     "latency_ms": 3004.0,
+     "cost_usd": 0.00042530000000000004
+    },
+    "warroom_bull": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 3023.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 278.0,
+     "reasoning_tokens": 0.0,
+     "latency_ms": 3116.0,
+     "cost_usd": 0.0004413
+    },
+    "warroom_model": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 2611.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 1102.0,
+     "reasoning_tokens": 284.0,
+     "latency_ms": 8696.0,
+     "cost_usd": 0.0008121000000000001
+    },
+    "warroom_moderator": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 2060.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 779.0,
+     "reasoning_tokens": 142.0,
+     "latency_ms": 7485.0,
+     "cost_usd": 0.0005955
+    },
+    "warroom_note_writer": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 11213.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 1373.0,
+     "reasoning_tokens": 370.0,
+     "latency_ms": 8946.0,
+     "cost_usd": 0.0018078
+    },
+    "warroom_read_across": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 2017.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 333.0,
+     "reasoning_tokens": 0.0,
+     "latency_ms": 3427.0,
+     "cost_usd": 0.00036820000000000006
+    },
+    "warroom_reader": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 8625.0,
+     "cached_input_tokens": 8622.0,
+     "output_tokens": 1580.0,
+     "reasoning_tokens": 167.0,
+     "latency_ms": 8224.0,
+     "cost_usd": 0.00087652
+    },
+    "warroom_thesis": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 1865.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 902.0,
+     "reasoning_tokens": 271.0,
+     "latency_ms": 7457.0,
+     "cost_usd": 0.0006375
+    }
+   },
+   "totals": {
+    "calls": 30.0,
+    "live": 30.0,
+    "mock": 0.0,
+    "input_tokens": 74287.0,
+    "cached_input_tokens": 24919.0,
+    "output_tokens": 15267.0,
+    "reasoning_tokens": 4074.0,
+    "latency_ms": 133084.0,
+    "cost_usd": 0.012819490000000001
+   },
+   "quality": {
+    "notes_passed": 7,
+    "notes": 8,
+    "claims_kept": 20,
+    "claims_written": 27
+   },
+   "wall_seconds": 120.9,
+   "effort": "prompt"
+  },
+  "d_tuned_r2": {
+   "label": "d_tuned_r2",
+   "model": "gpt-6-luna",
+   "ledger_from_id": 663,
+   "notes": [
+    {
+     "signal_id": 37,
+     "ticker": "ELME",
+     "source": "edgar",
+     "kept": 3,
+     "dropped": 0,
+     "dropped_reasons": [],
+     "passed": true
+    },
+    {
+     "signal_id": 210,
+     "ticker": "EONR",
+     "source": "edgar",
+     "kept": 3,
+     "dropped": 0,
+     "dropped_reasons": [],
+     "passed": true
+    },
+    {
+     "signal_id": 943,
+     "ticker": "PBFS",
+     "source": "ffiec",
+     "kept": 3,
+     "dropped": 2,
+     "dropped_reasons": [
+      "deterministic",
+      "deterministic"
+     ],
+     "passed": true
+    },
+    {
+     "signal_id": 970,
+     "ticker": "PNBK",
+     "source": "ffiec",
+     "kept": 3,
+     "dropped": 0,
+     "dropped_reasons": [],
+     "passed": true
+    },
+    {
+     "signal_id": 1057,
+     "ticker": "PCYO",
+     "source": "legistar",
+     "kept": 3,
+     "dropped": 0,
+     "dropped_reasons": [],
+     "passed": true
+    },
+    {
+     "signal_id": 1065,
+     "ticker": "MLP",
+     "source": "legistar",
+     "kept": 3,
+     "dropped": 0,
+     "dropped_reasons": [],
+     "passed": true
+    },
+    {
+     "signal_id": 609,
+     "ticker": "EP",
+     "source": "og_state",
+     "kept": 1,
+     "dropped": 2,
+     "dropped_reasons": [
+      "llm",
+      "llm"
+     ],
+     "passed": false
+    },
+    {
+     "signal_id": 1058,
+     "ticker": "GYRO",
+     "source": "pdf_agenda",
+     "kept": 2,
+     "dropped": 1,
+     "dropped_reasons": [
+      "llm"
+     ],
+     "passed": true
+    }
+   ],
+   "warroom": {
+    "status": "complete",
+    "kept": 3,
+    "dropped": 5,
+    "passed": true
+   },
+   "outreach": {
+    "drafts": 5,
+    "template_fallbacks": 0
+   },
+   "by_prompt": {
+    "analyst_signal_note": {
+     "calls": 8.0,
+     "live": 8.0,
+     "mock": 0.0,
+     "input_tokens": 21212.0,
+     "cached_input_tokens": 21188.0,
+     "output_tokens": 5729.0,
+     "reasoning_tokens": 2323.0,
+     "latency_ms": 44733.0,
+     "cost_usd": 0.0030787799999999997
+    },
+    "factcheck_claims": {
+     "calls": 9.0,
+     "live": 9.0,
+     "mock": 0.0,
+     "input_tokens": 15578.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 1868.0,
+     "reasoning_tokens": 522.0,
+     "latency_ms": 20270.0,
+     "cost_usd": 0.0024918
+    },
+    "outreach_email": {
+     "calls": 5.0,
+     "live": 5.0,
+     "mock": 0.0,
+     "input_tokens": 2481.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 932.0,
+     "reasoning_tokens": 0.0,
+     "latency_ms": 10773.0,
+     "cost_usd": 0.0007141000000000001
+    },
+    "warroom_bear": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 3023.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 251.0,
+     "reasoning_tokens": 0.0,
+     "latency_ms": 2805.0,
+     "cost_usd": 0.0004278
+    },
+    "warroom_bull": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 3023.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 277.0,
+     "reasoning_tokens": 0.0,
+     "latency_ms": 3047.0,
+     "cost_usd": 0.00044080000000000004
+    },
+    "warroom_model": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 2612.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 1072.0,
+     "reasoning_tokens": 280.0,
+     "latency_ms": 7358.0,
+     "cost_usd": 0.0007972000000000001
+    },
+    "warroom_moderator": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 2075.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 962.0,
+     "reasoning_tokens": 142.0,
+     "latency_ms": 7733.0,
+     "cost_usd": 0.0006885
+    },
+    "warroom_note_writer": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 11223.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 1448.0,
+     "reasoning_tokens": 325.0,
+     "latency_ms": 9454.0,
+     "cost_usd": 0.0018463
+    },
+    "warroom_read_across": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 2028.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 362.0,
+     "reasoning_tokens": 0.0,
+     "latency_ms": 3276.0,
+     "cost_usd": 0.0003838
+    },
+    "warroom_reader": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 8625.0,
+     "cached_input_tokens": 8622.0,
+     "output_tokens": 1518.0,
+     "reasoning_tokens": 105.0,
+     "latency_ms": 8152.0,
+     "cost_usd": 0.00084552
+    },
+    "warroom_thesis": {
+     "calls": 1.0,
+     "live": 1.0,
+     "mock": 0.0,
+     "input_tokens": 1866.0,
+     "cached_input_tokens": 0.0,
+     "output_tokens": 879.0,
+     "reasoning_tokens": 244.0,
+     "latency_ms": 7043.0,
+     "cost_usd": 0.0006261
+    }
+   },
+   "totals": {
+    "calls": 30.0,
+    "live": 30.0,
+    "mock": 0.0,
+    "input_tokens": 73746.0,
+    "cached_input_tokens": 29810.0,
+    "output_tokens": 15298.0,
+    "reasoning_tokens": 3941.0,
+    "latency_ms": 124644.0,
+    "cost_usd": 0.012340700000000001
+   },
+   "quality": {
+    "notes_passed": 7,
+    "notes": 8,
+    "claims_kept": 21,
+    "claims_written": 26
+   },
+   "wall_seconds": 113.2,
+   "effort": "prompt"
+  }
+ }
+}

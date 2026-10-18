@@ -1,0 +1,30 @@
+{
+ "exported_at": "2026-10-18T15:22:01+00:00",
+ "counts": {
+  "companies": 237,
+  "documents": 2121,
+  "signals": 1070,
+  "notes": 52,
+  "company_models": 474,
+  "warroom_sessions": 4,
+  "leads": 860
+ },
+ "outputs": [
+  "backtest/results.json",
+  "backtest/summary.md",
+  "tokenomics/tokenomics.json",
+  "tokenomics/tokenomics.md",
+  "safety/demo.json",
+  "safety/demo.md",
+  "bench/summary.md",
+  "newsletter/2026-W42.html",
+  "newsletter/2026-W42.md",
+  "models/PCYO.yaml",
+  "models/TRC.yaml"
+ ],
+ "raw_documents": 16,
+ "raw_tickers": [
+  "PCYO"
+ ],
+ "llm_cache_entries": 346
+}

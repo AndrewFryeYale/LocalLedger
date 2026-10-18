@@ -10,6 +10,19 @@ Local Ledger ingests public records (SEC filings, building permits, council agen
 
 Every signal carries a citation URL and a stored source document (`./raw/`, with sha256). A note with an uncited claim fails, and a fact-check pass drops any claim not supported verbatim or numerically by its source.
 
+## Quickstart (graders: about 2 minutes, no API key needed)
+
+```bash
+git clone <repo> && cd <repo>
+make quickstart    # venv + deps, loads the bundled demo data (./demo), starts http://127.0.0.1:8000
+```
+
+Log in with passcode `ledger-pilot` (or `ledger-admin` for the admin pages). Start at **/how-it-works**, then **Backtest**, **Signals**, a company page such as `/app/company/PCYO`, and **War room**.
+
+- `./demo` is a 4 MB snapshot of a real run: 237 companies, 2,121 stored documents, 1,070 cited signals, 52 fact-checked notes, 474 company models, 4 war rooms and the 13F leads, plus the backtest, tokenomics and red-team results and 346 cached gpt-6-luna responses. `make quickstart` never overwrites an existing database (`ll demo-load --force` replaces it and keeps a `.bak` copy).
+- **With a key:** put `PORTKEY_API_KEY=...` in `.env` in this folder or in the folder above it. Then `make demo` reruns the PCYO war room live (about 45 seconds, about $0.01) and `ll signals --limit 3` writes new notes. **Without a key** the same commands run on the deterministic mock.
+- To rebuild everything from the live public sources instead, use the full setup below. The full `make ingest` is a 30+ minute run; the demo data lets you skip it.
+
 ## Setup
 
 Requires Python 3.11+ and `make`. Uses a local virtual environment in `./venv`.

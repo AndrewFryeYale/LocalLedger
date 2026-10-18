@@ -1,0 +1,133 @@
+ticker: PCYO
+basis: fiscal quarter
+units: USD thousands unless noted
+drivers:
+- name: net_income
+  unit: USD thousands
+  value: 2948
+  kpi_aliases:
+  - net income
+  history:
+  - value: 2256
+    replaced_at: '2026-10-17 15:52:58.361161+00:00'
+  - value: $2,948
+    replaced_at: '2026-10-17 15:54:08.240256+00:00'
+- name: ebitda
+  unit: USD thousands
+  value: 4685
+  kpi_aliases:
+  - ebitda
+  history:
+  - value: 3628
+    replaced_at: '2026-10-17 15:52:58.361166+00:00'
+  - value: $4,685
+    replaced_at: '2026-10-17 15:54:08.240269+00:00'
+- name: diluted_eps
+  unit: USD per share
+  value: 0.12
+  kpi_aliases:
+  - diluted
+  - earnings per share
+  history:
+  - value: 0.09
+    replaced_at: '2026-10-17 15:52:58.361168+00:00'
+  - value: $0.12
+    replaced_at: '2026-10-17 15:54:08.240274+00:00'
+- name: lot_sales_revenue
+  unit: USD thousands
+  value: null
+  kpi_aliases:
+  - lot sales
+  - land development
+- name: water_wastewater_revenue
+  unit: USD thousands
+  value: 4659
+  kpi_aliases:
+  - water and wastewater
+  - metered water
+  history:
+  - value: null
+    replaced_at: '2026-10-17 15:52:58.361169+00:00'
+  - value: $2,401
+    replaced_at: '2026-10-17 15:54:08.240277+00:00'
+- name: tap_fees
+  unit: USD thousands
+  value: 2,258
+  kpi_aliases:
+  - tap fees
+  - taps
+  history:
+  - value: null
+    replaced_at: '2026-10-17 15:52:58.361170+00:00'
+- name: single_family_rental_revenue
+  unit: USD thousands
+  value: null
+  kpi_aliases:
+  - single-family rental
+  - rental
+- name: acre_feet_delivered
+  unit: acre-feet
+  value: null
+  kpi_aliases:
+  - acre-feet
+  - water delivered
+- name: cash
+  unit: USD thousands
+  value: null
+  kpi_aliases:
+  - cash and cash equivalents
+  - cash
+local_ledger_model:
+  last_reported_quarters:
+  - quarter: Q ending Aug 2025
+    revenue: 11200000.0
+    net_income: 6108000.0
+  - quarter: Q ending Nov 2025
+    revenue: 9135000.0
+    net_income: 4565000.0
+  - quarter: Q ending Feb 2026
+    revenue: 5169000.0
+    net_income: 1105000.0
+  - quarter: Q ending May 2026
+    revenue: 8222000.0
+    net_income: 2948000.0
+  forecast:
+  - quarter: Q ending Aug 2026
+    status: unreported
+    p10: 7306346.69
+    p50: 13790316.21
+    p90: 26394310.1
+    prior_year: 11200000.0
+    p_up_yoy: 0.643
+  - quarter: Q ending Nov 2026
+    status: current
+    p10: 5851309.61
+    p50: 11846152.14
+    p90: 27353864.74
+    prior_year: 9135000.0
+    p_up_yoy: 0.67
+  - quarter: Q ending Feb 2027
+    status: next
+    p10: 3340207.13
+    p50: 7493517.79
+    p90: 15816909.78
+    prior_year: 5169000.0
+    p_up_yoy: 0.71
+  ttm:
+    revenue: 33726000.0
+    net_income: 14726000.0
+    ebitda: 15071000.0
+    growth: 0.22876817138485084
+    through: '2026-05-31'
+  valuation:
+    method: ev_ebitda
+    price: 11.019874783015739
+    per_share:
+      low: 5.31
+      base: 9.79
+      high: 17.2
+    multiples:
+      low: 6.496309441891805
+      base: 11.734004371330244
+      high: 20.408631744840523
+      peers: universe (n=54)

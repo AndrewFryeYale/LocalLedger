@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import atexit
+import json
 import logging
 import subprocess
 import sys
@@ -45,6 +46,34 @@ def _print_usage() -> None:
 
 def _csv(value: str | None) -> list[str] | None:
     return [v.strip() for v in value.split(",") if v.strip()] if value else None
+
+
+@app.command("demo-load")
+def demo_load(
+    force: Annotated[bool, typer.Option(help="Replace existing data (old DB kept as .bak)")] = False,
+) -> None:
+    """Install the bundled demo dataset (./demo): the DB, result files, PCYO documents and cached LLM responses."""
+    from localledger.demo_data import load
+
+    try:
+        r = load(force=force)
+    except (FileExistsError, FileNotFoundError) as e:
+        typer.echo(str(e))
+        raise typer.Exit(1) from None
+    m, c = r["manifest"], r["copied"]
+    counts = ", ".join(f"{v:,} {k.replace('_', ' ')}" for k, v in m.get("counts", {}).items())
+    typer.echo(f"Loaded the demo snapshot from {m.get('exported_at', '?')} into {r['database']}: {counts}.")
+    typer.echo(f"Copied {c['outputs']} result files, {c['raw']} documents, {c['llm_cache']} cached LLM responses.")
+
+
+@app.command("demo-export", hidden=True)
+def demo_export() -> None:
+    """Maintainer: snapshot the current DB and result files into ./demo for `ll demo-load`."""
+    from localledger.demo_data import demo_dir, export
+
+    m = export()
+    size = sum(p.stat().st_size for p in demo_dir().rglob("*") if p.is_file())
+    typer.echo(f"wrote {demo_dir()} ({size / 1e6:.1f} MB): {json.dumps(m['counts'])}")
 
 
 @app.command()

@@ -3,10 +3,21 @@ VENV := venv
 LL := $(VENV)/bin/ll
 WEEK ?= $(shell date +%G-W%V)
 
-.PHONY: setup seed ingest models signals newsletter demo warroom leads outreach pdfs serve test lint check stats costs citations
+.PHONY: quickstart demo-data setup seed ingest models signals newsletter demo warroom leads outreach pdfs serve test lint check stats costs citations
 
 $(VENV)/bin/python:
 	$(PY) -m venv $(VENV)
+
+quickstart: $(VENV)/bin/python ## fresh clone -> running app in ~2 min: deps + bundled demo data + server (no ingest, no key needed)
+	$(VENV)/bin/pip install -q --upgrade pip
+	$(VENV)/bin/pip install -q -e .
+	@test -f .env || cp .env.example .env
+	$(LL) demo-load
+	@echo "Open http://127.0.0.1:8000  (passcodes: ledger-pilot, ledger-admin)"
+	$(VENV)/bin/uvicorn localledger.web.app:app --port 8000
+
+demo-data: ## maintainer: refresh ./demo from the current database and results
+	$(LL) demo-export
 
 setup: $(VENV)/bin/python ## venv + deps + .env + analyst-coverage refresh (non-blocking)
 	$(VENV)/bin/pip install -q --upgrade pip
