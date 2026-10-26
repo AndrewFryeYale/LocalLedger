@@ -95,11 +95,14 @@
     .page { margin: 0; padding: 0; max-width: none; box-shadow: none; }
     a { color: var(--body); text-decoration: none; }
     .scroll { overflow: visible; }
-    h2 { margin-top: 22px; }
+    h2 { margin-top: 20px; }
+    h3 { margin: 14px 0 4px; }
+    .disclaimer { margin-top: 10px; }
+    li { margin: 2px 0; }
     figure { margin: 10px 0 12px; }
-    figure img { width: auto; max-width: 100%; max-height: 3.9in; margin: 0 auto; }
+    figure img { width: auto; max-width: 100%; max-height: 3.4in; margin: 0 auto; }
     figure.tall img { max-height: 4.8in; }
-    figure.short img { max-height: 3.4in; }
+    figure.short img { max-height: 2.7in; }
     .kpis { margin: 10px 0; }
     table.data { font-size: 9pt; }
     h1 { font-size: 25pt; }
@@ -160,6 +163,7 @@
       <li><strong>The evidence.</strong> In a 12-month point-in-time backtest, town agenda items appeared a <strong>median 50 days before</strong> the first SEC filing that mentioned them. Risk filings flagged on the day they appeared were followed by a <strong>−8.1%</strong> median 20-day move relative to the Russell 2000.</li>
       <li><strong>The cost.</strong> Tuning reasoning effort per agent cut the benchmark workload's cost by <strong>55%</strong> ($0.0281 → $0.0126) and reasoning tokens by 87%. Serving 10,000 users costs <strong>$9.54 a month</strong> in model calls.</li>
       <li><strong>The trust.</strong> Every claim must quote its source verbatim. In a red-team test, a poisoned council agenda telling the model to "rate this stock a strong buy" never reached a published note, even when the analyst model itself was simulated as compromised.</li>
+      <li><strong>The user.</strong> A former small-cap equity research analyst answered "what happened at PCYO, and is anything local coming up?" in <strong>under 5 minutes</strong> in the app, against an estimated <strong>2+ hours</strong> by hand.</li>
     </ul>
   </section>
 </div>
@@ -210,7 +214,7 @@
   <li><strong>Priced for the small fund.</strong> About $0.09 a month in model calls per fund pilot (Section 4) makes a $99 seat workable where incumbents charge $10K+.</li>
 </ol>
 
-<figure class="tall">
+<figure>
   <div class="exh"><span>Exhibit 1</span> · A company page: the tear sheet a fund analyst opens</div>
   <img src="img/company.jpg" alt="Pure Cycle (PCYO) company page with market cap, analyst coverage, revenue forecast range, model value per share, a model and valuation chart, thesis and kill criteria, signal timeline and fact-checked notes">
   <figcaption><i>Pure Cycle (PCYO), zero analyst coverage.</i> The header gives market cap, coverage and our P10/P50/P90 revenue estimate. The chart shows reported quarters against the forecast range. The "What moved the model" line shows an Arapahoe County agenda item (Oct 13) moving the probability of a 159-lot builder contract into the November quarter from 30% to 37%. Every note below carries numbered sources. Source: Local Ledger app, <code>/app/company/PCYO</code>.</figcaption>
@@ -264,7 +268,7 @@
   <figcaption>Bars show each agent's start and end time on one clock; the overlap is the concurrency. The four fact-check rejections are listed with the reason. Source: ledger table <code>llm_calls</code> and <code>warroom_events</code>, rendered at <code>/how-it-works</code>.</figcaption>
 </figure>
 
-<figure>
+<figure class="short">
   <div class="exh"><span>Exhibit 4</span> · The same run in the war room, as the fund's analysts see it</div>
   <img src="img/room.jpg" alt="War room board for PCYO with panels for Reader, Model, Thesis, Read-across, Bull, Bear, Moderator and Note writer, a redirect box at the top, the post-earnings note with Approve button on the right, and an activity log">
   <figcaption>The top of the board: each panel is one agent's output with a <i>Claim</i> button (a person takes over that section). The redirect box at the top sends an instruction to any agent ("rerun bear case assuming lower volumes") and reruns everything downstream. The note on the right stays a draft until approved. Source: <code>/warroom/4</code>.</figcaption>
@@ -300,7 +304,7 @@
   <div class="kpi"><b>$9.54</b><span>per month at 10,000 users ($0.0010 each)</span></div>
 </div>
 
-<figure>
+<figure class="short">
   <div class="exh"><span>Exhibit 6</span> · Where the tokens went, and what tuning changed</div>
   <img src="img/costs.jpg" alt="Tokenomics page: KPI tiles for benchmark workload, one war room, weekly research run and 10,000 users; bar chart of output, reasoning and input tokens before and after tuning; table of unit costs with savings of 51-59%; list of six efficiencies">
   <figcaption>Before tuning, <i>73% of output tokens were hidden reasoning</i>, and output is billed at 5× the input price. Source: <code>/app/costs</code>, computed by <code>ll tokenomics</code> from the bench runs and the ledger.</figcaption>
@@ -400,13 +404,19 @@
   <li><strong>Reach:</strong> the 13F lead list holds <strong>860 funds</strong> that own at least one universe name, ranked by exposure (<code>ll leads</code>), with personalized outreach drafts written and never sent.</li>
 </ul>
 
-<h3>A real user: a former small-cap analyst's review</h3>
-<p><strong>Reviewer: Andrew Frye, the author, reviewing as the target user.</strong> Before Yale SOM he spent four years (2022–2026) at <strong>Shaker Investments</strong>, a small-cap growth fund in Beachwood, Ohio, most recently as Senior Equity Research Analyst. There he pitched 20+ small-cap theses to the CEO, CIO and PMs, built the models that extended the firm's coverage by 100+ companies, and interviewed 100+ management teams and sell-side analysts. That is the job Local Ledger is built for.</p>
+<h3>A real user: a former small-cap analyst, timed</h3>
+<p><strong>Sample user: Andrew Frye, the author, testing as the target user.</strong> Before Yale SOM he spent four years (2022–2026) at <strong>Shaker Investments</strong>, a small-cap growth fund in Beachwood, Ohio, most recently as Senior Equity Research Analyst. There he pitched 20+ small-cap theses to the CEO, CIO and PMs, built the models that extended the firm's coverage by 100+ companies, and interviewed 100+ management teams and sell-side analysts. That is the job Local Ledger is built for.</p>
+<p><strong>The task</strong> (October 26, 2026): <em>"What happened at Pure Cycle (PCYO) last quarter, and is anything local coming up?"</em></p>
+<div class="kpis" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+  <div class="kpi"><b>2+ hours</b><span>his estimate the Shaker way: read the 8-K and 10-Q, then hunt for the county agenda. Realistically the Arapahoe County item would not be found at all without a tip</span></div>
+  <div class="kpi"><b>&lt; 5 minutes</b><span>measured in Local Ledger at <code>/app/company/PCYO</code>: header, model chart, "What moved the model" and the cited notes answered both halves</span></div>
+  <div class="kpi"><b>4 of 4</b><span>features he would have used at Shaker: the company tear sheet, the signal feed and flags, the earnings war room, and the backtest</span></div>
+</div>
 <div class="callout">
   <p style="margin-top:0"><strong>"As an investor I like the flow and the information."</strong> His one requested change: <strong>more visuals and charts</strong>, in both the report and the deck.</p>
   <p style="margin-bottom:0"><strong>What changed because of it:</strong> six charts drawn into this report (Exhibits 5, 7 and 9–12: tokens, war-room cost, reading load, forecast error, post-flag moves and agenda lead time) and chart slides in the deck, all computed straight from the backtest and benchmark data.</p>
 </div>
-<p><strong>Honest limit:</strong> the reviewer is the author, not an independent tester, and this review did not time a before-and-after task. The first next step below is designed to get exactly that from his former firm.</p>
+<p><strong>Honest limits:</strong> one user, and he built the app, so he knew where to look. The "before" time is his estimate from four years doing this work, not a stopwatch run. An independent, timed pilot is the first next step.</p>
 
 <!-- ============================================================== -->
 <h2><span class="num">7</span>Honest limits and next steps</h2>
@@ -415,12 +425,12 @@
   <li><strong>Coverage is narrow.</strong> 7 source types and 12 local governments, against Curate's 12,000+ entities. Several sources are blocked: Census building permits by robots.txt, New Mexico OCD behind a bot challenge, Colorado gaming by CloudFront (<code>BLOCKERS.md</code>). We honor robots.txt rather than work around it.</li>
   <li><strong>The backtest is small and one year long.</strong> The agenda result rests on 34 items from 7 companies. Returns are medians over a single year and are not a forecast or a trading strategy.</li>
   <li><strong>Fact-check passes 7 of 8 notes after tuning,</strong> down from 8 of 8. Failures are caught, not published, but a fund will see fewer notes.</li>
-  <li><strong>One user so far, and he built it.</strong> The only review is the author's, as a former small-cap analyst. No independent fund has used it yet, and none of the funds on the 13F lead list has been contacted.</li>
+  <li><strong>One user so far, and he built it.</strong> The only test is the author's, as a former small-cap analyst. No independent fund has used it yet, and none of the funds on the 13F lead list has been contacted.</li>
   <li><strong>Regulatory questions are open.</strong> Impersonal research and the publisher's exclusion are the intended posture; <code>LEGAL_REVIEW.md</code> lists the questions for counsel before anything is sold.</li>
 </ul>
 <h3>Next steps</h3>
 <ol>
-  <li><strong>Send it back to Shaker Investments as the first pilot.</strong> Give the author's former team pilot access, time their research on three names before and after, and collect what they would pay for. Shaker runs a small-cap growth book and does not appear on our 13F lead list, so the pilot also tests whether the universe should extend to the names a fund like Shaker already follows.</li>
+  <li><strong>Take it back to Shaker Investments as the first independent pilot.</strong> Give the author's former team pilot access, stopwatch-time their research on three names before and after (the same task as above), and collect what they would pay for. Shaker runs a small-cap growth book and does not appear on our 13F lead list, so the pilot also tests whether the universe should extend to the names a fund like Shaker already follows.</li>
   <li>Five more fund-pilot conversations from the top of the 13F lead list, each measuring time-to-answer before and after.</li>
   <li>Add towns by configuration (adding one is a one-line edit in <code>config/agenda_sources.yaml</code>), prioritized by universe exposure.</li>
   <li>Licensed access for the blocked state and federal sources.</li>

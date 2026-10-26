@@ -19,7 +19,7 @@
 ## Repo layout (package `localledger`, CLI `ll` = `venv/bin/ll`)
 ```
 pyproject.toml  Makefile  .env.example  .gitignore  Dockerfile  render.yaml
-.github/workflows/weekly.yml          # disabled (if: false)
+docs/ci/weekly.yml.example            # sample weekly CI job (not installed; copy to .github/workflows/ to use)
 PLAN.md README.md SOURCES.md BLOCKERS.md LEGAL_REVIEW.md LAUNCH_CHECKLIST.md
 data/  (xlsx, coverage_check.py, cusip_map.csv)   raw/ (gitignored)   out/ (gitignored)
 config/ geo_map.yaml  agenda_sources.yaml  legistar_clients.yaml  bank_map.yaml  holdings.yaml  watchlists/{TICKER}.yaml
