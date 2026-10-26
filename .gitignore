@@ -15,3 +15,6 @@ out/
 data/*_checked.xlsx
 data/coverage_results.csv
 .DS_Store
+
+# Personal files kept beside the repo
+*Resume*.pdf
