@@ -163,7 +163,7 @@
       <li><strong>The evidence.</strong> In a 12-month point-in-time backtest, town agenda items appeared a <strong>median 50 days before</strong> the first SEC filing that mentioned them. Risk filings flagged on the day they appeared were followed by a <strong>−8.1%</strong> median 20-day move relative to the Russell 2000.</li>
       <li><strong>The cost.</strong> Tuning reasoning effort per agent cut the benchmark workload's cost by <strong>55%</strong> ($0.0281 → $0.0126) and reasoning tokens by 87%. Serving 10,000 users costs <strong>$9.54 a month</strong> in model calls.</li>
       <li><strong>The trust.</strong> Every claim must quote its source verbatim. In a red-team test, a poisoned council agenda telling the model to "rate this stock a strong buy" never reached a published note, even when the analyst model itself was simulated as compromised.</li>
-      <li><strong>The user.</strong> A former small-cap equity research analyst answered "what happened at PCYO, and is anything local coming up?" in <strong>under 5 minutes</strong> in the app, against an estimated <strong>2+ hours</strong> by hand.</li>
+      <li><strong>The user.</strong> Built from the author's four years researching small caps at Shaker Investments. As the sample user, he answered "what happened at PCYO, and is anything local coming up?" in <strong>under 5 minutes</strong> in the app, against an estimated <strong>2+ hours</strong> by hand.</li>
     </ul>
   </section>
 </div>
@@ -179,11 +179,15 @@
 <!-- ============================================================== -->
 <h2><span class="num">1</span>Motivation</h2>
 
+<h3>Where this came from</h3>
+<p>Local Ledger started at a desk in Beachwood, Ohio. From 2022 to 2026 the author was an equity research analyst, and then senior analyst, at <strong><a href="https://www.shakerinvest.com">Shaker Investments</a></strong>, a boutique, employee-owned investment manager founded in 1991 that runs a small cap growth strategy. Its homepage states the firm's creed: <em>"There is no substitute for insightful, original research."</em> The job was exactly that. He sourced and pitched 20+ high-conviction small-cap theses to the CEO, CIO and PMs, built the financial models that extended the firm's coverage by 100+ companies, and interviewed 100+ management teams and sell-side analysts.</p>
+<p>Every name added to coverage added filings to read, and the further down the market-cap ladder, the less help there was: thinner sell-side coverage, fewer transcripts, and more of what matters decided in places no data terminal looks, such as a county planning board, a bank's call report or a state regulator's monthly file. Asked how long it would have taken at Shaker to answer "what happened at Pure Cycle last quarter, and is anything local coming up?", his answer was <strong>2+ hours</strong>, and the county agenda item probably would not have been found at all without a tip (Section 6). Local Ledger is the tool he wanted on that desk: original research from primary sources, done by agents, checked by code, and handed to the analyst with every source attached.</p>
+
 <h3>Who has the problem</h3>
-<p>The user is <strong>the analyst or portfolio manager at a small value fund that owns microcaps</strong>: a team of two to five people holding names no sell-side analyst follows. Public 13F filings show who these funds are. One example is <strong>Oppenheimer &amp; Close</strong> (New York), #2 on our 13F lead list. At June 30, 2026 they reported <strong>16 positions in our universe worth $32.4M</strong>, about 20% of their 13F portfolio, and <strong>12 of the 16 have zero analyst coverage</strong>. We have not spoken with this fund; its 13F is used only as public evidence that this kind of holder exists, and of what their workload looks like.</p>
+<p>Shaker is not unusual. The user is <strong>the analyst or portfolio manager at a small fund that owns small caps and microcaps</strong>: often a team of two to five people holding names no sell-side analyst follows. Public 13F filings show who these funds are. One example is <strong>Oppenheimer &amp; Close</strong> (New York), #2 on our 13F lead list. At June 30, 2026 they reported <strong>16 positions in our universe worth $32.4M</strong>, about 20% of their 13F portfolio, and <strong>12 of the 16 have zero analyst coverage</strong>. We have not spoken with this fund; its 13F is used only as public evidence that this kind of holder exists, and of what their workload looks like.</p>
 
 <h3>How they handle it today, and what it costs</h3>
-<p>These stocks often move on <strong>local</strong> news before it reaches an SEC filing: a planning board approving a land developer's subdivision, a community bank's quarterly call report, a state's monthly casino revenue, a royalty trust's state production report. The records are public but scattered across thousands of websites in a dozen formats, so today the analyst reads filings by hand and mostly never sees the local records at all.</p>
+<p>The local records are public but scattered across thousands of websites in a dozen formats, so today the analyst reads filings by hand and rarely sees the local records at all. The scale of that reading:</p>
 <div class="kpis">
   <div class="kpi"><b>5,165</b><span>documents touching our 237 names in the last 12 months</span></div>
   <div class="kpi"><b>~1,056 h</b><span>to read them at 5–60 min each, about half an analyst-year</span></div>
@@ -305,11 +309,6 @@
   <div class="kpi"><b>$9.54</b><span>per month at 10,000 users ($0.0010 each)</span></div>
 </div>
 
-<figure class="short">
-  <div class="exh"><span>Exhibit 6</span> · Where the tokens went, and what tuning changed</div>
-  <img src="img/costs.jpg" alt="Tokenomics page: KPI tiles for benchmark workload, one war room, weekly research run and 10,000 users; bar chart of output, reasoning and input tokens before and after tuning; table of unit costs with savings of 51-59%; list of six efficiencies">
-  <figcaption>Before tuning, <i>73% of output tokens were hidden reasoning</i>, and output is billed at 5× the input price. Source: <code>/app/costs</code>, computed by <code>ll tokenomics</code> from the bench runs and the ledger.</figcaption>
-</figure>
 
 <h3>Cost per user and at scale</h3>
 <p>Research is written once a week and read by everyone, so a free reader or a $99 analyst-tier subscriber adds <strong>no</strong> model calls. Only fund pilots, who open their own war rooms, add per-user cost. Assumptions: 90% free readers, 9% analyst tier, 1% fund pilots; 20 notes and 15 LLM model updates a week; each fund opens 8 war rooms a month with 2 redirects each.</p>
@@ -321,7 +320,7 @@
 </table>
 <p>At these prices the model is a rounding error next to hosting and data licensing. The reason to keep tuning is <strong>latency</strong> (286 s → 117 s per workload, which matters in a live war room) and headroom to move the note writer to a larger model.</p>
 <figure class="chart-fig">
-  <div class="exh"><span>Exhibit 7</span> · Where one war room's $0.0075 goes</div>
+  <div class="exh"><span>Exhibit 6</span> · Where one war room's $0.0075 goes</div>
   <!--chart:warroom_cost-->
   <figcaption>Measured per call in war room #4. The Reader and Note writer read the full filings, so input tokens dominate; Bull and Bear are cheap because they argue only from the shared board. Source: <code>llm_calls</code> ledger.</figcaption>
 </figure>
@@ -362,7 +361,7 @@
 </table>
 
 <figure>
-  <div class="exh"><span>Exhibit 8</span> · The defense working: four poisoned claims struck before publication</div>
+  <div class="exh"><span>Exhibit 7</span> · The defense working: four poisoned claims struck before publication</div>
   <img src="img/redteam.jpg" alt="Safety page red-team results for conditions A, B and C. In C, four claims are struck through: strong buy rating, $90 million guarantee, fabricated 10-Q quote, and 'readers should buy GYRO', each with the reason it was rejected">
   <figcaption>In C the analyst obeys the injection and writes all four planted claims; the deterministic gate rejects each with a reason ("quote comes from text flagged as possible prompt injection", "quote not found verbatim in cited document"), and the note is blocked. Every filtered span is also logged as a safety event. Source: <code>/app/safety</code>, <code>out/safety/demo.md</code>; tests: <code>tests/test_safety.py</code>, <code>tests/test_factcheck.py</code>.</figcaption>
 </figure>
@@ -376,7 +375,7 @@
 <h3>Time</h3>
 <p>Keeping up with one fund's 16 universe holdings for 12 months meant reading 131 8-Ks, 48 10-Qs, 16 10-Ks and 48 call reports: <strong>about 59 hours</strong>, before any town agenda. Across the whole universe the load is 5,165 documents and about 1,056 hours. Local Ledger surfaced <strong>163 events (3.2%)</strong> from them, each with a cited note that takes about two minutes to read. That is the time saving: reading 3% of the documents, with the other 97% read and dismissed by the pipeline. Minutes per document: 5 per 8-K, 10 per agenda or call report, 30 per 10-Q, 60 per 10-K (stated assumptions in <code>backtest.py</code>).</p>
 <figure class="chart-fig">
-  <div class="exh"><span>Exhibit 9</span> · The reading load, before and after</div>
+  <div class="exh"><span>Exhibit 8</span> · The reading load, before and after</div>
   <!--chart:reading_hours-->
   <figcaption>The 2 minutes per note is our assumption for reading a 3–5 claim cited note; the document times are the stated assumptions above. Source: <code>ll backtest</code>, reading-load study.</figcaption>
 </figure>
@@ -384,17 +383,17 @@
 <h3>Quality: a point-in-time backtest</h3>
 <p>Every model was rebuilt from filings public on the day of the forecast, and every event is dated the day it was filed or posted. Returns are measured against the Russell 2000 ETF (IWM) from the close before the news.</p>
 <figure class="chart-fig">
-  <div class="exh"><span>Exhibit 10</span> · Our revenue model has a lower median error than both naive forecasts</div>
+  <div class="exh"><span>Exhibit 9</span> · Our revenue model has a lower median error than both naive forecasts</div>
   <!--chart:forecast_error-->
   <figcaption>Each forecast was made on the first day of the quarter from filings public at the time. Actual revenue fell inside our P10–P90 range 85% of the time (target 80%). For banks, the call-report nowcast cut the error to 2.1% and beat the statistical model 75% of the time. Source: <code>ll backtest</code>.</figcaption>
 </figure>
 <figure class="chart-fig">
-  <div class="exh"><span>Exhibit 11</span> · What happened to the stock after each flag</div>
+  <div class="exh"><span>Exhibit 10</span> · What happened to the stock after each flag</div>
   <!--chart:event_moves-->
   <figcaption>Event types with at least 6 measured events; n counts events with 20 trading days of prices so far. Most flags precede a decline: 64% of all EDGAR risk events were down relative to IWM 20 days later. Medians over one year, not a trading strategy. Source: <code>ll backtest</code>, as of October 18, 2026.</figcaption>
 </figure>
 <figure class="chart-fig">
-  <div class="exh"><span>Exhibit 12</span> · Town halls report first: agenda items lead the company's own filing</div>
+  <div class="exh"><span>Exhibit 11</span> · Town halls report first: agenda items lead the company's own filing</div>
   <!--chart:agenda_lead-->
   <figcaption>23 of 34 agenda items were later named in an SEC filing, a median 50 days after the meeting (up to 105 days). Hover a dot for its exact lag. Source: <code>ll backtest</code>; agenda matches from Legistar and PDF agendas, backfilled 12 months.</figcaption>
 </figure>
@@ -406,7 +405,7 @@
 </ul>
 
 <h3>A real user: a former small-cap analyst, timed</h3>
-<p><strong>Sample user: Andrew Frye, the author, testing as the target user.</strong> Before Yale SOM he spent four years (2022–2026) at <strong>Shaker Investments</strong>, a small-cap growth fund in Beachwood, Ohio, most recently as Senior Equity Research Analyst. There he pitched 20+ small-cap theses to the CEO, CIO and PMs, built the models that extended the firm's coverage by 100+ companies, and interviewed 100+ management teams and sell-side analysts. That is the job Local Ledger is built for.</p>
+<p><strong>Sample user: Andrew Frye, the author, testing as the target user.</strong> Before Yale SOM he spent four years (2022–2026) at <strong>Shaker Investments</strong>, the Cleveland-area boutique small cap growth manager described in Section 1, most recently as Senior Equity Research Analyst. There he pitched 20+ small-cap theses to the CEO, CIO and PMs, built the models that extended the firm's coverage by 100+ companies, and interviewed 100+ management teams and sell-side analysts. That is the job Local Ledger is built for.</p>
 <p><strong>The task</strong> (October 26, 2026): <em>"What happened at Pure Cycle (PCYO) last quarter, and is anything local coming up?"</em></p>
 <div class="kpis" style="grid-template-columns:repeat(3,minmax(0,1fr))">
   <div class="kpi"><b>2+ hours</b><span>his estimate the Shaker way: read the 8-K and 10-Q, then hunt for the county agenda. Realistically the Arapahoe County item would not be found at all without a tip</span></div>
@@ -415,7 +414,7 @@
 </div>
 <div class="callout">
   <p style="margin-top:0"><strong>"As an investor I like the flow and the information."</strong> His one requested change: <strong>more visuals and charts</strong>, in both the report and the deck.</p>
-  <p style="margin-bottom:0"><strong>What changed because of it:</strong> six charts drawn into this report (Exhibits 5, 7 and 9–12: tokens, war-room cost, reading load, forecast error, post-flag moves and agenda lead time) and chart slides in the deck, all computed straight from the backtest and benchmark data.</p>
+  <p style="margin-bottom:0"><strong>What changed because of it:</strong> six charts drawn into this report (Exhibits 5, 6 and 8–11: tokens, war-room cost, reading load, forecast error, post-flag moves and agenda lead time) and chart slides in the deck, all computed straight from the backtest and benchmark data.</p>
 </div>
 <p><strong>Honest limits:</strong> one user, and he built the app, so he knew where to look. The "before" time is his estimate from four years doing this work, not a stopwatch run. An independent, timed pilot is the first next step.</p>
 
