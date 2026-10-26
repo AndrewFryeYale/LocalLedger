@@ -293,9 +293,12 @@
   <tr><td>c_none</td><td>none everywhere</td><td class="n">30</td><td class="n">75,612</td><td class="n">0</td><td class="n">11,135</td><td class="n">0</td><td class="n">$0.0131</td><td class="n">94 s</td><td class="n bad">6/8</td></tr>
   <tr><td><strong>d_tuned</strong></td><td><strong>per agent</strong></td><td class="n">30</td><td class="n">74,287</td><td class="n">24,919</td><td class="n">15,267</td><td class="n">4,074</td><td class="n good">$0.0128</td><td class="n">121 s</td><td class="n">7/8</td></tr>
   <tr><td><strong>d_tuned_r2</strong></td><td><strong>per agent</strong></td><td class="n">30</td><td class="n">73,746</td><td class="n">29,810</td><td class="n">15,298</td><td class="n">3,941</td><td class="n good">$0.0123</td><td class="n">113 s</td><td class="n">7/8</td></tr>
+  <tr class="total"><td>rerun 10/26: baseline</td><td>default</td><td class="n">30</td><td class="n">89,000</td><td class="n">0</td><td class="n">44,776</td><td class="n">32,698</td><td class="n">$0.0313</td><td class="n">315 s</td><td class="n">8/8</td></tr>
+  <tr><td><strong>rerun 10/26: tuned</strong></td><td><strong>per agent</strong></td><td class="n">30</td><td class="n">74,535</td><td class="n">0</td><td class="n">15,434</td><td class="n">4,312</td><td class="n good">$0.0152</td><td class="n">124 s</td><td class="n">7/8</td></tr>
 </table>
 </div>
-<p style="font-size:12px;color:var(--muted)">Source: <code>ll bench</code>, six live runs on October 17–18, 2026 (<code>out/bench/summary.md</code>). Cached input appears only on runs that repeated an earlier run's exact prompts.</p>
+<p style="font-size:12px;color:var(--muted)">Source: <code>ll bench</code>, eight live runs on October 17–26, 2026 (<code>out/bench/summary.md</code>). Cached input appears only on runs that repeated an earlier run's exact prompts.</p>
+<div class="callout"><strong>Verified against the gateway.</strong> We reran both settings live on October 26, 2026, 5:14–5:21 PM ET (last two rows). Our ledger recorded 60 calls, <strong>223,745 tokens</strong> (163,535 in, 60,210 out) and <strong>$0.0465</strong>. Portkey's own analytics for that hour show <strong>223.7K tokens</strong>, <strong>$0.05</strong> and 61 requests. The tokens match to the last digit shown. The one extra request carried essentially no tokens, so it was most likely a failed or empty call. The rerun reproduced the result: cost −51%, reasoning tokens −87%, 2.5× faster. Tuned cost $0.0152 instead of $0.0126 only because nothing was cached this time.</div>
 <figure class="chart-fig">
   <div class="exh"><span>Exhibit 5</span> · Hidden reasoning was most of the bill; tuning cut it 87%</div>
   <!--chart:tokens_by_effort-->
