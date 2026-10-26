@@ -18,6 +18,7 @@
   .reveal ul { margin:0 0 0 1em; }
   .reveal li { margin:.28em 0; }
   .reveal strong { color:var(--ink); }
+  .reveal a { color:var(--brand); text-decoration:underline; }
   .bar { position:absolute; left:0; right:0; bottom:-6px; display:flex; justify-content:space-between; font-size:.42em; color:var(--muted);
     border-top:1px solid var(--rule); padding:6px 150px 0 0; }
   .tag { font-size:.5em; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); margin-bottom:.35em; }
@@ -56,7 +57,8 @@
     <h1>Local Ledger</h1>
     <div class="rule"></div>
     <p class="dek">The town hall reads the tape first. Agents turn the local public records that move uncovered microcaps into cited, fact-checked research for small funds.</p>
-    <p class="who">Andrew Frye · Yale SOM MBA '28 · October 26, 2026 · github.com/AndrewFryeYale/LocalLedger</p>
+    <p class="who">Andrew Frye · Yale SOM MBA '28 · October 26, 2026</p>
+    <p class="who" style="margin-top:.4em;color:var(--ink)"><strong>GitHub (public):</strong> <a href="https://github.com/AndrewFryeYale/LocalLedger">https://github.com/AndrewFryeYale/LocalLedger</a><br><code>git clone https://github.com/AndrewFryeYale/LocalLedger.git</code> · <code>make quickstart</code> · passcode <code>ledger-pilot</code></p>
   </div>
 </section>
 
@@ -75,7 +77,7 @@
     <li><strong>What moves them:</strong> a planning board vote, a bank's call report, a state's casino revenue. Public records spread across thousands of sites.</li>
   </ul>
   <div class="chartbox" style="max-width:1000px"><!--chart:reading_hours--></div>
-  <div class="bar"><span>Local Ledger</span><span>Sources: Yahoo Finance coverage check; SEC 13F (6/30/2026); ll backtest</span></div>
+  <div class="bar"><span>Local Ledger · github.com/AndrewFryeYale/LocalLedger</span><span>Sources: Yahoo Finance coverage check; SEC 13F (6/30/2026); ll backtest</span></div>
 </section>
 
 <!-- 3. What is new -->
@@ -94,7 +96,7 @@
     <li><strong>Measured lead:</strong> agenda items arrive a median <strong>50 days</strong> before the company's own SEC filing mentions them.</li>
     <li><strong>Multiplayer war room:</strong> eight agents draft the post-earnings note while the fund's analysts watch and redirect.</li>
   </ul>
-  <div class="bar"><span>Local Ledger</span><span>Prices: CostBench, Sacra, Koyfin; see report §2</span></div>
+  <div class="bar"><span>Local Ledger · github.com/AndrewFryeYale/LocalLedger</span><span>Prices: CostBench, Sacra, Koyfin; see report §2</span></div>
 </section>
 
 <!-- 4. Agents -->
@@ -103,7 +105,7 @@
   <h2>Code does the counting; agents do the reading</h2>
   <img class="shot" style="max-height:440px;margin:0 auto" src="img/diagram.jpg" alt="Agent diagram: weekly pipeline and earnings war room">
   <p class="cap">13 agents, all gpt-6-luna via Portkey, with reasoning effort tuned per agent. Deterministic code handles ingestion, ticker mapping, scoring, forecasts and valuation. The war room is an asyncio DAG: agents on the same level run concurrently, the board streams over SSE, and people redirect, claim or approve.</p>
-  <div class="bar"><span>Local Ledger</span><span>Source: /how-it-works</span></div>
+  <div class="bar"><span>Local Ledger · github.com/AndrewFryeYale/LocalLedger</span><span>Source: /how-it-works</span></div>
 </section>
 
 <!-- 5. Demo -->
@@ -120,7 +122,7 @@
       <p class="cap">The company tear sheet: a P10–P90 revenue range, the model value, and a county agenda item moving a 159-lot contract's odds from 30% to 37%.</p>
     </div>
   </div>
-  <div class="bar"><span>Local Ledger</span><span>War room #4, live on gpt-6-luna, 10/18/2026</span></div>
+  <div class="bar"><span>Local Ledger · github.com/AndrewFryeYale/LocalLedger</span><span>War room #4, live on gpt-6-luna, 10/18/2026</span></div>
 </section>
 
 <!-- 6. Cost -->
@@ -135,7 +137,7 @@
   </div>
   <div class="chartbox" style="max-width:1020px"><!--chart:tokens_by_effort--></div>
   <p class="cap">Also: 99.3% of model updates handled by rules, no LLM; one note per source document; exact-match cache; a hard $10 budget cap. Research is written once and read by everyone, so readers add no model cost.</p>
-  <div class="bar"><span>Local Ledger</span><span>Source: ll bench (6 runs), ll tokenomics · $0.10 / $0.01 / $0.50 per M tokens</span></div>
+  <div class="bar"><span>Local Ledger · github.com/AndrewFryeYale/LocalLedger</span><span>Source: ll bench (6 runs), ll tokenomics · $0.10 / $0.01 / $0.50 per M tokens</span></div>
 </section>
 
 <!-- 7. Safety -->
@@ -158,7 +160,7 @@
       <p>Even with a <strong>compromised analyst model</strong>, 4 of 4 poisoned claims were rejected: <strong>0 published</strong>.</p>
     </div>
   </div>
-  <div class="bar"><span>Local Ledger</span><span>Source: ll safety-demo, /app/safety, tests/test_safety.py</span></div>
+  <div class="bar"><span>Local Ledger · github.com/AndrewFryeYale/LocalLedger</span><span>Source: ll safety-demo, /app/safety, tests/test_safety.py</span></div>
 </section>
 
 <!-- 8. Impact -->
@@ -172,7 +174,7 @@
     <div class="kpi"><b>1,056 → 5 h</b><span>a year of reading, cut to 163 cited notes</span></div>
   </div>
   <div class="chartbox" style="max-width:860px"><!--chart:event_moves--></div>
-  <div class="bar"><span>Local Ledger</span><span>Source: ll backtest as of 10/18/2026 · medians over one year, not a forecast</span></div>
+  <div class="bar"><span>Local Ledger · github.com/AndrewFryeYale/LocalLedger</span><span>Source: ll backtest as of 10/18/2026 · medians over one year, not a forecast</span></div>
 </section>
 
 <!-- 9. The edge, in charts -->
@@ -181,7 +183,7 @@
   <h2>Town halls report first, and the model is more accurate</h2>
   <div class="chartbox" style="max-width:1100px"><!--chart:agenda_lead--></div>
   <div class="chartbox" style="max-width:1100px;margin-top:.5em"><!--chart:forecast_error--></div>
-  <div class="bar"><span>Local Ledger</span><span>Source: ll backtest · point in time · 606 company-quarters, 23 agenda items with a later SEC mention</span></div>
+  <div class="bar"><span>Local Ledger · github.com/AndrewFryeYale/LocalLedger</span><span>Source: ll backtest · point in time · 606 company-quarters, 23 agenda items with a later SEC mention</span></div>
 </section>
 
 <!-- 10. User review and next steps -->
@@ -205,10 +207,10 @@
         <li>More towns by config (a one-line edit), ranked by holdings exposure</li>
         <li>Licensed access to blocked sources; a larger model only for the note writer</li>
       </ul>
-      <p style="margin-top:.6em"><strong>Try it:</strong> <code>make quickstart</code>, passcode <code>ledger-pilot</code>. No key needed.</p>
+      <p style="margin-top:.6em"><strong>Try it:</strong> <code>git clone https://github.com/AndrewFryeYale/LocalLedger.git</code>, then <code>make quickstart</code>, passcode <code>ledger-pilot</code>. Public repo, no key needed.</p>
     </div>
   </div>
-  <div class="bar"><span>Local Ledger</span><span>Impersonal research, not investment advice</span></div>
+  <div class="bar"><span>Local Ledger · github.com/AndrewFryeYale/LocalLedger</span><span>Impersonal research, not investment advice</span></div>
 </section>
 
 </div></div>

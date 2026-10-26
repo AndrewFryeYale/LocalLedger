@@ -169,8 +169,9 @@
 </div>
 
 <div class="links">
-  <div><b>Repository</b> <a href="https://github.com/AndrewFryeYale/LocalLedger">github.com/AndrewFryeYale/LocalLedger</a></div>
-  <div><b>Run it</b> <code>git clone … &amp;&amp; cd LocalLedger &amp;&amp; make quickstart</code> → <code>http://127.0.0.1:8000</code>, passcode <code>ledger-pilot</code> (README, "Quickstart")</div>
+  <div><b>GitHub repo</b> <a href="https://github.com/AndrewFryeYale/LocalLedger"><strong>https://github.com/AndrewFryeYale/LocalLedger</strong></a> (public, no access needed)</div>
+  <div><b>Clone</b> <code>git clone https://github.com/AndrewFryeYale/LocalLedger.git</code></div>
+  <div><b>Run it</b> <code>cd LocalLedger &amp;&amp; make quickstart</code> → <code>http://127.0.0.1:8000</code>, any name, passcode <code>ledger-pilot</code> (README, "Quickstart")</div>
   <div><b>Live app</b> Not hosted; it runs locally from the bundled demo data, with no API key needed.</div>
   <div><b>In one line</b> Local Ledger turns town agendas, bank call reports and state data into cited, fact-checked research on the small public companies Wall Street doesn't cover.</div>
 </div>
@@ -441,6 +442,7 @@
 <!-- ============================================================== -->
 <h2><span class="num">8</span>How to run it, and the test dataset</h2>
 <ul>
+  <li><strong>Repository (public):</strong> <a href="https://github.com/AndrewFryeYale/LocalLedger">https://github.com/AndrewFryeYale/LocalLedger</a>. Clone with <code>git clone https://github.com/AndrewFryeYale/LocalLedger.git</code>.</li>
   <li><strong>Requirements:</strong> Python 3.11+ and <code>make</code> (macOS, Linux or WSL).</li>
   <li><strong>Run:</strong> <code>make quickstart</code> creates <code>./venv</code>, installs the package, loads the bundled demo dataset and starts <code>http://127.0.0.1:8000</code>. Log in with any name and passcode <code>ledger-pilot</code> (<code>ledger-admin</code> for admin pages). Verified from a fresh clone on October 26, 2026: about 2 minutes, all pages respond, 162 tests pass.</li>
   <li><strong>Test dataset:</strong> <code>./demo</code> is a 4.8 MB snapshot of a real run: 237 companies, 2,121 documents, 1,070 signals, 52 notes, 4 war rooms and 346 cached gpt-6-luna responses. No API key is needed to explore it.</li>
